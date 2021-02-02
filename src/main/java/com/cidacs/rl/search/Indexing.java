@@ -1,11 +1,12 @@
 package com.cidacs.rl.search;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.record.ColumnRecordModel;
-import com.cidacs.rl.record.RecordModel;
-import org.apache.commons.csv.CSVRecord;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
+import org.apache.commons.csv.CSVRecord;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -15,11 +16,11 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import com.cidacs.rl.Cleaning;
+import com.cidacs.rl.config.ColumnConfigModel;
+import com.cidacs.rl.config.ConfigModel;
+import com.cidacs.rl.record.ColumnRecordModel;
+import com.cidacs.rl.record.RecordModel;
 
 public class Indexing {
     ConfigModel config;
@@ -78,10 +79,12 @@ public class Indexing {
         String tmpType;
         ArrayList<ColumnRecordModel> tmpRecordColumns;
 
-        tmpRecordColumns = new ArrayList<ColumnRecordModel>();
+        tmpRecordColumns = new ArrayList<>();
         for(ColumnConfigModel column : config.getColumns()){
-            tmpIndex = column.getIndexA();
-            tmpValue = csvRecord.get(tmpIndex).replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ");
+            tmpIndex = column.getIndexB();
+            tmpValue = csvRecord.get(tmpIndex);
+            tmpValue = Cleaning.clean(column, tmpValue);
+            tmpValue = tmpValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ");
             if(tmpValue.equals(" ")){
                 tmpValue = "";
             }

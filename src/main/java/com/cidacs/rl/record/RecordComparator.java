@@ -1,10 +1,12 @@
 package com.cidacs.rl.record;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
+import java.util.ArrayList;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.spell.JaroWinklerDistance;
 
-import java.util.ArrayList;
+import com.cidacs.rl.config.ColumnConfigModel;
+import com.cidacs.rl.config.ConfigModel;
 
 public  class RecordComparator {
     private ConfigModel config;
@@ -43,7 +45,7 @@ public  class RecordComparator {
             }
 
             // PARA NOME E NOME DA MAE
-            if (columnConfig.getType().equals("name")){
+            if (columnConfig.getType().equals("name") || columnConfig.getType().equals("string")){
                 if(columnA.getValue().isEmpty() == false && columnB.getValue().isEmpty() == false) {
                     tmp_total = tmp_total + columnConfig.getWeight();
                     scoreNomes = scoreNomes + this.getDistanceString(columnA.getValue(), columnB.getValue(), columnConfig.getWeight());
@@ -131,6 +133,15 @@ public  class RecordComparator {
         }
         return null;
 
+    }
+
+    private double getDistanceNumericalId(String id1, String id2, double w) {
+        id1 = id1.replaceAll("[^0-9]", "");
+        id2 = id2.replaceAll("[^0-9]", "");
+        int length = Math.max(id1.length(), id2.length());
+        id1 = StringUtils.leftPad(id1, length, '0');
+        id2 = StringUtils.leftPad(id2, length, '0');
+        return getDistanceString(id1,  id2,  w);
     }
 
     private double getDistanceString(String nome1, String nome2, double w) {

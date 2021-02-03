@@ -81,29 +81,21 @@ public class Main {
                 // convert row to RecordModel
                 for(ColumnConfigModel column : config.getColumns()){
                     try {
-                        String tmpValue = row.getAs(column.getIndexA());
-                        tmpValue = Cleaning.clean(column, tmpValue);
+                        String originalValue = row.getAs(column.getIndexA());
+                        String tmpValue = Cleaning.clean(column, originalValue);
                         // Remove anything that is not a uppercase letter and a digit
-                        tmpValue = tmpValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ");
-                        // if the value is equal to one space, add empty string instead
-                        if(tmpValue.equals(" ")){
-                            tmpValue = "";
-                        }
+                        tmpValue = tmpValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ").trim();
                         //
                         String tmpId = column.getId();
-                        // maybe it is not necessary to have the type of the variable replicated
-                        // FIXME: add function to config that allows for consulting the type of the variable
-                        // using the ID
                         String tmpType = column.getType();
                         // add new column
-                        tmpRecordColumns.add(new ColumnRecordModel(tmpId, tmpType, tmpValue));
+                        tmpRecordColumns.add(new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue));
                     } catch (ArrayIndexOutOfBoundsException e){
                         e.printStackTrace();
                     }
                 }
                 // set the column to record
                 tmpRecord.setColumnRecordModels(tmpRecordColumns);
-                // TODO: return the original values, not the cleaned/processed ones
                 return linkage.linkSpark(tmpRecord);
             }
             private static final long serialVersionUID = 1L;

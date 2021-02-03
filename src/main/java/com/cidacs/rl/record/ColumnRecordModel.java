@@ -4,12 +4,17 @@ public class ColumnRecordModel {
     private String id;
     private String type;
     private String value;
+    private String originalValue;
 
     public ColumnRecordModel(String id, String type, String value) {
+        this(id, type, value, value);
+    }
 
+    public ColumnRecordModel(String id, String type, String value, String originalValue) {
         this.id = id;
         this.type = type;
         this.value = value;
+        this.originalValue = originalValue;
     }
 
     public String getId() {
@@ -34,5 +39,13 @@ public class ColumnRecordModel {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getOriginalValue() {
+        return originalValue;
+    }
+
+    public void setOriginalValue(String originalValue) {
+        this.originalValue = originalValue;
     }
 }

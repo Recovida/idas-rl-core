@@ -25,6 +25,8 @@ public class ConfigReader {
             // read dba, dbb and dbIndex
             configModel.setDbA(config.getProperty("db_a"));
             configModel.setDbB(config.getProperty("db_b"));
+            configModel.setSuffixA(config.getProperty("suffix_a"));
+            configModel.setSuffixB(config.getProperty("suffix_b"));
             configModel.setDbIndex(config.getProperty("db_index"));
 
             // read all columns

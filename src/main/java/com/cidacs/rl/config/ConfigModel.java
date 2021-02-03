@@ -5,9 +5,11 @@ import java.util.ArrayList;
 public class ConfigModel {
     private String dbA;
     private String dbB;
+    private String suffixA = "_dsa";
+    private String suffixB = "_dsb";
     private String dbIndex;
 
-    private ArrayList<ColumnConfigModel> columns = new ArrayList<ColumnConfigModel>();
+    private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
 
     public ConfigModel() {
 
@@ -42,6 +44,22 @@ public class ConfigModel {
 
     public void setDbIndex(String dbIndex) {
         this.dbIndex = dbIndex;
+    }
+
+    public String getSuffixA() {
+        return suffixA;
+    }
+
+    public void setSuffixA(String suffixA) {
+        this.suffixA = suffixA;
+    }
+
+    public String getSuffixB() {
+        return suffixB;
+    }
+
+    public void setSuffixB(String suffixB) {
+        this.suffixB = suffixB;
     }
 
     public ArrayList<ColumnConfigModel> getColumns() {

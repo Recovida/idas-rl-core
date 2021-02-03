@@ -1,30 +1,30 @@
 package com.cidacs.rl.linkage;
 
+import com.cidacs.rl.config.ColumnConfigModel;
+import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordPairModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.config.ColumnConfigModel;
 
 public class LinkageUtils {
     public String fromRecordPairToCsv(RecordPairModel recordPair){
         String csvResult = "";
         for(ColumnRecordModel column: recordPair.getRecordA().getColumnRecordModels()){
-            csvResult=csvResult+column.getValue()+",";
+            csvResult=csvResult+column.getOriginalValue()+",";
         }
         for(ColumnRecordModel column: recordPair.getRecordB().getColumnRecordModels()){
-            csvResult=csvResult+column.getValue()+",";
+            csvResult=csvResult+column.getOriginalValue()+",";
         }
         csvResult = csvResult + recordPair.getScore();
         return csvResult;
     }
 
-    public String getCsvHeaderFromRecordPair(RecordPairModel recordPair){
+    public String getCsvHeaderFromRecordPair(ConfigModel config, RecordPairModel recordPair) {
         String headerResult = "";
         for(ColumnRecordModel column: recordPair.getRecordA().getColumnRecordModels()){
-            headerResult=headerResult+column.getId()+"_dsa,";
+            headerResult=headerResult+column.getId() + config.getSuffixA() + ",";
         }
         for(ColumnRecordModel column: recordPair.getRecordB().getColumnRecordModels()){
-            headerResult=headerResult+column.getId()+"_dsb,";
+            headerResult=headerResult+column.getId() + config.getSuffixB() + ",";
         }
         headerResult = headerResult + "score";
         return headerResult;

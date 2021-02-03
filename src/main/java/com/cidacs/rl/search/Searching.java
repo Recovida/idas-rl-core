@@ -1,12 +1,9 @@
 package com.cidacs.rl.search;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.record.ColumnRecordModel;
-import com.cidacs.rl.record.RecordComparator;
-import com.cidacs.rl.record.RecordModel;
-import com.cidacs.rl.record.RecordPairModel;
-import com.cidacs.rl.util.Permutation;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -19,9 +16,13 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import com.cidacs.rl.config.ColumnConfigModel;
+import com.cidacs.rl.config.ConfigModel;
+import com.cidacs.rl.record.ColumnRecordModel;
+import com.cidacs.rl.record.RecordComparator;
+import com.cidacs.rl.record.RecordModel;
+import com.cidacs.rl.record.RecordPairModel;
+import com.cidacs.rl.util.Permutation;
 
 
 public class Searching {
@@ -75,7 +76,7 @@ public class Searching {
         }
 
         // FASE 2
-        tmpCandidates = new ArrayList<RecordModel>();
+        tmpCandidates = new ArrayList<>();
         //tmpCandidates.add(candidate);
         // GENERATE POSSIBLE COMBINATIONS
         ArrayList<ArrayList<Integer>> combinacoes = this.permutation.combine(filteredColumns.size(), filteredColumns.size()-1);
@@ -115,7 +116,7 @@ public class Searching {
         ArrayList<RecordModel> recordsFound;
         ScoreDoc[] tmpScoreDocs;
 
-        recordsFound = new ArrayList<RecordModel>();
+        recordsFound = new ArrayList<>();
         RecordModel tmpRecordModel;
 
         this.searcher = new IndexSearcher(reader);
@@ -161,12 +162,13 @@ public class Searching {
         String tmpType;
         ArrayList<ColumnRecordModel> tmpRecordColumns ;
 
-        tmpRecordColumns = new ArrayList<ColumnRecordModel>();
+        tmpRecordColumns = new ArrayList<>();
         for(ColumnConfigModel column : this.config.getColumns()){
             tmpId = column.getId();
             tmpValue = document.get(tmpId);
             tmpType = column.getType();
-            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue);
+            String originalValue = document.get(tmpId + "___ORIG___");
+            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);

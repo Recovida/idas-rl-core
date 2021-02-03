@@ -10,6 +10,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -59,10 +60,11 @@ public class Indexing {
         }
     }
 
-    private void addRecordToIndex (RecordModel record){
+    private void addRecordToIndex(RecordModel record){
         Document doc = new Document();
         for(ColumnRecordModel column: record.getColumnRecordModels()){
             doc.add(new TextField(column.getId(), column.getValue(),  Field.Store.YES));
+            doc.add(new StoredField(column.getId() + "___ORIG___", column.getOriginalValue()));
         }
         try {
             this.inWriter.addDocument(doc);
@@ -82,16 +84,13 @@ public class Indexing {
         tmpRecordColumns = new ArrayList<>();
         for(ColumnConfigModel column : config.getColumns()){
             tmpIndex = column.getIndexB();
-            tmpValue = csvRecord.get(tmpIndex);
-            tmpValue = Cleaning.clean(column, tmpValue);
-            tmpValue = tmpValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ");
-            if(tmpValue.equals(" ")){
-                tmpValue = "";
-            }
+            String originalValue = csvRecord.get(tmpIndex);
+            tmpValue = Cleaning.clean(column, originalValue);
+            tmpValue = tmpValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ").trim();
             tmpId = column.getId();
             tmpType = column.getType();
 
-            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue);
+            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);

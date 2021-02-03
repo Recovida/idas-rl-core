@@ -1,13 +1,5 @@
 package com.cidacs.rl.linkage;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.record.ColumnRecordModel;
-import com.cidacs.rl.record.RecordModel;
-import com.cidacs.rl.record.RecordPairModel;
-import com.cidacs.rl.search.Searching;
-import org.apache.commons.csv.CSVRecord;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +8,15 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import org.apache.commons.csv.CSVRecord;
+
+import com.cidacs.rl.config.ColumnConfigModel;
+import com.cidacs.rl.config.ConfigModel;
+import com.cidacs.rl.record.ColumnRecordModel;
+import com.cidacs.rl.record.RecordModel;
+import com.cidacs.rl.record.RecordPairModel;
+import com.cidacs.rl.search.Searching;
 
 public class Linkage {
     private ConfigModel config;
@@ -62,7 +63,7 @@ public class Linkage {
             try {
                 if (isHeaderPrinted == false) {
                     isHeaderPrinted = true;
-                    writer.write(linkageUtils.getCsvHeaderFromRecordPair(testPair) + "\n");
+                    writer.write(linkageUtils.getCsvHeaderFromRecordPair(config, testPair) + "\n");
                 }
                 writer.write(linkageUtils.fromRecordPairToCsv(testPair) + "\n");
             } catch (IOException e) {
@@ -95,16 +96,14 @@ public class Linkage {
         String tmpType;
         ArrayList<ColumnRecordModel> tmpRecordColumns;
 
-        tmpRecordColumns = new ArrayList<ColumnRecordModel>();
+        tmpRecordColumns = new ArrayList<>();
         for(ColumnConfigModel column : config.getColumns()){
             tmpIndex = column.getIndexB();
-            tmpValue = csvRecord.get(tmpIndex).replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ");
-            if(tmpValue.equals(" ")){
-                tmpValue = "";
-            }
+            String originalValue = csvRecord.get(tmpIndex);
+            tmpValue = originalValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ").trim();
             tmpId = column.getId();
             tmpType = column.getType();
-            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue);
+            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);

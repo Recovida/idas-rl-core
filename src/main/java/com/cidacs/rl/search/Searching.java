@@ -160,7 +160,7 @@ public class Searching {
         String tmpValue;
         String tmpId;
         String tmpType;
-        ArrayList<ColumnRecordModel> tmpRecordColumns ;
+        ArrayList<ColumnRecordModel> tmpRecordColumns;
 
         tmpRecordColumns = new ArrayList<>();
         for(ColumnConfigModel column : this.config.getColumns()){
@@ -169,6 +169,7 @@ public class Searching {
             tmpType = column.getType();
             String originalValue = document.get(tmpId + "___ORIG___");
             tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
+            tmpRecordColumnRecord.setGenerated(column.isGenerated());
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);

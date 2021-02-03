@@ -9,9 +9,13 @@ public class LinkageUtils {
     public String fromRecordPairToCsv(RecordPairModel recordPair){
         String csvResult = "";
         for(ColumnRecordModel column: recordPair.getRecordA().getColumnRecordModels()){
+            if (column.isGenerated())
+                continue;
             csvResult=csvResult+column.getOriginalValue()+",";
         }
         for(ColumnRecordModel column: recordPair.getRecordB().getColumnRecordModels()){
+            if (column.isGenerated())
+                continue;
             csvResult=csvResult+column.getOriginalValue()+",";
         }
         csvResult = csvResult + recordPair.getScore();
@@ -21,9 +25,13 @@ public class LinkageUtils {
     public String getCsvHeaderFromRecordPair(ConfigModel config, RecordPairModel recordPair) {
         String headerResult = "";
         for(ColumnRecordModel column: recordPair.getRecordA().getColumnRecordModels()){
+            if (column.isGenerated())
+                continue;
             headerResult=headerResult+column.getId() + config.getSuffixA() + ",";
         }
         for(ColumnRecordModel column: recordPair.getRecordB().getColumnRecordModels()){
+            if (column.isGenerated())
+                continue;
             headerResult=headerResult+column.getId() + config.getSuffixB() + ",";
         }
         headerResult = headerResult + "score";

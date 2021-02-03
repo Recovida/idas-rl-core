@@ -30,7 +30,7 @@ public class ConfigReader {
             configModel.setDbIndex(config.getProperty("db_index"));
 
             // read all columns
-            for(int i=0; i<20; i++){
+            for(int i=0; i<=20; i++){
                 String id = config.getProperty(i+"_id");
                 String type = config.getProperty(i+"_type");
                 String indexA = config.getProperty(i+"_index_a");
@@ -44,8 +44,15 @@ public class ConfigReader {
                 }
 
                 double weight = Double.valueOf(config.getProperty(i+"_weight"));
+                double phonWeight = Double.valueOf(config.getProperty(i + "_phon_weight", "0.0"));
 
-                configModel.addColumn(new ColumnConfigModel(id, type, indexA, indexB, weight));
+                configModel.addColumn(new ColumnConfigModel(id, type, indexA, indexB, weight, phonWeight));
+
+                if (type.equals("name") && phonWeight > 0) {
+                    ColumnConfigModel c = new ColumnConfigModel(id + "__PHON__", "string", "", "", phonWeight, 0.0);
+                    c.setGenerated(true);
+                    configModel.addColumn(c);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

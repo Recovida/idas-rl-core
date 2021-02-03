@@ -18,6 +18,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import com.cidacs.rl.Cleaning;
+import com.cidacs.rl.Phonetic;
 import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.record.ColumnRecordModel;
@@ -82,7 +83,9 @@ public class Indexing {
         ArrayList<ColumnRecordModel> tmpRecordColumns;
 
         tmpRecordColumns = new ArrayList<>();
-        for(ColumnConfigModel column : config.getColumns()){
+        for(ColumnConfigModel column : config.getColumns()) {
+            if (column.isGenerated())
+                continue;
             tmpIndex = column.getIndexB();
             String originalValue = csvRecord.get(tmpIndex);
             tmpValue = Cleaning.clean(column, originalValue);
@@ -92,6 +95,13 @@ public class Indexing {
 
             tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
             tmpRecordColumns.add(tmpRecordColumnRecord);
+
+            double phonWeight = column.getPhonWeight();
+            if (tmpType.equals("name") && phonWeight > 0) {
+                ColumnRecordModel c = new ColumnRecordModel(tmpId + "__PHON__", "string", Phonetic.convert(originalValue), "");
+                c.setGenerated(true);
+                tmpRecordColumns.add(c);
+            }
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);
         return recordModel;

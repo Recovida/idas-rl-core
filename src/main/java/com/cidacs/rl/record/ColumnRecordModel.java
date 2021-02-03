@@ -5,6 +5,7 @@ public class ColumnRecordModel {
     private String type;
     private String value;
     private String originalValue;
+    private boolean generated = false;
 
     public ColumnRecordModel(String id, String type, String value) {
         this(id, type, value, value);
@@ -47,5 +48,13 @@ public class ColumnRecordModel {
 
     public void setOriginalValue(String originalValue) {
         this.originalValue = originalValue;
+    }
+
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
+    }
+
+    public boolean isGenerated() {
+        return generated;
     }
 }

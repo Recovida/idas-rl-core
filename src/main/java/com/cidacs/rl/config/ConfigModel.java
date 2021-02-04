@@ -8,6 +8,7 @@ public class ConfigModel {
     private String suffixA = "_dsa";
     private String suffixB = "_dsb";
     private String dbIndex;
+    private long maxRows;
 
     private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
 
@@ -20,6 +21,7 @@ public class ConfigModel {
         this.dbB = dbB;
         this.dbIndex = dbIndex;
         this.columns = columns;
+        this.maxRows = Long.MAX_VALUE;
     }
 
     public String getDbA() {
@@ -73,4 +75,14 @@ public class ConfigModel {
     public void setColumns(ArrayList<ColumnConfigModel> columns) {
         this.columns = columns;
     }
+
+    public long getMaxRows() {
+        return maxRows;
+    }
+
+    public void setMaxRows(long maxRows) {
+        this.maxRows = maxRows;
+    }
+
+
 }

@@ -28,6 +28,8 @@ public class ConfigReader {
             configModel.setSuffixA(config.getProperty("suffix_a"));
             configModel.setSuffixB(config.getProperty("suffix_b"));
             configModel.setDbIndex(config.getProperty("db_index"));
+            if (config.containsKey("max_rows"))
+                configModel.setMaxRows(Long.valueOf(config.getProperty("max_rows")));
 
             // read all columns
             for(int i=0; i<=20; i++){

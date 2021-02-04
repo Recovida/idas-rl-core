@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import org.apache.commons.csv.CSVRecord;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -20,17 +22,22 @@ import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.search.Indexing;
 
+import scala.Tuple2;
+
 
 
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        Logger.getRootLogger().setLevel(Level.WARN);
+
+
         ConfigReader confReader = new ConfigReader();
         ConfigModel config = confReader.readConfig();
 
-        String fileName_a = args[0];
-        String fileName_b = args[1];
+        String fileName_a = config.getDbA();
+        String fileName_b = config.getDbB();
 
         String firstLine_a = Files.lines(Path.of(fileName_a)).findFirst().get();
         String firstLine_b = Files.lines(Path.of(fileName_b)).findFirst().get();
@@ -42,10 +49,11 @@ public class Main {
         Indexing indexing = new Indexing(config);
 
         // read database B
+        System.out.println("Reading and indexing dataset B...");
         Iterable<CSVRecord> dbBCsvRecords;
         dbBCsvRecords = csvHandler.getCsvIterable(config.getDbB(), delimiter_b);
-
         indexing.index(dbBCsvRecords);
+        System.out.println("Finished indexing.");
 
 
         // Start Spark session
@@ -64,15 +72,21 @@ public class Main {
 
         String resultPath = "assets/linkage-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime());
 
-        dsa.javaRDD().map(new Function<Row, String>() {
+        System.out.println("Performing integration...");
+
+        dsa.javaRDD().zipWithIndex().map(new Function<Tuple2<Row, Long>, String>() {
+
             @Override
-            public String call(Row row){
+            public String call(Tuple2<Row, Long> r){
+                Row row = r._1;
                 // Reading config again
                 // Using the config from outer scope throws java not serializable error
                 ConfigReader confReader = new ConfigReader();
                 ConfigModel config = confReader.readConfig();
                 // same with linkage
                 Linkage linkage = new Linkage(config);
+                if (r._2 >= config.getMaxRows())
+                    return "...";
 
                 // place holder variables to instantiate an record object
                 RecordModel tmpRecord = new RecordModel();
@@ -109,6 +123,7 @@ public class Main {
         }).saveAsTextFile(resultPath);
         // Write header to file
         csvHandler.writeHeaderFromConfig(resultPath + "/header.csv", config);
+        System.out.println("Completed.");
         spark.stop();
     }
 

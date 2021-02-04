@@ -1,5 +1,8 @@
 package com.cidacs.rl.config;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -16,8 +19,12 @@ public class ConfigReader {
         Properties config = new Properties();
 
         InputStream configFileStream;
-
-        configFileStream = ConfigReader.class.getClassLoader().getResourceAsStream(propFileName);
+        try {
+            configFileStream = new FileInputStream(new File(propFileName));
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+            return configModel;
+        }
 
         try {
             config.load(configFileStream);
@@ -55,6 +62,7 @@ public class ConfigReader {
                     c.setGenerated(true);
                     configModel.addColumn(c);
                 }
+                configFileStream.close();
             }
         } catch (IOException e) {
             e.printStackTrace();

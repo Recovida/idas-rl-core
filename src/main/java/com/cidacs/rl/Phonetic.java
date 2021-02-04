@@ -6,30 +6,39 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.sun.tools.javac.util.Pair;
-
 public class Phonetic {
 
     public static class Substitution {
 
-        private List<Pair<Pattern, String>> items = new LinkedList<>();
+        public Pattern pattern;
+        public String replacement;
 
-        public Substitution add(String regex, String replacement) {
-            items.add(new Pair<>(Pattern.compile(regex), replacement));
+        public Substitution(Pattern pattern, String replacement) {
+            this.pattern = pattern;
+            this.replacement = replacement;
+        }
+    }
+
+    public static class MultipleSubstitution {
+
+        private List<Substitution> items = new LinkedList<>();
+
+        public MultipleSubstitution add(String regex, String replacement) {
+            items.add(new Substitution(Pattern.compile(regex), replacement));
             return this;
         }
 
         public String apply(String s) {
-            for (Pair<Pattern, String> p : items)
-                s = p.fst.matcher(s).replaceAll(p.snd);
+            for (Substitution p : items)
+                s = p.pattern.matcher(s).replaceAll(p.replacement);
             return s;
         }
 
     }
 
-    final static Substitution globalSubstitutions = new Substitution()
+    final static MultipleSubstitution globalSubstitutions = new MultipleSubstitution()
             .add(" (D?[AEO]|D[AO]S|EM|N[OA]S?) ", " ").add("(.)(\\1)+", "$1");
-    final static Substitution perNameSubstitutions = new Substitution()
+    final static MultipleSubstitution perNameSubstitutions = new MultipleSubstitution()
             .add("Y", "I").add("PH", "F").add("CHR", "CR").add("CHIO", "QUIO")
             .add("CÇ", "S").add("C([TS])", "$1").add("[MN]Ç", "S")
             .add("[MN]([BCDFGJKLPQRSTVWXZ])", "$1").add("SÇ", "C")

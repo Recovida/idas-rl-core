@@ -32,18 +32,20 @@ public class Indexing {
         this.config = config;
     }
 
-    public void index(Iterable<CSVRecord> csvRecords){
+    public long index(Iterable<CSVRecord> csvRecords){
         RecordModel tmpRecordModel;
 
         Path dbIndexPath = Paths.get(this.config.getDbIndex());
 
         if (Files.exists(dbIndexPath)){
-            System.out.println("There is a database already indexed with the name provided.");
+            System.out.println("There is a database already indexed with the name provided. No indexing is necessary.");
+            return 0;
         } else {
             StandardAnalyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
             Directory index = null;
+            long n = 0;
             try {
                 index = FSDirectory.open(dbIndexPath);
                 this.inWriter = new IndexWriter(index, config);
@@ -51,13 +53,15 @@ public class Indexing {
                 for (CSVRecord csvRecord : csvRecords) {
                     tmpRecordModel = this.fromCSVRecordToRecord(csvRecord);
                     this.addRecordToIndex(tmpRecordModel);
+                    n++;
                 }
 
                 this.inWriter.close();
-
+                return n;
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return -1;
         }
     }
 

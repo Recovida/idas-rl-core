@@ -2,6 +2,7 @@ package com.cidacs.rl.linkage;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +19,8 @@ import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.record.RecordPairModel;
 import com.cidacs.rl.search.Searching;
 
-public class Linkage {
+public class Linkage implements Serializable {
+    private static final long serialVersionUID = 1L;
     private ConfigModel config;
 
     public Linkage(ConfigModel config) {

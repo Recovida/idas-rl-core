@@ -25,7 +25,8 @@ hs_err_pid*
 *.csv
 
 # assets folder
-assets/
+assets/*
+!assets/config.properties
 
 # target folder
 target/

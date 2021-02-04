@@ -1,8 +1,10 @@
 package com.cidacs.rl.config;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ConfigModel {
+public class ConfigModel implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String dbA;
     private String dbB;
     private String suffixA = "_dsa";

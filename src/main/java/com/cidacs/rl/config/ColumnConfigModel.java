@@ -1,6 +1,9 @@
 package com.cidacs.rl.config;
 
-public class ColumnConfigModel {
+import java.io.Serializable;
+
+public class ColumnConfigModel implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String type;
     private String indexA;

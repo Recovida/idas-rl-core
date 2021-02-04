@@ -1,13 +1,12 @@
 package com.cidacs.rl;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
 import org.apache.commons.csv.CSVRecord;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -23,6 +22,7 @@ import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.search.Indexing;
 
 import scala.Tuple2;
+import sun.misc.Unsafe;
 
 
 
@@ -30,11 +30,13 @@ import scala.Tuple2;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Logger.getRootLogger().setLevel(Level.WARN);
-
 
         ConfigReader confReader = new ConfigReader();
-        ConfigModel config = confReader.readConfig();
+        if (args.length != 1) {
+            System.err.println("Please provide the configuration file name as the first argument.");
+            System.exit(1);
+        }
+        ConfigModel config = confReader.readConfig(args[0]);
 
         String fileName_a = config.getDbA();
         String fileName_b = config.getDbB();
@@ -52,9 +54,11 @@ public class Main {
         System.out.println("Reading and indexing dataset B...");
         Iterable<CSVRecord> dbBCsvRecords;
         dbBCsvRecords = csvHandler.getCsvIterable(config.getDbB(), delimiter_b);
-        indexing.index(dbBCsvRecords);
-        System.out.println("Finished indexing.");
+        long count_b = indexing.index(dbBCsvRecords);
+        if (count_b > 0)
+            System.out.println("Finished reading and indexing dataset B (entries: " + count_b + ").");
 
+        disableIllegalAccessWarnings();
 
         // Start Spark session
         SparkSession spark = SparkSession
@@ -64,27 +68,25 @@ public class Main {
                 .getOrCreate();
 
         // read dataset A
+        System.out.println("Reading dataset A...");
         Dataset<Row> dsa = spark.read().format("csv")
                 .option("sep", "" + delimiter_a)
                 .option("inferSchema", "false")
                 .option("header", "true")
                 .load(config.getDbA());
+        System.out.println("Finished reading dataset A (entries: " + dsa.count() + ").");
 
         String resultPath = "assets/linkage-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime());
 
-        System.out.println("Performing integration...");
+        System.out.println("Performing linkage...");
+
+        Linkage linkage = new Linkage(config);
 
         dsa.javaRDD().zipWithIndex().map(new Function<Tuple2<Row, Long>, String>() {
 
             @Override
             public String call(Tuple2<Row, Long> r){
                 Row row = r._1;
-                // Reading config again
-                // Using the config from outer scope throws java not serializable error
-                ConfigReader confReader = new ConfigReader();
-                ConfigModel config = confReader.readConfig();
-                // same with linkage
-                Linkage linkage = new Linkage(config);
                 if (r._2 >= config.getMaxRows())
                     return "...";
 
@@ -139,6 +141,17 @@ public class Main {
             }
         }
         return delimiter;
+    }
+
+    private static void disableIllegalAccessWarnings() {
+        try {
+            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            Unsafe unsafe = (Unsafe) unsafeField.get(null);
+            Class<?> c = Class.forName("jdk.internal.module.IllegalAccessLogger");
+            unsafe.putObjectVolatile(c, unsafe.staticFieldOffset(c.getDeclaredField("logger")), null);
+        } catch (Exception e) {
+        }
     }
 
 }

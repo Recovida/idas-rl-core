@@ -2,11 +2,14 @@ package com.cidacs.rl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Dataset;
@@ -53,6 +56,8 @@ public class Main {
         char delimiter_a = guessCsvDelimiter(firstLine_a);
         char delimiter_b = guessCsvDelimiter(firstLine_b);
 
+        // prepare indexing
+        config.setDbIndex(config.getDbIndex() + File.separator + getHash(fileName_b));
         CsvHandler csvHandler = new CsvHandler();
         Indexing indexing = new Indexing(config);
 
@@ -181,6 +186,15 @@ public class Main {
             unsafe.putObjectVolatile(c, unsafe.staticFieldOffset(c.getDeclaredField("logger")), null);
         } catch (Exception e) {
         }
+    }
+
+    private static String getHash(String fileName) {
+        try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
+            return DigestUtils.md5Hex(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

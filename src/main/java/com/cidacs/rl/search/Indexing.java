@@ -35,7 +35,7 @@ public class Indexing {
     public long index(Iterable<CSVRecord> csvRecords){
         RecordModel tmpRecordModel;
 
-        Path dbIndexPath = Paths.get(this.config.getDbIndex());
+        Path dbIndexPath = Paths.get(config.getDbIndex());
 
         if (Files.exists(dbIndexPath)){
             System.out.println("There is a database already indexed with the name provided. No indexing is necessary.");

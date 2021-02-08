@@ -26,7 +26,7 @@ public class DBFConverter {
             e1.printStackTrace();
             return null;
         }
-        //        tempFile.deleteOnExit();
+        tempFile.deleteOnExit();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
             dbf = new DBFReader(new FileInputStream(dbfFileName));
             int n = dbf.getFieldCount();

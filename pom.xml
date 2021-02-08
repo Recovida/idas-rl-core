@@ -110,5 +110,11 @@
             <artifactId>spark-sql_2.12</artifactId>
             <version>3.1.0</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.github.albfernandez</groupId>
+            <artifactId>javadbf</artifactId>
+            <version>1.11.2</version>
+        </dependency>
     </dependencies>
 </project>

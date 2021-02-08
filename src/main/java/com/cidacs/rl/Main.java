@@ -1,5 +1,6 @@
 package com.cidacs.rl;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -16,6 +17,7 @@ import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.config.ConfigReader;
 import com.cidacs.rl.io.CsvHandler;
+import com.cidacs.rl.io.DBFConverter;
 import com.cidacs.rl.linkage.Linkage;
 import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordModel;
@@ -25,12 +27,11 @@ import scala.Tuple2;
 import sun.misc.Unsafe;
 
 
-
-
 public class Main {
 
     public static void main(String[] args) throws IOException {
 
+        // read configuration file
         ConfigReader confReader = new ConfigReader();
         if (args.length != 1) {
             System.err.println("Please provide the configuration file name as the first argument.");
@@ -38,12 +39,17 @@ public class Main {
         }
         ConfigModel config = confReader.readConfig(args[0]);
 
+        // convert file if not CSV
         String fileName_a = config.getDbA();
         String fileName_b = config.getDbB();
+        fileName_a = convertFileIfNeeded(fileName_a);
+        fileName_b = convertFileIfNeeded(fileName_b);
+        config.setDbA(fileName_a);
+        config.setDbB(fileName_b);
 
+        // read first line and guess delimiter
         String firstLine_a = Files.lines(Path.of(fileName_a)).findFirst().get();
         String firstLine_b = Files.lines(Path.of(fileName_b)).findFirst().get();
-
         char delimiter_a = guessCsvDelimiter(firstLine_a);
         char delimiter_b = guessCsvDelimiter(firstLine_b);
 
@@ -95,7 +101,7 @@ public class Main {
                 ArrayList<ColumnRecordModel> tmpRecordColumns = new ArrayList<>();
 
                 // convert row to RecordModel
-                for(ColumnConfigModel column : config.getColumns()){
+                for (ColumnConfigModel column : config.getColumns()){
                     if (column.isGenerated())
                         continue;
                     try {
@@ -127,6 +133,29 @@ public class Main {
         csvHandler.writeHeaderFromConfig(resultPath + "/header.csv", config);
         System.out.println("Completed.");
         spark.stop();
+    }
+
+
+    private static String convertFileIfNeeded(String fileName) {
+        if (! new File(fileName).isFile()) {
+            System.err.format("Could not find file: %s\n", fileName);
+            System.exit(1);
+        }
+        if (fileName.toLowerCase().endsWith(".csv")) {
+            // do nothing
+        } else if (fileName.toLowerCase().endsWith(".dbf")) {
+            System.out.format("Converting file %s to CSV...\n", fileName);
+            String newFileName = DBFConverter.toCSV(fileName);
+            if (newFileName == null) {
+                System.err.format("Could not read file: %s\n", fileName);
+                System.exit(1);
+            }
+            return newFileName;
+        } else {
+            System.err.format("Unsupported format: %s\n", fileName);
+            System.exit(1);
+        }
+        return fileName;
     }
 
     private static char guessCsvDelimiter(String firstLine) throws IOException {

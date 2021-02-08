@@ -18,7 +18,7 @@ public class LinkageUtils {
                 continue;
             csvResult=csvResult+column.getOriginalValue()+",";
         }
-        csvResult = csvResult + recordPair.getScore();
+        csvResult = csvResult + String.format("%7.10f", recordPair.getScore());
         return csvResult;
     }
 

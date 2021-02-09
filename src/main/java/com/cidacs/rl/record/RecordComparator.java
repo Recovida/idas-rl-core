@@ -23,7 +23,7 @@ public  class RecordComparator {
         ColumnRecordModel columnA=null;
         ColumnRecordModel columnB=null;
 
-        double scoreNomes=0.0, scoreDates=0.0,  scoreIbge=0.0, scoreCategorical=0.0, scoreGender=0.0;
+        double scoreNomes=0.0, scoreDates=0.0,  scoreIbge=0.0, scoreCategorical=0.0, scoreGender=0.0, scoreNumericalId=0.0;
 
         for(ColumnConfigModel columnConfig : this.config.getColumns()){
             // nao avaliar colunas sem peso
@@ -46,7 +46,7 @@ public  class RecordComparator {
             }
 
             // PARA NOME E NOME DA MAE
-            if (columnConfig.getType().equals("name") || columnConfig.getType().equals("string")){
+            if (columnConfig.getType().equals("name") || columnConfig.getType().equals("string")) {
                 if(columnA.getValue().isEmpty() == false && columnB.getValue().isEmpty() == false) {
                     tmp_total = tmp_total + columnConfig.getWeight();
                     scoreNomes = scoreNomes + this.getDistanceString(columnA.getValue(), columnB.getValue(), columnConfig.getWeight());
@@ -55,7 +55,7 @@ public  class RecordComparator {
                 }
             }
             // PARA DATA DE NASCIMENTO
-            if (columnConfig.getType().equals("date")){
+            else if (columnConfig.getType().equals("date")) {
                 try {
                     if (columnA.getValue().isEmpty() == false && columnB.getValue().isEmpty() == false) {
                         tmp_total = tmp_total + columnConfig.getWeight();
@@ -68,7 +68,7 @@ public  class RecordComparator {
                 }
             }
             // PARA CODIGO DO MUNIC
-            if (columnConfig.getType().equals("ibge")){
+            else if (columnConfig.getType().equals("ibge")) {
                 try {
                     if ("".equals(columnA.getValue()) == false && "".equals(columnB.getValue()) == false) {
                         if (columnA.getValue().length()==6 && columnB.getValue().length()==6) {
@@ -81,7 +81,7 @@ public  class RecordComparator {
                 }
             }
             // PARA SEXO
-            if (columnConfig.getType().equals("gender")){
+            else if (columnConfig.getType().equals("gender")) {
                 try {
                     if (columnA.getValue().isEmpty() == false && columnB.getValue().isEmpty() == false) {
                         tmp_total = tmp_total + columnConfig.getWeight();
@@ -97,7 +97,7 @@ public  class RecordComparator {
             }
 
             // PARA CATEGORICAS
-            if (columnConfig.getType().equals("categorical")){
+            else if (columnConfig.getType().equals("categorical")) {
                 try {
                     if (columnA.getValue().isEmpty() == false && columnB.getValue().isEmpty() == false) {
                         tmp_total = tmp_total + columnConfig.getWeight();
@@ -107,12 +107,23 @@ public  class RecordComparator {
                     Logger.getLogger(getClass()).warn("Invalid category: " + columnA.getValue());
                 }
             }
+
+            else if (columnConfig.getType().equals("numerical_id")) {
+                try {
+                    if (columnA.getValue().isEmpty() == false && columnB.getValue().isEmpty() == false) {
+                        tmp_total = tmp_total + columnConfig.getWeight();
+                        scoreNumericalId = scoreNumericalId + this.getDistanceNumericalId(columnA.getValue(), columnB.getValue(), columnConfig.getWeight());
+                    }
+                } catch (StringIndexOutOfBoundsException e) {
+                    Logger.getLogger(getClass()).warn("Invalid numerical id: " + columnA.getValue());
+                }
+            }
         }
         if(penalty >= 0.03){
             penalty = penalty * 2;
         }
 
-        score = scoreCategorical+scoreDates+scoreIbge+scoreNomes+scoreGender;
+        score = scoreCategorical+scoreDates+scoreIbge+scoreNomes+scoreGender+scoreNumericalId;
         return (score / tmp_total)-penalty;
     }
 

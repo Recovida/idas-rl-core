@@ -10,6 +10,7 @@ public class ConfigModel implements Serializable {
     private String suffixA = "_dsa";
     private String suffixB = "_dsb";
     private String dbIndex;
+    private String linkageDir = ".";
     private long maxRows;
 
     private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
@@ -84,6 +85,14 @@ public class ConfigModel implements Serializable {
 
     public void setMaxRows(long maxRows) {
         this.maxRows = maxRows;
+    }
+
+    public String getLinkageDir() {
+        return linkageDir;
+    }
+
+    public void setLinkageDir(String linkageDir) {
+        this.linkageDir = linkageDir;
     }
 
 

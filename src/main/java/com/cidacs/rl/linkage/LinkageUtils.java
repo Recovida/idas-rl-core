@@ -38,15 +38,19 @@ public class LinkageUtils {
         return headerResult;
     }
 
-    public String getCsvHeaderFromConfig(ConfigModel config){
+    public static String getCsvHeaderFromConfig(ConfigModel config){
         String headerResult = "";
         // for each column a add to result
         for (ColumnConfigModel col: config.getColumns()){
-            headerResult = headerResult + col.getIndexA()+"_dsa,";
+            if (col.isGenerated())
+                continue;
+            headerResult = headerResult + col.getIndexA() + "_" + config.getSuffixA() + ",";
         }
         // for each column b add to result
         for (ColumnConfigModel col: config.getColumns()){
-            headerResult = headerResult + col.getIndexB()+"_dsb,";
+            if (col.isGenerated())
+                continue;
+            headerResult = headerResult + col.getIndexB() + "_" + config.getSuffixB() + ",";
         }
         headerResult = headerResult + "score";
         return headerResult;

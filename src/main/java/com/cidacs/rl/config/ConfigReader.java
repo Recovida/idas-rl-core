@@ -38,6 +38,7 @@ public class ConfigReader {
             configModel.setSuffixA(config.getProperty("suffix_a"));
             configModel.setSuffixB(config.getProperty("suffix_b"));
             configModel.setDbIndex(config.getProperty("db_index"));
+            configModel.setLinkageDir(config.getProperty("linkage_folder"));
             if (config.containsKey("max_rows"))
                 configModel.setMaxRows(Long.valueOf(config.getProperty("max_rows")));
 

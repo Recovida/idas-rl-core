@@ -1,6 +1,7 @@
 package com.cidacs.rl;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -8,13 +9,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.iterators.IteratorChain;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -25,6 +30,7 @@ import com.cidacs.rl.config.ConfigReader;
 import com.cidacs.rl.io.CsvHandler;
 import com.cidacs.rl.io.DBFConverter;
 import com.cidacs.rl.linkage.Linkage;
+import com.cidacs.rl.linkage.LinkageUtils;
 import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.search.Indexing;
@@ -97,7 +103,7 @@ public class Main {
                 .load(config.getDbA());
         logger.info("Finished reading dataset A (entries: " + dsa.count() + ").");
 
-        String resultPath = "assets/linkage-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime());
+        String resultPath = config.getLinkageDir() + File.separator + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime());
 
         if (config.getMaxRows() < Long.MAX_VALUE)
             logger.info(String.format("Linking at most %d item(s).", config.getMaxRows()));
@@ -105,6 +111,8 @@ public class Main {
         logger.info("Performing linkage...");
 
         Linkage linkage = new Linkage(config);
+
+        String header = LinkageUtils.getCsvHeaderFromConfig(config);
 
         dsa.javaRDD().zipWithIndex().map(new Function<Tuple2<Row, Long>, String>() {
 
@@ -146,31 +154,40 @@ public class Main {
                 return linkage.linkSpark(tmpRecord);
             }
             private static final long serialVersionUID = 1L;
-        }).saveAsTextFile(resultPath);
-        // Write header to file
-        csvHandler.writeHeaderFromConfig(resultPath + "/header.csv", config);
-        logger.info("Completed.");
+        }).repartition(1).mapPartitionsWithIndex(new Function2<Integer, Iterator<String>, Iterator<String>>() {
+            private static final long serialVersionUID = 1L;
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public Iterator<String> call(Integer index, Iterator<String> iterator)
+                    throws Exception {
+                // Includes header
+                return new IteratorChain(Arrays.asList(header).iterator(), iterator);
+            }
+        }, false).saveAsTextFile(resultPath);
+        finalize(resultPath, "result.csv");
+        logger.info(String.format("Completed. The result was saved in “%s”.", resultPath));
         spark.stop();
     }
 
 
     private static String convertFileIfNeeded(String fileName) {
         if (!new File(fileName).isFile()) {
-            logger.error(String.format("Could not find file: %s\n", fileName));
+            logger.error(String.format("Could not find file: “%s”\n", fileName));
             System.exit(1);
         }
         if (fileName.toLowerCase().endsWith(".csv")) {
             // do nothing
         } else if (fileName.toLowerCase().endsWith(".dbf")) {
-            Logger.getLogger(Main.class).info(String.format("Converting file %s to CSV...", fileName));
+            Logger.getLogger(Main.class).info(String.format("Converting file “%s” to CSV...", fileName));
             String newFileName = DBFConverter.toCSV(fileName);
             if (newFileName == null) {
-                logger.error(String.format("Could not read file: %s", fileName));
+                logger.error(String.format("Could not read file: “%s”", fileName));
                 System.exit(1);
             }
             return newFileName;
         } else {
-            logger.error(String.format("Unsupported format: %s", fileName));
+            logger.error(String.format("Unsupported format: “%s”", fileName));
             System.exit(1);
         }
         return fileName;
@@ -188,6 +205,21 @@ public class Main {
             }
         }
         return delimiter;
+    }
+
+    private static void finalize(String directory, String resultFileName) {
+        String[] crc = new File(directory).list(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".crc");
+            }
+        });
+        for (String f : crc)
+            new File(directory + File.separator + f).deleteOnExit();
+        File resultFile = new File(directory + File.separator + "part-00000");
+        if (resultFile.isFile())
+            resultFile.renameTo(new File(directory + File.separator + resultFileName));
     }
 
     private static void disableIllegalAccessWarnings() {

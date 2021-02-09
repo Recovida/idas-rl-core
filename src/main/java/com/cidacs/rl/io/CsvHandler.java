@@ -35,8 +35,7 @@ public class CsvHandler {
 
     public void writeHeaderFromConfig(String pathToHeader, ConfigModel config)  {
         // get string from config
-        LinkageUtils lu = new LinkageUtils();
-        String header = lu.getCsvHeaderFromConfig(config);
+        String header = LinkageUtils.getCsvHeaderFromConfig(config);
 
         // open file
         Path path = Paths.get(pathToHeader);

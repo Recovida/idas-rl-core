@@ -24,15 +24,15 @@ public class LinkageUtils {
 
     public String getCsvHeaderFromRecordPair(ConfigModel config, RecordPairModel recordPair) {
         String headerResult = "";
-        for(ColumnRecordModel column: recordPair.getRecordA().getColumnRecordModels()){
+        for (ColumnRecordModel column: recordPair.getRecordA().getColumnRecordModels()){
             if (column.isGenerated())
                 continue;
-            headerResult=headerResult+column.getId() + config.getSuffixA() + ",";
+            headerResult = headerResult + quote(column.getId() + "_" + config.getSuffixA()) + ",";
         }
-        for(ColumnRecordModel column: recordPair.getRecordB().getColumnRecordModels()){
+        for (ColumnRecordModel column: recordPair.getRecordB().getColumnRecordModels()){
             if (column.isGenerated())
                 continue;
-            headerResult=headerResult+column.getId() + config.getSuffixB() + ",";
+            headerResult = headerResult + quote(column.getId() + "_" + config.getSuffixB()) + ",";
         }
         headerResult = headerResult + "score";
         return headerResult;
@@ -44,15 +44,19 @@ public class LinkageUtils {
         for (ColumnConfigModel col: config.getColumns()){
             if (col.isGenerated())
                 continue;
-            headerResult = headerResult + col.getIndexA() + "_" + config.getSuffixA() + ",";
+            headerResult = headerResult + quote(col.getIndexA() + "_" + config.getSuffixA()) + ",";
         }
         // for each column b add to result
         for (ColumnConfigModel col: config.getColumns()){
             if (col.isGenerated())
                 continue;
-            headerResult = headerResult + col.getIndexB() + "_" + config.getSuffixB() + ",";
+            headerResult = headerResult + quote(col.getIndexB() + "_" + config.getSuffixB()) + ",";
         }
         headerResult = headerResult + "score";
         return headerResult;
+    }
+
+    protected static String quote(String s) {
+        return '"' + s.replaceAll("\"", "\"\"") + '"';
     }
 }

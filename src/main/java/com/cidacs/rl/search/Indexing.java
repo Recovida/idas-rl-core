@@ -1,5 +1,6 @@
 package com.cidacs.rl.search;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -37,33 +39,47 @@ public class Indexing {
         RecordModel tmpRecordModel;
 
         Path dbIndexPath = Paths.get(config.getDbIndex());
+        Path successPath = Paths.get(dbIndexPath + File.separator + "_COMPLETE");
 
-        if (Files.exists(dbIndexPath)){
-            Logger.getLogger(getClass()).info("There is a database already indexed with the name provided. No indexing is necessary.");
-            return 0;
-        } else {
-            StandardAnalyzer analyzer = new StandardAnalyzer();
-            IndexWriterConfig config = new IndexWriterConfig(analyzer);
-
-            Directory index = null;
-            long n = 0;
-            try {
-                index = FSDirectory.open(dbIndexPath);
-                this.inWriter = new IndexWriter(index, config);
-
-                for (CSVRecord csvRecord : csvRecords) {
-                    tmpRecordModel = this.fromCSVRecordToRecord(csvRecord);
-                    this.addRecordToIndex(tmpRecordModel);
-                    n++;
+        if (Files.exists(dbIndexPath)) {
+            if (Files.exists(successPath)) {
+                Logger.getLogger(getClass()).info("Database B has already been indexing. Reusing index.");
+                return 0;
+            } else {
+                Logger.getLogger(getClass()).info("Indexing of database B has probably been interrupted in a previous execution. Indexing it again.");
+                try {
+                    FileUtils.deleteDirectory(dbIndexPath.toFile());
+                } catch (IOException e) {
+                    Logger.getLogger(getClass()).error(
+                            String.format("Could not delete old index. Please delete the directory “%s” and try again.", dbIndexPath.toString()));
+                    e.printStackTrace();
+                    System.exit(1);
                 }
-
-                this.inWriter.close();
-                return n;
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-            return -1;
         }
+        StandardAnalyzer analyzer = new StandardAnalyzer();
+        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+
+        Directory index = null;
+        long n = 0;
+        try {
+            index = FSDirectory.open(dbIndexPath);
+            this.inWriter = new IndexWriter(index, config);
+
+            for (CSVRecord csvRecord : csvRecords) {
+                tmpRecordModel = this.fromCSVRecordToRecord(csvRecord);
+                this.addRecordToIndex(tmpRecordModel);
+                n++;
+            }
+
+            this.inWriter.close();
+
+            successPath.toFile().createNewFile();
+            return n;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     private void addRecordToIndex(RecordModel record){

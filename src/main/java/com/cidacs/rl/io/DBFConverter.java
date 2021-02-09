@@ -12,7 +12,7 @@ import com.linuxense.javadbf.DBFUtils;
 
 public class DBFConverter {
 
-    protected static String enquote(String s) {
+    protected static String quote(String s) {
         return '"' + s.replaceAll("\"", "\"\"") + '"';
     }
 
@@ -32,13 +32,13 @@ public class DBFConverter {
             int n = dbf.getFieldCount();
             StringBuilder row = new StringBuilder();
             for (int i = 0; i < n; i++)
-                row.append(i > 0 ? "," : "").append(enquote(dbf.getField(i).getName()));
+                row.append(i > 0 ? "," : "").append(quote(dbf.getField(i).getName()));
             bw.write(row.append('\n').toString());
             Object[] rowObjects;
             while ((rowObjects = dbf.nextRecord()) != null) {
                 row = new StringBuilder();
                 for (int i = 0; i < rowObjects.length; i++)
-                    row.append(i > 0 ? "," : "").append(enquote(rowObjects[i] != null ? rowObjects[i].toString() : ""));
+                    row.append(i > 0 ? "," : "").append(quote(rowObjects[i] != null ? rowObjects[i].toString() : ""));
                 bw.write(row.append('\n').toString());
             }
         } catch (DBFException e) {

@@ -29,7 +29,7 @@ public class Cleaning {
         case "numerical_id":
             return data.replaceAll("[^0-9]", "");
         case "name": // TODO: process names
-            return nameCleaningPattern.matcher(data.toUpperCase()).replaceAll("");
+            return nameCleaningPattern.matcher(StringUtils.stripAccents(data.toUpperCase())).replaceAll("");
         case "date": // convert ddmmyyyy and dd/mm/yyyy to yyyy-mm-dd
             for (Pattern p : datePatterns) {
                 Matcher m = p.matcher(data);

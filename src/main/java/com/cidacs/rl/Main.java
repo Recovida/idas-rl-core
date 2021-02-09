@@ -51,11 +51,13 @@ public class Main {
 
         // read configuration file
         ConfigReader confReader = new ConfigReader();
-        if (args.length != 1) {
-            logger.error("Please provide the configuration file name as the first argument.");
+        String configFileName= args.length < 1 ? "assets/config.properties" : args[0];
+        if (!new File(configFileName).isFile()) {
+            logger.error(String.format("Configuration file “%s” does not exist.", configFileName));
             System.exit(1);
         }
-        ConfigModel config = confReader.readConfig(args[0]);
+        logger.info(String.format("Using configuration file “%s”.", configFileName));
+        ConfigModel config = confReader.readConfig(configFileName);
 
 
         // convert file if not CSV
@@ -173,7 +175,7 @@ public class Main {
 
     private static String convertFileIfNeeded(String fileName) {
         if (!new File(fileName).isFile()) {
-            logger.error(String.format("Could not find file: “%s”\n", fileName));
+            logger.error(String.format("Could not find file: “%s”.", fileName));
             System.exit(1);
         }
         if (fileName.toLowerCase().endsWith(".csv")) {
@@ -182,12 +184,12 @@ public class Main {
             Logger.getLogger(Main.class).info(String.format("Converting file “%s” to CSV...", fileName));
             String newFileName = DBFConverter.toCSV(fileName);
             if (newFileName == null) {
-                logger.error(String.format("Could not read file: “%s”", fileName));
+                logger.error(String.format("Could not read file: “%s”.", fileName));
                 System.exit(1);
             }
             return newFileName;
         } else {
-            logger.error(String.format("Unsupported format: “%s”", fileName));
+            logger.error(String.format("Unsupported format: “%s”.", fileName));
             System.exit(1);
         }
         return fileName;

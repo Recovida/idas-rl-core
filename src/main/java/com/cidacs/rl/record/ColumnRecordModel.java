@@ -15,7 +15,7 @@ public class ColumnRecordModel {
         this.id = id;
         this.type = type;
         this.value = value;
-        this.originalValue = originalValue;
+        this.originalValue = originalValue == null ? "" : originalValue;
     }
 
     public String getId() {
@@ -47,7 +47,7 @@ public class ColumnRecordModel {
     }
 
     public void setOriginalValue(String originalValue) {
-        this.originalValue = originalValue;
+        this.originalValue = originalValue == null ? "" : originalValue;
     }
 
     public void setGenerated(boolean generated) {

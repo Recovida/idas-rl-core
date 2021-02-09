@@ -12,11 +12,11 @@ import org.apache.log4j.Logger;
 
 public class ConfigReader {
 
-    public ConfigModel readConfig() {
-        return readConfig("assets/config.properties");
-    }
 
     public ConfigModel readConfig(String propFileName){
+        if (propFileName == null)
+            propFileName = "assets/config.properties";
+
         ConfigModel configModel = new ConfigModel();
 
         Properties config = new Properties();

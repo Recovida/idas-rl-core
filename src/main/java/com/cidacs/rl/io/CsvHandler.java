@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.log4j.Logger;
 
 import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.linkage.LinkageUtils;
@@ -44,7 +45,7 @@ public class CsvHandler {
         try {
             Files.write(path, (header+"\n").getBytes());
         } catch (IOException e) {
-            System.out.println("Error while writting file.");
+            Logger.getLogger(getClass()).error("Error while writing file.");
         }
         // close file
     }

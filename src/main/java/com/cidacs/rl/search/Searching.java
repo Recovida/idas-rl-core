@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -146,9 +147,9 @@ public class Searching {
             }
 
         } catch (IOException e){
-            System.out.println("Row "+idCandidate+" could not be linked.");
+            Logger.getLogger(getClass()).warn("Row " + idCandidate + " could not be linked.");
         } catch (ParseException e) {
-            System.out.println("Row "+idCandidate+" could not be linked.");
+            Logger.getLogger(getClass()).warn("Row " + idCandidate + " could not be linked.");
         }
 
         return recordsFound;

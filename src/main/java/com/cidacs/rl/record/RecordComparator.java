@@ -3,6 +3,7 @@ package com.cidacs.rl.record;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.lucene.search.spell.JaroWinklerDistance;
 
 import com.cidacs.rl.config.ColumnConfigModel;
@@ -63,7 +64,7 @@ public  class RecordComparator {
                         penalty = penalty+0.01;
                     }
                 } catch (ArrayIndexOutOfBoundsException dta) {
-                    System.out.println("Data com erro: " + columnA.getValue());
+                    Logger.getLogger(getClass()).warn("Invalid date: " + columnA.getValue());
                 }
             }
             // PARA CODIGO DO MUNIC
@@ -76,7 +77,7 @@ public  class RecordComparator {
                         }
                     }
                 } catch (StringIndexOutOfBoundsException ibge) {
-                    System.out.println("Código IBGE com erro: " + columnA.getValue());
+                    Logger.getLogger(getClass()).warn("Invalid IBGE code: " + columnA.getValue());
                 }
             }
             // PARA SEXO
@@ -91,7 +92,7 @@ public  class RecordComparator {
                         }
                     }
                 } catch (StringIndexOutOfBoundsException ibge) {
-                    System.out.println("Variável sexo com erro: " + columnA.getValue());
+                    Logger.getLogger(getClass()).warn("Invalid gender: " + columnA.getValue());
                 }
             }
 
@@ -103,7 +104,7 @@ public  class RecordComparator {
                         scoreCategorical = scoreCategorical + this.getDistanceCategorical(columnA.getValue(), columnB.getValue(), columnConfig.getWeight());
                     }
                 } catch (StringIndexOutOfBoundsException ibge) {
-                    System.out.println("Categorica com erro: " + columnA.getValue());
+                    Logger.getLogger(getClass()).warn("Invalid category: " + columnA.getValue());
                 }
             }
         }

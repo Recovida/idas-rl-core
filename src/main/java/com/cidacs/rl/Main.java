@@ -11,6 +11,9 @@ import java.util.ArrayList;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -32,15 +35,22 @@ import sun.misc.Unsafe;
 
 public class Main {
 
+    final static Logger logger = LogManager.getLogger(Main.class);
+
     public static void main(String[] args) throws IOException {
+
+        Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
+        Logger.getLogger("org.apache.hadoop").setLevel(Level.ERROR);
+        Logger.getLogger("org.sparkproject").setLevel(Level.ERROR);
 
         // read configuration file
         ConfigReader confReader = new ConfigReader();
         if (args.length != 1) {
-            System.err.println("Please provide the configuration file name as the first argument.");
+            logger.error("Please provide the configuration file name as the first argument.");
             System.exit(1);
         }
         ConfigModel config = confReader.readConfig(args[0]);
+
 
         // convert file if not CSV
         String fileName_a = config.getDbA();
@@ -62,12 +72,12 @@ public class Main {
         Indexing indexing = new Indexing(config);
 
         // read database B
-        System.out.println("Reading and indexing dataset B...");
+        logger.info("Reading and indexing dataset B...");
         Iterable<CSVRecord> dbBCsvRecords;
         dbBCsvRecords = csvHandler.getCsvIterable(config.getDbB(), delimiter_b);
         long count_b = indexing.index(dbBCsvRecords);
         if (count_b > 0)
-            System.out.println("Finished reading and indexing dataset B (entries: " + count_b + ").");
+            logger.info("Finished reading and indexing dataset B (entries: " + count_b + ").");
 
         disableIllegalAccessWarnings();
 
@@ -79,17 +89,20 @@ public class Main {
                 .getOrCreate();
 
         // read dataset A
-        System.out.println("Reading dataset A...");
+        logger.info("Reading dataset A...");
         Dataset<Row> dsa = spark.read().format("csv")
                 .option("sep", "" + delimiter_a)
                 .option("inferSchema", "false")
                 .option("header", "true")
                 .load(config.getDbA());
-        System.out.println("Finished reading dataset A (entries: " + dsa.count() + ").");
+        logger.info("Finished reading dataset A (entries: " + dsa.count() + ").");
 
         String resultPath = "assets/linkage-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime());
 
-        System.out.println("Performing linkage...");
+        if (config.getMaxRows() < Long.MAX_VALUE)
+            logger.info(String.format("Linking at most %d item(s).", config.getMaxRows()));
+
+        logger.info("Performing linkage...");
 
         Linkage linkage = new Linkage(config);
 
@@ -136,28 +149,28 @@ public class Main {
         }).saveAsTextFile(resultPath);
         // Write header to file
         csvHandler.writeHeaderFromConfig(resultPath + "/header.csv", config);
-        System.out.println("Completed.");
+        logger.info("Completed.");
         spark.stop();
     }
 
 
     private static String convertFileIfNeeded(String fileName) {
-        if (! new File(fileName).isFile()) {
-            System.err.format("Could not find file: %s\n", fileName);
+        if (!new File(fileName).isFile()) {
+            logger.error(String.format("Could not find file: %s\n", fileName));
             System.exit(1);
         }
         if (fileName.toLowerCase().endsWith(".csv")) {
             // do nothing
         } else if (fileName.toLowerCase().endsWith(".dbf")) {
-            System.out.format("Converting file %s to CSV...\n", fileName);
+            Logger.getLogger(Main.class).info(String.format("Converting file %s to CSV...", fileName));
             String newFileName = DBFConverter.toCSV(fileName);
             if (newFileName == null) {
-                System.err.format("Could not read file: %s\n", fileName);
+                logger.error(String.format("Could not read file: %s", fileName));
                 System.exit(1);
             }
             return newFileName;
         } else {
-            System.err.format("Unsupported format: %s\n", fileName);
+            logger.error(String.format("Unsupported format: %s", fileName));
             System.exit(1);
         }
         return fileName;

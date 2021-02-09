@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
+
 public class ConfigReader {
 
     public ConfigModel readConfig() {
@@ -48,7 +51,7 @@ public class ConfigReader {
                 // if any of the columns is missing the columns is thrown away
                 if(id==null || type==null || indexA==null || indexB==null || config.getProperty(i+"_weight")==null){
                     if (id != null || type != null || indexA != null || indexB != null)
-                        System.err.format("WARNING: Ignoring column %d_ because some items are missing.\n", i);
+                        Logger.getLogger(getClass()).warn(String.format("Ignoring column %d_ because some items are missing.\n", i));
                     continue;
                 }
 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.apache.commons.csv.CSVRecord;
+import org.apache.log4j.Logger;
 
 import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
@@ -34,7 +35,7 @@ public class Linkage implements Serializable {
         try {
             return linkageUtils.fromRecordPairToCsv(candidatePair);
         } catch (NullPointerException e) {
-            System.out.println("Row " + record.getColumnRecordModels().get(0).getValue() + " could not be linked.");
+            Logger.getLogger(getClass()).warn("Row " + record.getColumnRecordModels().get(0).getValue() + " could not be linked.");
         }
         return "";
     }
@@ -71,7 +72,7 @@ public class Linkage implements Serializable {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
-                System.out.println("Row "+tmpRecordModel.getColumnRecordModels().get(0).getValue()+" could not be linked.");
+                Logger.getLogger(getClass()).warn("Row "+tmpRecordModel.getColumnRecordModels().get(0).getValue()+" could not be linked.");
             }
         }
 

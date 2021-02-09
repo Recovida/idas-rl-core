@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.apache.commons.csv.CSVRecord;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -38,7 +39,7 @@ public class Indexing {
         Path dbIndexPath = Paths.get(config.getDbIndex());
 
         if (Files.exists(dbIndexPath)){
-            System.out.println("There is a database already indexed with the name provided. No indexing is necessary.");
+            Logger.getLogger(getClass()).info("There is a database already indexed with the name provided. No indexing is necessary.");
             return 0;
         } else {
             StandardAnalyzer analyzer = new StandardAnalyzer();

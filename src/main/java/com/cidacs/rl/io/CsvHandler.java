@@ -1,7 +1,10 @@
 package com.cidacs.rl.io;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -11,6 +14,7 @@ import java.nio.file.Paths;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaRDD;
 
 import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.linkage.LinkageUtils;
@@ -47,5 +51,17 @@ public class CsvHandler {
             Logger.getLogger(getClass()).error("Error while writing file.");
         }
         // close file
+    }
+
+    public static void writeRDDasCSV(JavaRDD<String> data, String fileName) {
+        new File(fileName).getParentFile().mkdirs();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+            for (String row : data.collect())
+                bw.write(row + "\n");
+        } catch (IOException e) {
+            Logger.getLogger(CsvHandler.class).error("Could not save file.");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

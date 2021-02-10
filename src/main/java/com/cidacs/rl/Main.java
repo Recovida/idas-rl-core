@@ -1,7 +1,6 @@
 package com.cidacs.rl;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -15,9 +14,12 @@ import java.util.Iterator;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.iterators.IteratorChain;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.sql.Dataset;
@@ -49,14 +51,27 @@ public class Main {
         Logger.getLogger("org.apache.hadoop").setLevel(Level.ERROR);
         Logger.getLogger("org.sparkproject").setLevel(Level.ERROR);
 
+        // On Windows, save some required files
+        if (SystemUtils.IS_OS_WINDOWS) {
+            Path hadoopPath = Files.createTempDirectory("hadoop");
+            hadoopPath.toFile().deleteOnExit();
+            Path hadoopBinPath = hadoopPath.resolve("bin");
+            hadoopBinPath.toFile().mkdirs();
+            String[] hadoopFiles = {"hadoop.dll", "winutils.exe"};
+            for (String f : hadoopFiles)
+                FileUtils.copyInputStreamToFile(Main.class.getClassLoader().getResourceAsStream(f), hadoopBinPath.resolve(f).toFile());
+            System.setProperty("hadoop.home.dir", hadoopPath.toAbsolutePath().toString());
+        }
+
+
         // read configuration file
         ConfigReader confReader = new ConfigReader();
-        String configFileName= args.length < 1 ? "assets/config.properties" : args[0];
+        String configFileName = new File(args.length < 1 ? "assets/config.properties" : args[0]).getPath();
         if (!new File(configFileName).isFile()) {
-            logger.error(String.format("Configuration file “%s” does not exist.", configFileName));
+            logger.error(String.format("Configuration file \"%s\" does not exist.", configFileName));
             System.exit(1);
         }
-        logger.info(String.format("Using configuration file “%s”.", configFileName));
+        logger.info(String.format("Using configuration file \"%s\".", configFileName));
         ConfigModel config = confReader.readConfig(configFileName);
 
 
@@ -69,8 +84,8 @@ public class Main {
         config.setDbB(fileName_b);
 
         // read first line and guess delimiter
-        String firstLine_a = Files.lines(Path.of(fileName_a)).findFirst().get();
-        String firstLine_b = Files.lines(Path.of(fileName_b)).findFirst().get();
+        String firstLine_a = Files.lines(Paths.get(fileName_a)).findFirst().get();
+        String firstLine_b = Files.lines(Paths.get(fileName_b)).findFirst().get();
         char delimiter_a = guessCsvDelimiter(firstLine_a);
         char delimiter_b = guessCsvDelimiter(firstLine_b);
 
@@ -93,7 +108,7 @@ public class Main {
         SparkSession spark = SparkSession
                 .builder()
                 .appName("Cidacs-RL")
-                .config("spark.master", "local[*]")
+                .config("spark.master", "local[*]").config("spark.testing.memory", "2000000000")
                 .getOrCreate();
 
         // read dataset A
@@ -105,7 +120,7 @@ public class Main {
                 .load(config.getDbA());
         logger.info("Finished reading dataset A (entries: " + dsa.count() + ").");
 
-        String resultPath = config.getLinkageDir() + File.separator + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime());
+        String resultPath = new File(config.getLinkageDir() + File.separator + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime())).getPath();
 
         if (config.getMaxRows() < Long.MAX_VALUE)
             logger.info(String.format("Linking at most %d item(s).", config.getMaxRows()));
@@ -116,7 +131,7 @@ public class Main {
 
         String header = LinkageUtils.getCsvHeaderFromConfig(config);
 
-        dsa.javaRDD().zipWithIndex().map(new Function<Tuple2<Row, Long>, String>() {
+        JavaRDD<String> rdd = dsa.javaRDD().zipWithIndex().map(new Function<Tuple2<Row, Long>, String>() {
 
             @Override
             public String call(Tuple2<Row, Long> r){
@@ -166,30 +181,31 @@ public class Main {
                 // Includes header
                 return new IteratorChain(Arrays.asList(header).iterator(), iterator);
             }
-        }, false).saveAsTextFile(resultPath);
-        finalize(resultPath, "result.csv");
-        logger.info(String.format("Completed. The result was saved in “%s”.", resultPath));
+        }, false);
+        logger.info("Saving linkage result...");
+        CsvHandler.writeRDDasCSV(rdd, resultPath + File.separator + "result.csv");
+        logger.info(String.format("Completed. The result was saved in \"%s\".", resultPath));
         spark.stop();
     }
 
 
     private static String convertFileIfNeeded(String fileName) {
         if (!new File(fileName).isFile()) {
-            logger.error(String.format("Could not find file: “%s”.", fileName));
+            logger.error(String.format("Could not find file: \"%s\".", fileName));
             System.exit(1);
         }
         if (fileName.toLowerCase().endsWith(".csv")) {
             // do nothing
         } else if (fileName.toLowerCase().endsWith(".dbf")) {
-            Logger.getLogger(Main.class).info(String.format("Converting file “%s” to CSV...", fileName));
+            Logger.getLogger(Main.class).info(String.format("Converting file \"%s\" to CSV...", fileName));
             String newFileName = DBFConverter.toCSV(fileName);
             if (newFileName == null) {
-                logger.error(String.format("Could not read file: “%s”.", fileName));
+                logger.error(String.format("Could not read file: \"%s\".", fileName));
                 System.exit(1);
             }
             return newFileName;
         } else {
-            logger.error(String.format("Unsupported format: “%s”.", fileName));
+            logger.error(String.format("Unsupported format: \"%s\".", fileName));
             System.exit(1);
         }
         return fileName;
@@ -207,21 +223,6 @@ public class Main {
             }
         }
         return delimiter;
-    }
-
-    private static void finalize(String directory, String resultFileName) {
-        String[] crc = new File(directory).list(new FilenameFilter() {
-
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".crc");
-            }
-        });
-        for (String f : crc)
-            new File(directory + File.separator + f).deleteOnExit();
-        File resultFile = new File(directory + File.separator + "part-00000");
-        if (resultFile.isFile())
-            resultFile.renameTo(new File(directory + File.separator + resultFileName));
     }
 
     private static void disableIllegalAccessWarnings() {

@@ -34,7 +34,7 @@ public class LinkageUtils {
                 continue;
             headerResult = headerResult + quote(column.getId() + "_" + config.getSuffixB()) + ",";
         }
-        headerResult = headerResult + "score";
+        headerResult = headerResult + quote("score");
         return headerResult;
     }
 
@@ -52,7 +52,7 @@ public class LinkageUtils {
                 continue;
             headerResult = headerResult + quote(col.getIndexB() + "_" + config.getSuffixB()) + ",";
         }
-        headerResult = headerResult + "score";
+        headerResult = headerResult + quote("score");
         return headerResult;
     }
 

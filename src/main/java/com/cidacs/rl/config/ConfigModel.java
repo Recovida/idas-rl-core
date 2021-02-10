@@ -1,5 +1,6 @@
 package com.cidacs.rl.config;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -20,9 +21,9 @@ public class ConfigModel implements Serializable {
     }
 
     public ConfigModel(String dbA, String dbB, String dbIndex, ArrayList<ColumnConfigModel> columns) {
-        this.dbA = dbA;
-        this.dbB = dbB;
-        this.dbIndex = dbIndex;
+        this.setDbA(dbA);
+        this.setDbB(dbB);
+        this.setDbIndex(dbIndex);
         this.columns = columns;
         this.maxRows = Long.MAX_VALUE;
     }
@@ -32,7 +33,7 @@ public class ConfigModel implements Serializable {
     }
 
     public void setDbA(String dbA) {
-        this.dbA = dbA;
+        this.dbA = new File(dbA).getPath();
     }
 
     public String getDbB() {
@@ -40,7 +41,7 @@ public class ConfigModel implements Serializable {
     }
 
     public void setDbB(String dbB) {
-        this.dbB = dbB;
+        this.dbB = new File(dbB).getPath();
     }
 
     public String getDbIndex() {
@@ -48,7 +49,7 @@ public class ConfigModel implements Serializable {
     }
 
     public void setDbIndex(String dbIndex) {
-        this.dbIndex = dbIndex;
+        this.dbIndex = new File(dbIndex).getPath();
     }
 
     public String getSuffixA() {

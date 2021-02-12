@@ -12,7 +12,7 @@ public class ConfigModel implements Serializable {
     private String suffixB = "_dsb";
     private String dbIndex;
     private String linkageDir = ".";
-    private long maxRows;
+    private long maxRows = Long.MAX_VALUE;
 
     private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
 

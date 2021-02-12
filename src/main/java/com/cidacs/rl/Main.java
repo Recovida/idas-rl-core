@@ -182,7 +182,6 @@ public class Main {
                 return new IteratorChain(Arrays.asList(header).iterator(), iterator);
             }
         }, false);
-        logger.info("Saving linkage result...");
         CsvHandler.writeRDDasCSV(rdd, resultPath + File.separator + "result.csv");
         logger.info(String.format("Completed. The result was saved in \"%s\".", resultPath));
         spark.stop();

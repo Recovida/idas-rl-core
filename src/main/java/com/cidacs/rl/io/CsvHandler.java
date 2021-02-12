@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -56,7 +57,9 @@ public class CsvHandler {
     public static void writeRDDasCSV(JavaRDD<String> data, String fileName) {
         new File(fileName).getParentFile().mkdirs();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-            for (String row : data.collect())
+            List<String> rows = data.collect();
+            Logger.getLogger(CsvHandler.class).info("Saving linkage result...");
+            for (String row : rows)
                 bw.write(row + "\n");
         } catch (IOException e) {
             Logger.getLogger(CsvHandler.class).error("Could not save file.");

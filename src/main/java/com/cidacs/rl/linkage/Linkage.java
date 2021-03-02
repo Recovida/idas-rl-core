@@ -26,7 +26,10 @@ public class Linkage implements Serializable {
         LinkageUtils linkageUtils = new LinkageUtils();
         RecordPairModel candidatePair = searching.getCandidatePairFromRecord(record);
         if (candidatePair != null) {
-            return linkageUtils.fromRecordPairToCsv(candidatePair);
+            if (candidatePair.getScore() >= config.getMinimumScore())
+                return linkageUtils.fromRecordPairToCsv(candidatePair);
+            else
+                return "";
         } else {
             Logger.getLogger(getClass()).warn("Could not link row.");
             Logger.getLogger(getClass()).debug("This is the row that could not be linked: " + record.getColumnRecordModels());

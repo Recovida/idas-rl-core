@@ -41,6 +41,8 @@ public class ConfigReader {
             configModel.setLinkageDir(config.getProperty("linkage_folder"));
             if (config.containsKey("max_rows"))
                 configModel.setMaxRows(Long.valueOf(config.getProperty("max_rows")));
+            if (config.containsKey("min_score"))
+                configModel.setMinimumScore(Float.valueOf(config.getProperty("min_score")) / 100);
 
             // read all columns
             for(int i=0; i<=20; i++){

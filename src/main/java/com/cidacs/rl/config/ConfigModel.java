@@ -13,6 +13,7 @@ public class ConfigModel implements Serializable {
     private String dbIndex;
     private String linkageDir = ".";
     private long maxRows = Long.MAX_VALUE;
+    private float minimumScore = 0;
 
     private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
 
@@ -26,6 +27,7 @@ public class ConfigModel implements Serializable {
         this.setDbIndex(dbIndex);
         this.columns = columns;
         this.maxRows = Long.MAX_VALUE;
+        this.minimumScore = 0;
     }
 
     public String getDbA() {
@@ -94,6 +96,14 @@ public class ConfigModel implements Serializable {
 
     public void setLinkageDir(String linkageDir) {
         this.linkageDir = linkageDir;
+    }
+
+    public float getMinimumScore() {
+        return minimumScore;
+    }
+
+    public void setMinimumScore(float minimumScore) {
+        this.minimumScore = minimumScore;
     }
 
 

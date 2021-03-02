@@ -25,12 +25,13 @@ public class Linkage implements Serializable {
         Searching searching = new Searching(this.config);
         LinkageUtils linkageUtils = new LinkageUtils();
         RecordPairModel candidatePair = searching.getCandidatePairFromRecord(record);
-        try {
+        if (candidatePair != null) {
             return linkageUtils.fromRecordPairToCsv(candidatePair);
-        } catch (NullPointerException e) {
-            Logger.getLogger(getClass()).warn("Could not link row: " + record.getColumnRecordModels() + ".");
+        } else {
+            Logger.getLogger(getClass()).warn("Could not link row.");
+            Logger.getLogger(getClass()).debug("This is the row that could not be linked: " + record.getColumnRecordModels());
+            return "";
         }
-        return "";
     }
 
     public RecordModel fromCSVRecordToRecord(CSVRecord csvRecord){

@@ -28,7 +28,7 @@ public class Linkage implements Serializable {
         try {
             return linkageUtils.fromRecordPairToCsv(candidatePair);
         } catch (NullPointerException e) {
-            Logger.getLogger(getClass()).warn("Row " + record.getColumnRecordModels().get(0).getValue() + " could not be linked.");
+            Logger.getLogger(getClass()).warn("Could not link row: " + record.getColumnRecordModels() + ".");
         }
         return "";
     }

@@ -11,7 +11,8 @@ public class ColumnRecordModel {
         this(id, type, value, value);
     }
 
-    public ColumnRecordModel(String id, String type, String value, String originalValue) {
+    public ColumnRecordModel(String id, String type, String value,
+            String originalValue) {
         this.id = id;
         this.type = type;
         this.value = value;
@@ -56,5 +57,10 @@ public class ColumnRecordModel {
 
     public boolean isGenerated() {
         return generated;
+    }
+
+    @Override
+    public String toString() {
+        return "" + id + "=\"" + (generated ? value : originalValue) + "\"";
     }
 }

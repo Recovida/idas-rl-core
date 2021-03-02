@@ -147,9 +147,9 @@ public class Searching {
             }
 
         } catch (IOException e){
-            Logger.getLogger(getClass()).warn("Row " + idCandidate + " could not be linked.");
+            Logger.getLogger(getClass()).debug("Row " + idCandidate + " could not be linked.");
         } catch (ParseException e) {
-            Logger.getLogger(getClass()).warn("Row " + idCandidate + " could not be linked.");
+            Logger.getLogger(getClass()).debug("Row " + idCandidate + " could not be linked.");
         }
 
         return recordsFound;

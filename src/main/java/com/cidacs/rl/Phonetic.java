@@ -56,6 +56,8 @@ public class Phonetic {
             .add("K$", "KE").add("(.)(\\1)+", "$1");
 
     public static String convert(String name) {
+        if (name == null)
+            return "";
         name = StringUtils.stripAccents(name.toUpperCase());
         name = globalSubstitutions.apply(name);
         List<String> cleaned_name = new LinkedList<>();

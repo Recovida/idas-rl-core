@@ -1,5 +1,7 @@
 package com.cidacs.rl.linkage;
 
+import java.util.Locale;
+
 import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.record.ColumnRecordModel;
@@ -18,7 +20,7 @@ public class LinkageUtils {
                 continue;
             csvResult=csvResult+column.getOriginalValue()+",";
         }
-        csvResult = csvResult + String.format("%7.10f", recordPair.getScore());
+        csvResult = csvResult + String.format(Locale.ENGLISH, "%7.10f", recordPair.getScore());
         return csvResult;
     }
 

@@ -19,7 +19,7 @@ public class Cleaning {
             Pattern.compile(
                     "(?<year>\\d{4})-(?<month>\\d{1,2})-(?<day>\\d{1,2})") };
 
-    private static Pattern nameCleaningPattern = Pattern.compile("\\s+(LAUDO|BO|FF)\\s*[0-9]+");
+    private static Pattern nameCleaningPattern = Pattern.compile("\\s+(LAUDO|BO|FF|NATIMORTO|DESCONHECIDO|NUA|CHAMADA)\\s*[0-9]+");
 
     public static String clean(ColumnConfigModel c, String data) {
         if (data == null)

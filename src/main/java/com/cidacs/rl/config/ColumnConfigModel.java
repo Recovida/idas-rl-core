@@ -8,19 +8,23 @@ public class ColumnConfigModel implements Serializable {
     private String type;
     private String indexA;
     private String indexB;
+    private String renameA;
+    private String renameB;
     private double weight;
     private double phonWeight;
     private boolean generated;
 
-    public ColumnConfigModel(String id, String type, String indexA, String indexB, double weight) {
-        this(id, type, indexA, indexB, weight, 0.0);
+    public ColumnConfigModel(String id, String type, String indexA, String indexB, String renameA, String renameB, double weight) {
+        this(id, type, indexA, indexB, renameA, renameB, weight, 0.0);
     }
 
-    public ColumnConfigModel(String id, String type, String indexA, String indexB, double weight, double phonWeight) {
+    public ColumnConfigModel(String id, String type, String indexA, String indexB, String renameA, String renameB, double weight, double phonWeight) {
         this.id = id;
         this.type = type;
         this.indexA = indexA;
         this.indexB = indexB;
+        this.setRenameA(renameA);
+        this.setRenameB(renameB);
         this.weight = weight;
         this.phonWeight = phonWeight;
     }
@@ -79,5 +83,21 @@ public class ColumnConfigModel implements Serializable {
 
     public boolean isGenerated() {
         return generated;
+    }
+
+    public String getRenameA() {
+        return renameA;
+    }
+
+    public void setRenameA(String renameA) {
+        this.renameA = renameA;
+    }
+
+    public String getRenameB() {
+        return renameB;
+    }
+
+    public void setRenameB(String renameB) {
+        this.renameB = renameB;
     }
 }

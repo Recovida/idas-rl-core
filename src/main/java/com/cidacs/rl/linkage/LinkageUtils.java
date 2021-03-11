@@ -27,42 +27,19 @@ public class LinkageUtils {
         return csvResult;
     }
 
-    public String getCsvHeaderFromRecordPair(ConfigModel config,
-            RecordPairModel recordPair) {
-        String headerResult = "";
-        for (ColumnRecordModel column : recordPair.getRecordA()
-                .getColumnRecordModels()) {
-            if (column.isGenerated())
-                continue;
-            headerResult = headerResult
-                    + quote(column.getId() + "_" + config.getSuffixA()) + ";";
-        }
-        for (ColumnRecordModel column : recordPair.getRecordB()
-                .getColumnRecordModels()) {
-            if (column.isGenerated())
-                continue;
-            headerResult = headerResult
-                    + quote(column.getId() + "_" + config.getSuffixB()) + ";";
-        }
-        headerResult = headerResult + quote("score");
-        return headerResult;
-    }
-
     public static String getCsvHeaderFromConfig(ConfigModel config) {
         String headerResult = "";
         // for each column a add to result
         for (ColumnConfigModel col : config.getColumns()) {
             if (col.isGenerated())
                 continue;
-            headerResult = headerResult
-                    + quote(col.getIndexA() + "_" + config.getSuffixA()) + ";";
+            headerResult = headerResult + quote(col.getRenameA()) + ";";
         }
         // for each column b add to result
         for (ColumnConfigModel col : config.getColumns()) {
             if (col.isGenerated())
                 continue;
-            headerResult = headerResult
-                    + quote(col.getIndexB() + "_" + config.getSuffixB()) + ";";
+            headerResult = headerResult + quote(col.getRenameB()) + ";";
         }
         headerResult = headerResult + quote("score");
         return headerResult;

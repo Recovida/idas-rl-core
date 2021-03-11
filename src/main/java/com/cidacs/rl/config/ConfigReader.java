@@ -50,6 +50,8 @@ public class ConfigReader {
                 String type = config.getProperty(i+"_type");
                 String indexA = config.getProperty(i+"_index_a");
                 String indexB = config.getProperty(i+"_index_b");
+                String renameA = config.getProperty(i+"_rename_a", indexA + "_" + configModel.getSuffixA());
+                String renameB = config.getProperty(i+"_rename_b", indexB + "_" + configModel.getSuffixB());
 
                 // if any of the columns is missing the columns is thrown away
                 if(id==null || type==null || indexA==null || indexB==null || config.getProperty(i+"_weight")==null){
@@ -61,10 +63,10 @@ public class ConfigReader {
                 double weight = Double.valueOf(config.getProperty(i+"_weight"));
                 double phonWeight = Double.valueOf(config.getProperty(i + "_phon_weight", "0.0"));
 
-                configModel.addColumn(new ColumnConfigModel(id, type, indexA, indexB, weight, phonWeight));
+                configModel.addColumn(new ColumnConfigModel(id, type, indexA, indexB,renameA, renameB, weight, phonWeight));
 
                 if (type.equals("name") && phonWeight > 0) {
-                    ColumnConfigModel c = new ColumnConfigModel(id + "__PHON__", "string", "", "", phonWeight, 0.0);
+                    ColumnConfigModel c = new ColumnConfigModel(id + "__PHON__", "string", "", "", "", "", phonWeight, 0.0);
                     c.setGenerated(true);
                     configModel.addColumn(c);
                 }

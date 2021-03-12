@@ -10,6 +10,8 @@ public class ConfigModel implements Serializable {
     private String dbB;
     private String suffixA = "_dsa";
     private String suffixB = "_dsb";
+    private String rowNumColNameA = "#A";
+    private String rowNumColNameB = "#B";
     private String dbIndex;
     private String linkageDir = ".";
     private long maxRows = Long.MAX_VALUE;
@@ -104,6 +106,22 @@ public class ConfigModel implements Serializable {
 
     public void setMinimumScore(float minimumScore) {
         this.minimumScore = minimumScore;
+    }
+
+    public String getRowNumColNameA() {
+        return rowNumColNameA;
+    }
+
+    public void setRowNumColNameA(String rowNumColNameA) {
+        this.rowNumColNameA = rowNumColNameA;
+    }
+
+    public String getRowNumColNameB() {
+        return rowNumColNameB;
+    }
+
+    public void setRowNumColNameB(String rowNumColNameB) {
+        this.rowNumColNameB = rowNumColNameB;
     }
 
 

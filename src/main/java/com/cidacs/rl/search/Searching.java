@@ -168,8 +168,7 @@ public class Searching {
             tmpId = column.getId();
             tmpValue = document.get(tmpId);
             tmpType = column.getType();
-            String originalValue = document.get(tmpId + "___ORIG___");
-            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
+            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue);
             tmpRecordColumnRecord.setGenerated(column.isGenerated());
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }

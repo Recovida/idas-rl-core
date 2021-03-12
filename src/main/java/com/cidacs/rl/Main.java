@@ -148,17 +148,17 @@ public class Main {
                     if (column.isGenerated())
                         continue;
                     try {
-                        String originalValue = row.getAs(column.getIndexA());
-                        String tmpValue = Cleaning.clean(column, originalValue);
-                        // Remove anything that is not a uppercase letter and a digit
-                        tmpValue = tmpValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ").trim();
+                        String originalValue = column.getIndexA().equals(config.getRowNumColNameA()) ? String.valueOf(r._2 + 1) : row.getAs(column.getIndexA());
+                        String cleanedValue = Cleaning.clean(column, originalValue);
+                        // Remove anything that is not an uppercase letter, slash, space or digit
+                        String tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
                         String tmpId = column.getId();
                         String tmpType = column.getType();
                         // add new column
-                        tmpRecordColumns.add(new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue));
+                        tmpRecordColumns.add(new ColumnRecordModel(tmpId, tmpType, tmpValue));
                         double phonWeight = column.getPhonWeight();
                         if (tmpType.equals("name") && phonWeight > 0) {
-                            ColumnRecordModel c = new ColumnRecordModel(tmpId + "__PHON__", "string", Phonetic.convert(originalValue), "");
+                            ColumnRecordModel c = new ColumnRecordModel(tmpId + "__PHON__", "string", Phonetic.convert(cleanedValue));
                             c.setGenerated(true);
                             tmpRecordColumns.add(c);
                         }

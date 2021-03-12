@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -67,9 +66,8 @@ public class Indexing {
             this.inWriter = new IndexWriter(index, config);
 
             for (CSVRecord csvRecord : csvRecords) {
-                tmpRecordModel = this.fromCSVRecordToRecord(csvRecord);
+                tmpRecordModel = this.fromCSVRecordToRecord(++n, csvRecord);
                 this.addRecordToIndex(tmpRecordModel);
-                n++;
             }
 
             this.inWriter.close();
@@ -86,7 +84,6 @@ public class Indexing {
         Document doc = new Document();
         for(ColumnRecordModel column: record.getColumnRecordModels()){
             doc.add(new TextField(column.getId(), column.getValue(),  Field.Store.YES));
-            doc.add(new StoredField(column.getId() + "___ORIG___", column.getOriginalValue()));
         }
         try {
             this.inWriter.addDocument(doc);
@@ -95,31 +92,33 @@ public class Indexing {
         }
     }
 
-    private RecordModel fromCSVRecordToRecord(CSVRecord csvRecord){
+    private RecordModel fromCSVRecordToRecord(long num, CSVRecord csvRecord){
         ColumnRecordModel tmpRecordColumnRecord;
         String tmpIndex;
+        String cleanedValue;
         String tmpValue;
         String tmpId;
         String tmpType;
         ArrayList<ColumnRecordModel> tmpRecordColumns;
 
         tmpRecordColumns = new ArrayList<>();
-        for(ColumnConfigModel column : config.getColumns()) {
+        for (ColumnConfigModel column : config.getColumns()) {
             if (column.isGenerated())
                 continue;
             tmpIndex = column.getIndexB();
-            String originalValue = csvRecord.get(tmpIndex);
-            tmpValue = Cleaning.clean(column, originalValue);
-            tmpValue = tmpValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ").trim();
+            String originalValue;
+            originalValue = tmpIndex.equals(config.getRowNumColNameB()) ? String.valueOf(num) : csvRecord.get(tmpIndex);
+            cleanedValue = Cleaning.clean(column, originalValue);
+            tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
             tmpId = column.getId();
             tmpType = column.getType();
 
-            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
+            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue);
             tmpRecordColumns.add(tmpRecordColumnRecord);
 
             double phonWeight = column.getPhonWeight();
             if (tmpType.equals("name") && phonWeight > 0) {
-                ColumnRecordModel c = new ColumnRecordModel(tmpId + "__PHON__", "string", Phonetic.convert(originalValue), "");
+                ColumnRecordModel c = new ColumnRecordModel(tmpId + "__PHON__", "string", Phonetic.convert(cleanedValue));
                 c.setGenerated(true);
                 tmpRecordColumns.add(c);
             }

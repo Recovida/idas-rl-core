@@ -163,10 +163,10 @@ public  class RecordComparator {
 
     private double getDistanceDate(String data1, String data2, double w) {
         double score = 0;
-        int minLength = Math.min(data1.length(), data2.length());
+        data1 = data1.replaceAll("-|/", "");
+        data2 = data2.replaceAll("-|/", "");
 
-        //data1 = data1.replaceAll("-", "");
-        //data2 = data2.replaceAll("-", "");
+        int minLength = Math.min(data1.length(), data2.length());
 
         for (int i = 0; i < minLength; i++) {
             if (data1.charAt(i) == data2.charAt(i)) {

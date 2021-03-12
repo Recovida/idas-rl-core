@@ -4,19 +4,12 @@ public class ColumnRecordModel {
     private String id;
     private String type;
     private String value;
-    private String originalValue;
     private boolean generated = false;
 
     public ColumnRecordModel(String id, String type, String value) {
-        this(id, type, value, value);
-    }
-
-    public ColumnRecordModel(String id, String type, String value,
-            String originalValue) {
         this.id = id;
         this.type = type;
         this.value = value;
-        this.originalValue = originalValue == null ? "" : originalValue;
     }
 
     public String getId() {
@@ -43,14 +36,6 @@ public class ColumnRecordModel {
         this.value = value;
     }
 
-    public String getOriginalValue() {
-        return originalValue;
-    }
-
-    public void setOriginalValue(String originalValue) {
-        this.originalValue = originalValue == null ? "" : originalValue;
-    }
-
     public void setGenerated(boolean generated) {
         this.generated = generated;
     }
@@ -61,6 +46,6 @@ public class ColumnRecordModel {
 
     @Override
     public String toString() {
-        return "" + id + "=\"" + (generated ? value : originalValue) + "\"";
+        return "" + id + "=\"" + value + "\"";
     }
 }

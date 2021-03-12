@@ -1,14 +1,10 @@
 package com.cidacs.rl.linkage;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
-import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
 
-import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.record.RecordPairModel;
 import com.cidacs.rl.search.Searching;
@@ -37,25 +33,4 @@ public class Linkage implements Serializable {
         }
     }
 
-    public RecordModel fromCSVRecordToRecord(CSVRecord csvRecord){
-        ColumnRecordModel tmpRecordColumnRecord;
-        String tmpIndex;
-        String tmpValue;
-        String tmpId;
-        String tmpType;
-        ArrayList<ColumnRecordModel> tmpRecordColumns;
-
-        tmpRecordColumns = new ArrayList<>();
-        for(ColumnConfigModel column : config.getColumns()){
-            tmpIndex = column.getIndexB();
-            String originalValue = csvRecord.get(tmpIndex);
-            tmpValue = originalValue.replaceAll("[^A-Z0-9 ]", "").replaceAll("\\s+", " ").trim();
-            tmpId = column.getId();
-            tmpType = column.getType();
-            tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue, originalValue);
-            tmpRecordColumns.add(tmpRecordColumnRecord);
-        }
-        RecordModel recordModel = new RecordModel(tmpRecordColumns);
-        return recordModel;
-    }
 }

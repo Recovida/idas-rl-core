@@ -23,8 +23,8 @@ public class ColumnConfigModel implements Serializable {
         this.type = type;
         this.indexA = indexA;
         this.indexB = indexB;
-        this.setRenameA(renameA);
-        this.setRenameB(renameB);
+        this.renameA = renameA;
+        this.renameB = renameB;
         this.weight = weight;
         this.phonWeight = phonWeight;
     }
@@ -100,4 +100,5 @@ public class ColumnConfigModel implements Serializable {
     public void setRenameB(String renameB) {
         this.renameB = renameB;
     }
+
 }

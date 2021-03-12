@@ -14,13 +14,13 @@ public class LinkageUtils {
                 .getColumnRecordModels()) {
             if (column.isGenerated())
                 continue;
-            csvResult = csvResult + quote(column.getOriginalValue()) + ";";
+            csvResult = csvResult + quote(column.getValue()) + ";";
         }
         for (ColumnRecordModel column : recordPair.getRecordB()
                 .getColumnRecordModels()) {
             if (column.isGenerated())
                 continue;
-            csvResult = csvResult + quote(column.getOriginalValue()) + ";";
+            csvResult = csvResult + quote(column.getValue()) + ";";
         }
         csvResult = csvResult + String.format(Locale.ENGLISH, "%.2f",
                 100 * recordPair.getScore());

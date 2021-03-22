@@ -24,6 +24,8 @@ public class Cleaning {
     public static String clean(ColumnConfigModel c, String data) {
         if (data == null)
             return "";
+        if (c.getType().equals("copy"))
+            return data;
         data = data.trim();
         switch (c.getType()) {
         case "numerical_id":

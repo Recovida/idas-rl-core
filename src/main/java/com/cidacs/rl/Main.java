@@ -145,15 +145,23 @@ public class Main {
 
                 // convert row to RecordModel
                 for (ColumnConfigModel column : config.getColumns()){
-                    if (column.isGenerated())
+                    if (column.isGenerated() || (column.getType().equals("copy") && column.getIndexA().equals("")))
                         continue;
                     try {
-                        String originalValue = column.getIndexA().equals(config.getRowNumColNameA()) ? String.valueOf(r._2 + 1) : row.getAs(column.getIndexA());
-                        String cleanedValue = Cleaning.clean(column, originalValue);
-                        // Remove anything that is not an uppercase letter, slash, space or digit
-                        String tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
-                        String tmpId = column.getId();
                         String tmpType = column.getType();
+                        String originalValue, cleanedValue, tmpValue;
+                        if (tmpType.equals("copy")) {
+                            originalValue = column.getIndexA().equals("") ? "" : row.getAs(column.getIndexA());
+                            cleanedValue = originalValue;
+                            tmpValue = originalValue;
+                        } else {
+                            originalValue = column.getIndexA().equals(config.getRowNumColNameA()) ? String.valueOf(r._2 + 1) : row.getAs(column.getIndexA());
+                            cleanedValue = Cleaning.clean(column, originalValue);
+                            // Remove anything that is not an uppercase letter, slash, space or digit
+                            tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
+                        }
+                        String tmpId = column.getId();
+
                         // add new column
                         tmpRecordColumns.add(new ColumnRecordModel(tmpId, tmpType, tmpValue));
                         double phonWeight = column.getPhonWeight();

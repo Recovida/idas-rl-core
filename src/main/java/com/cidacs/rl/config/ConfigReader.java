@@ -63,6 +63,15 @@ public class ConfigReader {
                 String type = config.getProperty(i + "_type");
                 String indexA = config.getProperty(i + "_index_a");
                 String indexB = config.getProperty(i + "_index_b");
+
+                if (type != null && type.equals("copy")) {
+                    config.setProperty(i + "_weight", "0");
+                    if (indexA == null && indexB != null)
+                        indexA = "";
+                    else if (indexB == null && indexA != null)
+                        indexB = "";
+                }
+
                 String renameA = config.getProperty(i + "_rename_a",
                         indexA + "_" + configModel.getSuffixA());
                 String renameB = config.getProperty(i + "_rename_b",
@@ -85,8 +94,9 @@ public class ConfigReader {
                 double phonWeight = Double
                         .valueOf(config.getProperty(i + "_phon_weight", "0.0"));
 
-                configModel.addColumn(new ColumnConfigModel(id, type, indexA,
-                        indexB, renameA, renameB, weight, phonWeight));
+                ColumnConfigModel column = new ColumnConfigModel(id, type, indexA,
+                        indexB, renameA, renameB, weight, phonWeight);
+                configModel.addColumn(column);
 
                 if (type.equals("name") && phonWeight > 0) {
                     ColumnConfigModel c = new ColumnConfigModel(id + "__PHON__",

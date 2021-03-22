@@ -31,13 +31,13 @@ public class LinkageUtils {
         String headerResult = "";
         // for each column a add to result
         for (ColumnConfigModel col : config.getColumns()) {
-            if (col.isGenerated())
+            if (col.isGenerated() || (col.getType().equals("copy") && col.getIndexA().equals("")))
                 continue;
             headerResult = headerResult + quote(col.getRenameA()) + ";";
         }
         // for each column b add to result
         for (ColumnConfigModel col : config.getColumns()) {
-            if (col.isGenerated())
+            if (col.isGenerated() || (col.getType().equals("copy") && col.getIndexB().equals("")))
                 continue;
             headerResult = headerResult + quote(col.getRenameB()) + ";";
         }

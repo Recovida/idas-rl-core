@@ -1,11 +1,15 @@
 package com.cidacs.rl.search;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
@@ -40,20 +44,38 @@ public class Indexing {
         Path dbIndexPath = Paths.get(config.getDbIndex());
         Path successPath = Paths.get(dbIndexPath + File.separator + "_COMPLETE");
 
+        Set<String> columnsToIndex = new HashSet<>();
+        for (ColumnConfigModel column : this.config.getColumns())
+            if (!column.isGenerated() && !(column.getType().equals("copy") && column.getIndexB().equals("")))
+                columnsToIndex.add(column.getIndexB());
+
         if (Files.exists(dbIndexPath)) {
             if (Files.exists(successPath)) {
-                Logger.getLogger(getClass()).info("Database B has already been indexing. Reusing index.");
-                return 0;
+                Set<String> indexedColumns = new HashSet<>();
+                try {
+                    for (String c : new String(Files.readAllBytes(successPath)).split("\\n"))
+                        indexedColumns.add(c);
+                } catch (IOException e) {
+                }
+                boolean allIndexed = false;
+                if (indexedColumns.size() >= columnsToIndex.size()) {
+                    allIndexed = true;
+                    for (String c : columnsToIndex)
+                        if (!indexedColumns.contains(c)) {
+                            allIndexed = false;
+                            break;
+                        }
+                }
+                if (allIndexed) {
+                    Logger.getLogger(getClass()).info("Database B has already been indexed. Reusing index.");
+                    return 0;
+                } else {
+                    Logger.getLogger(getClass()).info("Database B has already been indexed, but the old index does not contain some of the required columns. Indexing it again.");
+                    deleteOldIndex(dbIndexPath.toFile());
+                }
             } else {
                 Logger.getLogger(getClass()).info("Indexing of database B has probably been interrupted in a previous execution. Indexing it again.");
-                try {
-                    FileUtils.deleteDirectory(dbIndexPath.toFile());
-                } catch (IOException e) {
-                    Logger.getLogger(getClass()).error(
-                            String.format("Could not delete old index. Please delete the directory “%s” and try again.", dbIndexPath.toString()));
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                deleteOldIndex(dbIndexPath.toFile());
             }
         }
         StandardAnalyzer analyzer = new StandardAnalyzer();
@@ -72,7 +94,10 @@ public class Indexing {
 
             this.inWriter.close();
 
-            successPath.toFile().createNewFile();
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(successPath.toFile()))) {
+                for (String col : columnsToIndex)
+                    bw.write(col + '\n');
+            }
             return n;
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,13 +132,21 @@ public class Indexing {
                 continue;
             tmpIndex = column.getIndexB();
             String originalValue;
-            originalValue = tmpIndex.equals(config.getRowNumColNameB()) ? String.valueOf(num) : csvRecord.get(tmpIndex);
-            cleanedValue = Cleaning.clean(column, originalValue);
-            tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
+            if (column.getType().equals("copy")) {
+                originalValue = tmpIndex.equals("") ? "" : csvRecord.get(tmpIndex);
+                cleanedValue = originalValue;
+                tmpValue = originalValue;
+            } else {
+                originalValue = tmpIndex.equals(config.getRowNumColNameB()) ? String.valueOf(num) : csvRecord.get(tmpIndex);
+                cleanedValue = Cleaning.clean(column, originalValue);
+                tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
+            }
             tmpId = column.getId();
             tmpType = column.getType();
 
             tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue);
+            if (column.getType().equals("copy") && tmpIndex.equals(""))
+                tmpRecordColumnRecord.setGenerated(true);
             tmpRecordColumns.add(tmpRecordColumnRecord);
 
             double phonWeight = column.getPhonWeight();
@@ -125,5 +158,16 @@ public class Indexing {
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);
         return recordModel;
+    }
+
+    private void deleteOldIndex(File f) {
+        try {
+            FileUtils.deleteDirectory(f);
+        } catch (IOException e) {
+            Logger.getLogger(getClass()).error(
+                    String.format("Could not delete old index. Please delete the directory “%s” and try again.", f.toString()));
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }

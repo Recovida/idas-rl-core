@@ -1,8 +1,8 @@
 package com.cidacs.rl.search;
 
-import com.cidacs.rl.record.ColumnRecordModel;
-
 import java.util.ArrayList;
+
+import com.cidacs.rl.record.ColumnRecordModel;
 
 public class SearchingUtils {
 
@@ -53,9 +53,9 @@ public class SearchingUtils {
 
     public String getStrQueryExact(ArrayList<ColumnRecordModel> columns){
         String query = new String();
-        
-        for(ColumnRecordModel column: columns){
-            if(column.getValue().isEmpty() == false) {
+
+        for (ColumnRecordModel column: columns) {
+            if (!column.getType().equals("copy") && !column.getValue().isEmpty()) {
                 if (column.getType().equals("name")) {
                     query = query + "+" + column.getId() + ":\"" + column.getValue() + "\" ";
                 }
@@ -75,22 +75,22 @@ public class SearchingUtils {
     }
 
     public ArrayList<ColumnRecordModel> filterUnusedColumns(ArrayList<ColumnRecordModel> columns){
-        ArrayList<ColumnRecordModel> tmpResult = new ArrayList<ColumnRecordModel>();
+        ArrayList<ColumnRecordModel> tmpResult = new ArrayList<>();
 
         for (ColumnRecordModel column : columns){
             switch(column.getType()){
-                case "name":
-                    tmpResult.add(column);
-                    break;
-                case "date":
-                    tmpResult.add(column);
-                    break;
-                case "ibge":
-                    tmpResult.add(column);
-                    break;
-                case "categorical":
-                    tmpResult.add(column);
-                    break;
+            case "name":
+                tmpResult.add(column);
+                break;
+            case "date":
+                tmpResult.add(column);
+                break;
+            case "ibge":
+                tmpResult.add(column);
+                break;
+            case "categorical":
+                tmpResult.add(column);
+                break;
             }
         }
         return tmpResult;

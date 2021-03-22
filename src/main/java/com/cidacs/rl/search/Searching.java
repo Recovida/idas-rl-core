@@ -169,7 +169,7 @@ public class Searching {
             tmpValue = document.get(tmpId);
             tmpType = column.getType();
             tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType, tmpValue);
-            tmpRecordColumnRecord.setGenerated(column.isGenerated());
+            tmpRecordColumnRecord.setGenerated(column.isGenerated() || (tmpType.equals("copy") && column.getIndexB().equals("")));
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);

@@ -58,7 +58,7 @@ public class ConfigReader {
                     configModel.getRowNumColNameB(), 0, 0));
 
             // read all columns
-            for (int i = 0; i <= 99; i++) {
+            for (int i = 0; i <= 999; i++) {
                 String id = config.getProperty(i + "_id");
                 String type = config.getProperty(i + "_type");
                 String indexA = config.getProperty(i + "_index_a");

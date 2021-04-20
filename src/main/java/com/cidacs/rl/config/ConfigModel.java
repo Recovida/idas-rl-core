@@ -8,6 +8,8 @@ public class ConfigModel implements Serializable {
     private static final long serialVersionUID = 1L;
     private String dbA;
     private String dbB;
+    private String encodingA = "UTF-8";
+    private String encodingB = "UTF-8";
     private String suffixA = "_dsa";
     private String suffixB = "_dsb";
     private String rowNumColNameA = "#A";
@@ -122,6 +124,29 @@ public class ConfigModel implements Serializable {
 
     public void setRowNumColNameB(String rowNumColNameB) {
         this.rowNumColNameB = rowNumColNameB;
+    }
+
+    public String getEncodingA() {
+        return encodingA;
+    }
+
+    public void setEncodingA(String encodingA) {
+        this.encodingA = convertNonStandardEncodingName(encodingA);
+    }
+
+    public String getEncodingB() {
+        return encodingB;
+    }
+
+    public void setEncodingB(String encodingB) {
+        this.encodingB = convertNonStandardEncodingName(encodingB);
+    }
+
+    protected static String convertNonStandardEncodingName(String encoding) {
+        String enc = encoding.toUpperCase().replaceAll("[^A-Z0-9]", "");
+        if (enc.equals("ANSI"))
+            return "Cp1252";
+        return encoding;
     }
 
 

@@ -49,6 +49,10 @@ public class ConfigReader {
             if (config.containsKey("row_num_col_b"))
                 configModel
                 .setRowNumColNameB(config.getProperty("row_num_col_b"));
+            if (config.containsKey("encoding_a"))
+                configModel.setEncodingA(config.getProperty("encoding_a"));
+            if (config.containsKey("encoding_b"))
+                configModel.setEncodingB(config.getProperty("encoding_b"));
 
             // row number
             configModel.addColumn(new ColumnConfigModel("_____NUM",

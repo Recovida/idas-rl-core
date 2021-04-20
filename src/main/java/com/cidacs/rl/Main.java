@@ -3,7 +3,9 @@ package com.cidacs.rl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,16 +80,14 @@ public class Main {
         // convert file if not CSV
         String fileName_a = config.getDbA();
         String fileName_b = config.getDbB();
-        fileName_a = convertFileIfNeeded(fileName_a);
-        fileName_b = convertFileIfNeeded(fileName_b);
+        fileName_a = convertFileIfNeeded(fileName_a, config.getEncodingA());
+        fileName_b = convertFileIfNeeded(fileName_b, config.getEncodingB());
         config.setDbA(fileName_a);
         config.setDbB(fileName_b);
 
         // read first line and guess delimiter
-        String firstLine_a = Files.lines(Paths.get(fileName_a)).findFirst().get();
-        String firstLine_b = Files.lines(Paths.get(fileName_b)).findFirst().get();
-        char delimiter_a = guessCsvDelimiter(firstLine_a);
-        char delimiter_b = guessCsvDelimiter(firstLine_b);
+        char delimiter_a = guessCsvDelimiter(fileName_a, config.getEncodingA());
+        char delimiter_b = guessCsvDelimiter(fileName_b, config.getEncodingB());
 
         // prepare indexing
         config.setDbIndex(config.getDbIndex() + File.separator + getHash(fileName_b));
@@ -97,7 +97,7 @@ public class Main {
         // read database B
         logger.info("Reading and indexing dataset B...");
         Iterable<CSVRecord> dbBCsvRecords;
-        dbBCsvRecords = csvHandler.getCsvIterable(config.getDbB(), delimiter_b);
+        dbBCsvRecords = csvHandler.getCsvIterable(config.getDbB(), delimiter_b, config.getEncodingB());
         long count_b = indexing.index(dbBCsvRecords);
         if (count_b > 0)
             logger.info("Finished reading and indexing dataset B (entries: " + count_b + ").");
@@ -115,6 +115,7 @@ public class Main {
         logger.info("Reading dataset A...");
         Dataset<Row> dsa = spark.read().format("csv")
                 .option("sep", "" + delimiter_a)
+                .option("encoding", config.getEncodingA())
                 .option("inferSchema", "false")
                 .option("header", "true")
                 .load(config.getDbA());
@@ -196,7 +197,7 @@ public class Main {
     }
 
 
-    private static String convertFileIfNeeded(String fileName) {
+    private static String convertFileIfNeeded(String fileName, String encoding) {
         if (!new File(fileName).isFile()) {
             logger.error(String.format("Could not find file: \"%s\".", fileName));
             System.exit(1);
@@ -205,7 +206,7 @@ public class Main {
             // do nothing
         } else if (fileName.toLowerCase().endsWith(".dbf")) {
             Logger.getLogger(Main.class).info(String.format("Converting file \"%s\" to CSV...", fileName));
-            String newFileName = DBFConverter.toCSV(fileName);
+            String newFileName = DBFConverter.toCSV(fileName, encoding);
             if (newFileName == null) {
                 logger.error(String.format("Could not read file: \"%s\".", fileName));
                 System.exit(1);
@@ -218,8 +219,14 @@ public class Main {
         return fileName;
     }
 
-    private static char guessCsvDelimiter(String fileName) throws IOException {
-        String firstLine = Files.lines(Paths.get(fileName)).findFirst().get();
+    private static char guessCsvDelimiter(String fileName, String encoding) throws IOException {
+        String firstLine = null;
+        try {
+            firstLine = Files.lines(Paths.get(fileName), Charset.forName(encoding)).findFirst().get();
+        } catch (UncheckedIOException e) {
+            Logger.getLogger(Main.class).error(String.format("Could not read file \"%s\" using encoding \"%s\".", fileName, encoding));
+            System.exit(1);
+        }
         char[] delimiters = {',', ';', '|', '\t'};
         char delimiter = '\0';
         long occurrences = -1;

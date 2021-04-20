@@ -2,11 +2,13 @@ package com.cidacs.rl.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,10 +24,10 @@ import com.cidacs.rl.linkage.LinkageUtils;
 
 
 public class CsvHandler {
-    public Iterable<CSVRecord> getCsvIterable(String csvPath, char delimiter) {
+    public Iterable<CSVRecord> getCsvIterable(String csvPath, char delimiter, String encoding) {
         Reader in = null;
         try {
-            in = new FileReader(csvPath);
+            in = new InputStreamReader(new FileInputStream(csvPath), Charset.forName(encoding));
             Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().withDelimiter(delimiter).parse(in);
 
             return records;

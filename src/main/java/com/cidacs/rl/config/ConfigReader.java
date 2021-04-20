@@ -59,7 +59,7 @@ public class ConfigReader {
 
             // read all columns
             for (int i = 0; i <= 999; i++) {
-                String id = config.getProperty(i + "_id");
+                String id = "_COL" + i;
                 String type = config.getProperty(i + "_type");
                 String indexA = config.getProperty(i + "_index_a");
                 String indexB = config.getProperty(i + "_index_b");
@@ -78,11 +78,9 @@ public class ConfigReader {
                         indexB + "_" + configModel.getSuffixB());
 
                 // if any of the columns is missing the columns is thrown away
-                if (id == null || type == null || indexA == null
-                        || indexB == null
+                if (type == null || indexA == null || indexB == null
                         || config.getProperty(i + "_weight") == null) {
-                    if (id != null || type != null || indexA != null
-                            || indexB != null)
+                    if (type != null || indexA != null || indexB != null)
                         Logger.getLogger(getClass()).warn(String.format(
                                 "Ignoring column %d_ because some items are missing.\n",
                                 i));
@@ -94,8 +92,8 @@ public class ConfigReader {
                 double phonWeight = Double
                         .valueOf(config.getProperty(i + "_phon_weight", "0.0"));
 
-                ColumnConfigModel column = new ColumnConfigModel(id, type, indexA,
-                        indexB, renameA, renameB, weight, phonWeight);
+                ColumnConfigModel column = new ColumnConfigModel(id, type,
+                        indexA, indexB, renameA, renameB, weight, phonWeight);
                 configModel.addColumn(column);
 
                 if (type.equals("name") && phonWeight > 0) {

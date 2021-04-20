@@ -218,7 +218,8 @@ public class Main {
         return fileName;
     }
 
-    private static char guessCsvDelimiter(String firstLine) throws IOException {
+    private static char guessCsvDelimiter(String fileName) throws IOException {
+        String firstLine = Files.lines(Paths.get(fileName)).findFirst().get();
         char[] delimiters = {',', ';', '|', '\t'};
         char delimiter = '\0';
         long occurrences = -1;

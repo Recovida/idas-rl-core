@@ -29,7 +29,7 @@ public class DBFConverter {
         }
         tempFile.deleteOnExit();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile, Charset.forName(encoding)))) {
-            dbf = new DBFReader(new FileInputStream(dbfFileName));
+            dbf = new DBFReader(new FileInputStream(dbfFileName), Charset.forName(encoding));
             int n = dbf.getFieldCount();
             StringBuilder row = new StringBuilder();
             for (int i = 0; i < n; i++)

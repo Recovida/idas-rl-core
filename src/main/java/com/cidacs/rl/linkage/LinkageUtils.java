@@ -46,6 +46,8 @@ public class LinkageUtils {
     }
 
     protected static String quote(String s) {
+        if (s == null)
+            return ""; // empty value does not need quotes
         return '"' + s.replaceAll("\"", "\"\"") + '"';
     }
 }

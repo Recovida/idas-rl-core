@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -26,6 +25,7 @@ import com.cidacs.rl.Cleaning;
 import com.cidacs.rl.Phonetic;
 import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
+import com.cidacs.rl.io.DatasetRecord;
 import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.util.StatusReporter;
@@ -38,7 +38,7 @@ public class Indexing {
         this.config = config;
     }
 
-    public long index(Iterable<CSVRecord> csvRecords){
+    public long index(Iterable<DatasetRecord> csvRecords){
         RecordModel tmpRecordModel;
 
         Path dbIndexPath = Paths.get(config.getDbIndex());
@@ -87,7 +87,7 @@ public class Indexing {
             index = FSDirectory.open(dbIndexPath);
             this.inWriter = new IndexWriter(index, config);
 
-            for (CSVRecord csvRecord : csvRecords) {
+            for (DatasetRecord csvRecord : csvRecords) {
                 tmpRecordModel = this.fromCSVRecordToRecord(++n, csvRecord);
                 this.addRecordToIndex(tmpRecordModel);
             }
@@ -117,7 +117,7 @@ public class Indexing {
         }
     }
 
-    private RecordModel fromCSVRecordToRecord(long num, CSVRecord csvRecord){
+    private RecordModel fromCSVRecordToRecord(long num, DatasetRecord csvRecord){
         ColumnRecordModel tmpRecordColumnRecord;
         String tmpIndex;
         String cleanedValue;

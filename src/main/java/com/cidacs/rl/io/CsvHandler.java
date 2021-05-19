@@ -27,7 +27,7 @@ import com.cidacs.rl.util.StatusReporter;
 
 
 public class CsvHandler {
-    public Iterable<CSVRecord> getCsvIterable(String csvPath, char delimiter,
+    public static Iterable<DatasetRecord> getDatasetRecordIterable(String csvPath, char delimiter,
             String encoding) {
         Reader in = null;
         try {
@@ -41,7 +41,7 @@ public class CsvHandler {
                     .withFirstRecordAsHeader().withDelimiter(delimiter)
                     .parse(in);
 
-            return records;
+            return DatasetRecord.fromCSVRecordIterable(records);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

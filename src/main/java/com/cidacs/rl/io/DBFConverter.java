@@ -6,6 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.linuxense.javadbf.DBFException;
 import com.linuxense.javadbf.DBFReader;
@@ -15,6 +20,41 @@ public class DBFConverter {
 
     protected static String quote(String s) {
         return '"' + s.replaceAll("\"", "\"\"") + '"';
+    }
+
+    public static Iterable<DatasetRecord> getDatasetRecordIterable(String dbfFileName, String encoding) {
+        try {
+            return new Iterable<DatasetRecord>() {
+
+                DBFReader dbf = new DBFReader(new FileInputStream(dbfFileName), Charset.forName(encoding));
+                Map<String, Integer> keyToIndex = IntStream.range(0, dbf.getFieldCount()).boxed().collect(Collectors.toMap(i -> dbf.getField(i).getName(), Function.identity()));
+
+                @Override
+                public Iterator<DatasetRecord> iterator() {
+
+                    return new Iterator<DatasetRecord>() {
+
+                        Object[] nextItem = dbf.nextRecord();
+
+                        @Override
+                        public boolean hasNext() {
+                            return nextItem != null;
+                        }
+
+                        @Override
+                        public DatasetRecord next() {
+                            Object[] r = nextItem;
+                            nextItem = dbf.nextRecord();
+                            return DatasetRecord.fromKeyToIndexAndArray(keyToIndex, nextItem);
+                        }
+                    };
+
+                }
+            };
+        } catch (IOException | DBFException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

@@ -15,7 +15,6 @@ import java.util.Iterator;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.iterators.IteratorChain;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.log4j.Level;
@@ -33,6 +32,7 @@ import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.config.ConfigReader;
 import com.cidacs.rl.io.CsvHandler;
 import com.cidacs.rl.io.DBFConverter;
+import com.cidacs.rl.io.DatasetRecord;
 import com.cidacs.rl.linkage.Linkage;
 import com.cidacs.rl.linkage.LinkageUtils;
 import com.cidacs.rl.record.ColumnRecordModel;
@@ -83,23 +83,34 @@ public class Main {
         String fileName_a = config.getDbA();
         String fileName_b = config.getDbB();
         fileName_a = convertFileIfNeeded(fileName_a, config.getEncodingA());
-        fileName_b = convertFileIfNeeded(fileName_b, config.getEncodingB());
         config.setDbA(fileName_a);
-        config.setDbB(fileName_b);
 
         // read first line and guess delimiter
         char delimiter_a = guessCsvDelimiter(fileName_a, config.getEncodingA());
-        char delimiter_b = guessCsvDelimiter(fileName_b, config.getEncodingB());
+
+
+
+
+        Iterable<DatasetRecord> dbBCsvRecords = null;
+        if (fileName_b.toLowerCase().endsWith(".csv")) {
+            char delimiter_b = guessCsvDelimiter(fileName_b, config.getEncodingB());
+            dbBCsvRecords = CsvHandler.getDatasetRecordIterable(config.getDbB(), delimiter_b, config.getEncodingB());
+        } else if (fileName_b.toLowerCase().endsWith(".dbf")) {
+            dbBCsvRecords = DBFConverter.getDatasetRecordIterable(fileName_b, config.getEncodingB());
+        } else {
+            StatusReporter.get().errorDatasetFileFormatIsUnsupported(fileName_b);
+            System.exit(1);
+        }
 
         // prepare indexing
         config.setDbIndex(config.getDbIndex() + File.separator + getHash(fileName_b));
-        CsvHandler csvHandler = new CsvHandler();
+
         Indexing indexing = new Indexing(config);
 
         // read database B
         StatusReporter.get().infoReadingAndIndexingB(config.getDbB());
-        Iterable<CSVRecord> dbBCsvRecords;
-        dbBCsvRecords = csvHandler.getCsvIterable(config.getDbB(), delimiter_b, config.getEncodingB());
+
+
         long count_b = indexing.index(dbBCsvRecords);
         if (count_b > 0)
             StatusReporter.get().infoFinishedIndexingB(count_b);

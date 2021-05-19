@@ -146,9 +146,7 @@ public class Searching {
                 }
             }
 
-        } catch (IOException e){
-            Logger.getLogger(getClass()).debug("Row " + idCandidate + " could not be linked.");
-        } catch (ParseException e) {
+        } catch (IOException | ParseException e){
             Logger.getLogger(getClass()).debug("Row " + idCandidate + " could not be linked.");
         }
 

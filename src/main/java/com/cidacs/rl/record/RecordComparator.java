@@ -3,11 +3,11 @@ package com.cidacs.rl.record;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.lucene.search.spell.JaroWinklerDistance;
 
 import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
+import com.cidacs.rl.util.StatusReporter;
 
 public  class RecordComparator {
     private ConfigModel config;
@@ -64,7 +64,7 @@ public  class RecordComparator {
                         penalty = penalty+0.01;
                     }
                 } catch (ArrayIndexOutOfBoundsException dta) {
-                    Logger.getLogger(getClass()).warn("Invalid date: " + columnA.getValue());
+                    StatusReporter.get().warnInvalidValueForType(columnA.getValue(), "date");
                 }
             }
             // PARA CODIGO DO MUNIC
@@ -77,7 +77,7 @@ public  class RecordComparator {
                         }
                     }
                 } catch (StringIndexOutOfBoundsException ibge) {
-                    Logger.getLogger(getClass()).warn("Invalid IBGE code: " + columnA.getValue());
+                    StatusReporter.get().warnInvalidValueForType(columnA.getValue(), "ibge");
                 }
             }
             // PARA SEXO
@@ -92,7 +92,7 @@ public  class RecordComparator {
                         }
                     }
                 } catch (StringIndexOutOfBoundsException ibge) {
-                    Logger.getLogger(getClass()).warn("Invalid gender: " + columnA.getValue());
+                    StatusReporter.get().warnInvalidValueForType(columnA.getValue(), "gender");
                 }
             }
 
@@ -104,7 +104,7 @@ public  class RecordComparator {
                         scoreCategorical = scoreCategorical + this.getDistanceCategorical(columnA.getValue(), columnB.getValue(), columnConfig.getWeight());
                     }
                 } catch (StringIndexOutOfBoundsException ibge) {
-                    Logger.getLogger(getClass()).warn("Invalid category: " + columnA.getValue());
+                    StatusReporter.get().warnInvalidValueForType(columnA.getValue(), "categorical");
                 }
             }
 
@@ -115,7 +115,7 @@ public  class RecordComparator {
                         scoreNumericalId = scoreNumericalId + this.getDistanceNumericalId(columnA.getValue(), columnB.getValue(), columnConfig.getWeight());
                     }
                 } catch (StringIndexOutOfBoundsException e) {
-                    Logger.getLogger(getClass()).warn("Invalid numerical id: " + columnA.getValue());
+                    StatusReporter.get().warnInvalidValueForType(columnA.getValue(), "numerical_id");
                 }
             }
         }

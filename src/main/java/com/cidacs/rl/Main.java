@@ -38,9 +38,11 @@ import com.cidacs.rl.linkage.LinkageUtils;
 import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.search.Indexing;
+import com.cidacs.rl.util.StatusReporter;
 
 import scala.Tuple2;
 import sun.misc.Unsafe;
+
 
 
 public class Main {
@@ -70,10 +72,10 @@ public class Main {
         ConfigReader confReader = new ConfigReader();
         String configFileName = new File(args.length < 1 ? "assets/config.properties" : args[0]).getPath();
         if (!new File(configFileName).isFile()) {
-            logger.error(String.format("Configuration file \"%s\" does not exist.", configFileName));
+            StatusReporter.get().errorConfigFileDoesNotExist(configFileName);
             System.exit(1);
         }
-        logger.info(String.format("Using configuration file \"%s\".", configFileName));
+        StatusReporter.get().infoUsingConfigFile(configFileName);
         ConfigModel config = confReader.readConfig(configFileName);
 
 
@@ -95,12 +97,12 @@ public class Main {
         Indexing indexing = new Indexing(config);
 
         // read database B
-        logger.info("Reading and indexing dataset B...");
+        StatusReporter.get().infoReadingAndIndexingB(config.getDbB());
         Iterable<CSVRecord> dbBCsvRecords;
         dbBCsvRecords = csvHandler.getCsvIterable(config.getDbB(), delimiter_b, config.getEncodingB());
         long count_b = indexing.index(dbBCsvRecords);
         if (count_b > 0)
-            logger.info("Finished reading and indexing dataset B (entries: " + count_b + ").");
+            StatusReporter.get().infoFinishedIndexingB(count_b);
 
         disableIllegalAccessWarnings();
 
@@ -112,21 +114,21 @@ public class Main {
                 .getOrCreate();
 
         // read dataset A
-        logger.info("Reading dataset A...");
+        StatusReporter.get().infoReadingA(config.getDbA());
         Dataset<Row> dsa = spark.read().format("csv")
                 .option("sep", "" + delimiter_a)
                 .option("encoding", config.getEncodingA())
                 .option("inferSchema", "false")
                 .option("header", "true")
                 .load(config.getDbA());
-        logger.info("Finished reading dataset A (entries: " + dsa.count() + ").");
+        StatusReporter.get().infoFinishedReadingA(dsa.count());
 
         String resultPath = new File(config.getLinkageDir() + File.separator + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(java.util.Calendar.getInstance().getTime())).getPath();
 
         if (config.getMaxRows() < Long.MAX_VALUE)
-            logger.info(String.format("Linking at most %d item(s).", config.getMaxRows()));
+            StatusReporter.get().infoMaxRowsA(config.getMaxRows());
 
-        logger.info("Performing linkage...");
+        StatusReporter.get().infoPerformingLinkage();
 
         Linkage linkage = new Linkage(config);
 
@@ -192,14 +194,14 @@ public class Main {
             }
         }, false);
         CsvHandler.writeRDDasCSV(rdd, resultPath + File.separator + "result.csv");
-        logger.info(String.format("Completed. The result was saved in \"%s\".", resultPath));
+        StatusReporter.get().infoCompleted(resultPath);
         spark.stop();
     }
 
 
     private static String convertFileIfNeeded(String fileName, String encoding) {
         if (!new File(fileName).isFile()) {
-            logger.error(String.format("Could not find file: \"%s\".", fileName));
+            StatusReporter.get().errorDatasetFileDoesNotExist(fileName);
             System.exit(1);
         }
         if (fileName.toLowerCase().endsWith(".csv")) {
@@ -208,12 +210,12 @@ public class Main {
             Logger.getLogger(Main.class).info(String.format("Converting file \"%s\" to CSV...", fileName));
             String newFileName = DBFConverter.toCSV(fileName, encoding);
             if (newFileName == null) {
-                logger.error(String.format("Could not read file: \"%s\".", fileName));
+                StatusReporter.get().errorDatasetFileCannotBeRead(fileName);
                 System.exit(1);
             }
             return newFileName;
         } else {
-            logger.error(String.format("Unsupported format: \"%s\".", fileName));
+            StatusReporter.get().errorDatasetFileFormatIsUnsupported(fileName);
             System.exit(1);
         }
         return fileName;
@@ -224,7 +226,7 @@ public class Main {
         try {
             firstLine = Files.lines(Paths.get(fileName), Charset.forName(encoding)).findFirst().get();
         } catch (UncheckedIOException e) {
-            Logger.getLogger(Main.class).error(String.format("Could not read file \"%s\" using encoding \"%s\".", fileName, encoding));
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileName, encoding);
             System.exit(1);
         }
         char[] delimiters = {',', ';', '|', '\t'};

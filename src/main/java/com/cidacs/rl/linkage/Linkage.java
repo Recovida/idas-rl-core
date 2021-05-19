@@ -8,6 +8,7 @@ import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.record.RecordModel;
 import com.cidacs.rl.record.RecordPairModel;
 import com.cidacs.rl.search.Searching;
+import com.cidacs.rl.util.StatusReporter;
 
 public class Linkage implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -27,7 +28,7 @@ public class Linkage implements Serializable {
             else
                 return "";
         } else {
-            Logger.getLogger(getClass()).warn("Could not link row.");
+            StatusReporter.get().warnCouldNotLinkRow();
             Logger.getLogger(getClass()).debug("This is the row that could not be linked: " + record.getColumnRecordModels());
             return "";
         }

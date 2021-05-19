@@ -19,11 +19,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 
 import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.linkage.LinkageUtils;
+import com.cidacs.rl.util.StatusReporter;
 
 
 public class CsvHandler {
@@ -62,7 +62,8 @@ public class CsvHandler {
         try {
             Files.write(path, (header+"\n").getBytes());
         } catch (IOException e) {
-            Logger.getLogger(getClass()).error("Error while writing file.");
+            StatusReporter.get().errorCannotSaveResult();
+            e.printStackTrace();
         }
         // close file
     }
@@ -71,11 +72,11 @@ public class CsvHandler {
         new File(fileName).getParentFile().mkdirs();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
             List<String> rows = data.collect();
-            Logger.getLogger(CsvHandler.class).info("Saving linkage result...");
+            StatusReporter.get().infoSavingResult();
             for (String row : rows)
                 bw.write(row + "\n");
         } catch (IOException e) {
-            Logger.getLogger(CsvHandler.class).error("Could not save file.");
+            StatusReporter.get().errorCannotSaveResult();
             e.printStackTrace();
             System.exit(1);
         }

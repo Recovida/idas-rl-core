@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -29,6 +28,7 @@ import com.cidacs.rl.config.ColumnConfigModel;
 import com.cidacs.rl.config.ConfigModel;
 import com.cidacs.rl.record.ColumnRecordModel;
 import com.cidacs.rl.record.RecordModel;
+import com.cidacs.rl.util.StatusReporter;
 
 public class Indexing {
     ConfigModel config;
@@ -67,14 +67,14 @@ public class Indexing {
                         }
                 }
                 if (allIndexed) {
-                    Logger.getLogger(getClass()).info("Database B has already been indexed. Reusing index.");
+                    StatusReporter.get().infoReusingIndex();
                     return 0;
                 } else {
-                    Logger.getLogger(getClass()).info("Database B has already been indexed, but the old index does not contain some of the required columns. Indexing it again.");
+                    StatusReporter.get().infoOldIndexLacksColumns();
                     deleteOldIndex(dbIndexPath.toFile());
                 }
             } else {
-                Logger.getLogger(getClass()).info("Indexing of database B has probably been interrupted in a previous execution. Indexing it again.");
+                StatusReporter.get().infoOldIndexIsCorrupt();
                 deleteOldIndex(dbIndexPath.toFile());
             }
         }
@@ -164,9 +164,7 @@ public class Indexing {
         try {
             FileUtils.deleteDirectory(f);
         } catch (IOException e) {
-            Logger.getLogger(getClass()).error(
-                    String.format("Could not delete old index. Please delete the directory “%s” and try again.", f.toString()));
-            e.printStackTrace();
+            StatusReporter.get().errorOldIndexCannotBeDeleted(f.toString());
             System.exit(1);
         }
     }

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import com.cidacs.rl.util.StatusReporter;
 
 public class ConfigReader {
 
@@ -85,9 +85,7 @@ public class ConfigReader {
                 if (type == null || indexA == null || indexB == null
                         || config.getProperty(i + "_weight") == null) {
                     if (type != null || indexA != null || indexB != null)
-                        Logger.getLogger(getClass()).warn(String.format(
-                                "Ignoring column %d_ because some items are missing.\n",
-                                i));
+                        StatusReporter.get().warnIgnoringColumn(i);
                     continue;
                 }
 

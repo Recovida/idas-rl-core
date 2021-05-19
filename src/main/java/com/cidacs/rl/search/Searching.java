@@ -71,7 +71,7 @@ public class Searching {
         if(tmpCandidates.isEmpty() == false){
             tmpCandidate = recordComparator.findBestCandidatePair(record,tmpCandidates);
 
-            if(tmpCandidate.getScore() >= 0.95) {
+            if(tmpCandidate != null && tmpCandidate.getScore() >= 0.95) {
                 return tmpCandidate;
             }
         }
@@ -94,7 +94,7 @@ public class Searching {
         if(tmpCandidates.isEmpty() == false){
             tmpCandidate = recordComparator.findBestCandidatePair(record,tmpCandidates);
 
-            if(tmpCandidate.getScore() >= 0.95) {
+            if(tmpCandidate != null && tmpCandidate.getScore() >= 0.95) {
                 return tmpCandidate;
             }
         }

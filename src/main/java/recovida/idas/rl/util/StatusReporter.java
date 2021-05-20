@@ -1,9 +1,12 @@
 package recovida.idas.rl.util;
 
+import java.text.MessageFormat;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import recovida.idas.rl.Main;
+import recovida.idas.rl.lang.MessageProvider;
 
 public class StatusReporter {
 
@@ -23,101 +26,102 @@ public class StatusReporter {
     }
 
     public void warnIgnoringColumn(int number) {
-        LOGGER.warn(String.format(
-                "Ignoring column %d_ because some items are missing.\n",
+        LOGGER.warn(MessageFormat.format(
+                MessageProvider.getMessage("config.ignoringnum"),
                 number));
     }
 
     public void errorConfigFileDoesNotExist(String configFileName) {
-        LOGGER.error(String.format("Configuration file \"%s\" does not exist.",
+        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("config.doesnotexist"),
                 configFileName));
     }
 
     public void infoUsingConfigFile(String configFileName) {
-        LOGGER.info(String.format("Using configuration file \"%s\".",
+        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("config.using"),
                 configFileName));
     }
 
     public void infoReadingA(String fileName) {
-        LOGGER.info(String.format("Reading dataset A (\"%s\")...", fileName));
+        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.a.reading"),
+                fileName));
     }
 
     public void infoReadingAndIndexingB(String fileName) {
-        LOGGER.info(String.format("Reading and indexing dataset B (\"%s\")...",
+        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.b.reading"),
                 fileName));
     }
 
     public void infoFinishedIndexingB(long n) {
-        LOGGER.info("Finished reading and indexing dataset B (entries: " + n
-                + ").");
+        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.b.finishedreading"),
+                n));
     }
 
     public void infoReusingIndex() {
-        LOGGER.info("Database B has already been indexed. Reusing index.");
+        LOGGER.info(MessageProvider.getMessage("dataset.b.reusingindex"));
     }
 
     public void infoOldIndexLacksColumns() {
-        LOGGER.info("Database B has already been indexed, but the old index does not contain some of the required columns. Indexing it again.");
+        LOGGER.info(MessageProvider.getMessage("dataset.b.incompleteindex"));
     }
 
     public void infoOldIndexIsCorrupt() {
-        LOGGER.info("Indexing of database B has probably been interrupted in a previous execution. Indexing it again.");
+        LOGGER.info(MessageProvider.getMessage("dataset.b.corruptindex"));
     }
 
     public void infoFinishedReadingA(long n) {
-        LOGGER.info("Finished reading dataset A (entries: " + n + ").");
+        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.a.finishedreading"),
+                n));
     }
 
     public void infoMaxRowsA(long n) {
-        LOGGER.info(String.format("Linking at most %d item(s).", n));
+        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("linkage.maxrows"),
+                n));
     }
 
     public void infoPerformingLinkage() {
-        LOGGER.info("Performing linkage...");
+        LOGGER.info(MessageProvider.getMessage("linkage.linking"));
     }
 
     public void infoCompleted(String resultPath) {
-        LOGGER.info(String.format("Completed. The result was saved in \"%s\".",
+        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("linkage.done"),
                 resultPath));
     }
 
     public void errorDatasetFileDoesNotExist(String fileName) {
-        LOGGER.error(String.format("Could not find file: \"%s\".", fileName));
-    }
-
-    public void errorDatasetFileCannotBeRead(String fileName) {
-        LOGGER.error(String.format("Could not read file: \"%s\".", fileName));
+        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.doesnotexist"),
+                fileName));
     }
 
     public void errorDatasetFileFormatIsUnsupported(String fileName) {
-        LOGGER.error(String.format("Unsupported format: \"%s\".", fileName));
+        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.unsupportedformat"),
+                fileName));
     }
 
     public void errorDatasetFileCannotBeRead(String fileName, String encoding) {
-        LOGGER.error(String.format(
-                "Could not read file \"%s\" using encoding \"%s\".", fileName,
-                encoding));
+        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.couldnotread"),
+                fileName, encoding));
     }
 
     public void errorOldIndexCannotBeDeleted(String dir) {
-        LOGGER.error(String.format(
-                "Could not delete old index. Please delete the directory \"%s\" and try again.",
+        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.b.cannotdeleteoldindex"),
                 dir));
     }
 
     public void warnInvalidValueForType(String value, String type) {
-        LOGGER.warn(String.format("Invalid value for type \"%s\":  \"%s\"", type, value));
+        LOGGER.warn(MessageFormat.format(MessageProvider.getMessage("dataset.invalidvalue"),
+                value, type));
     }
 
     public void warnCouldNotLinkRow() {
-        LOGGER.warn("Could not link row.");
+        LOGGER.warn(MessageProvider.getMessage("linkage.cannotlink"));
     }
 
     public void errorCannotSaveResult() {
-        LOGGER.error("Error while writing file.");
+        LOGGER.error(MessageProvider.getMessage("linkage.cannotsave"));
     }
 
     public void infoSavingResult() {
-        LOGGER.info("Saving linkage result...");
+        LOGGER.info(MessageProvider.getMessage("linkage.saving"));
     }
+
 }

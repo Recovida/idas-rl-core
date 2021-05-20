@@ -220,7 +220,7 @@ public class Main {
             Logger.getLogger(Main.class).info(String.format("Converting file \"%s\" to CSV...", fileName));
             String newFileName = DBFConverter.toCSV(fileName, encoding);
             if (newFileName == null) {
-                StatusReporter.get().errorDatasetFileCannotBeRead(fileName);
+                StatusReporter.get().errorDatasetFileCannotBeRead(fileName, encoding);
                 System.exit(1);
             }
             return newFileName;

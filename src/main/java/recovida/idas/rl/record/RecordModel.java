@@ -1,4 +1,4 @@
-package com.cidacs.rl.record;
+package recovida.idas.rl.record;
 
 import java.util.ArrayList;
 

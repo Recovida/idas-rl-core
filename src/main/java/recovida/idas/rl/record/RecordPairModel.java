@@ -1,4 +1,4 @@
-package com.cidacs.rl.record;
+package recovida.idas.rl.record;
 
 public class RecordPairModel {
     private RecordModel recordA;

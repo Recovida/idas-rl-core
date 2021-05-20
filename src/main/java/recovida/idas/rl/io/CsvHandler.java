@@ -1,4 +1,4 @@
-package com.cidacs.rl.io;
+package recovida.idas.rl.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,9 +21,9 @@ import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.spark.api.java.JavaRDD;
 
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.linkage.LinkageUtils;
-import com.cidacs.rl.util.StatusReporter;
+import recovida.idas.rl.config.ConfigModel;
+import recovida.idas.rl.linkage.LinkageUtils;
+import recovida.idas.rl.util.StatusReporter;
 
 
 public class CsvHandler {

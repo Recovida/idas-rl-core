@@ -1,4 +1,4 @@
-package com.cidacs.rl.io;
+package recovida.idas.rl.io;
 
 import java.util.Iterator;
 import java.util.Map;

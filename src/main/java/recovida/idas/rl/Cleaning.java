@@ -1,14 +1,14 @@
 /**
  *
  */
-package com.cidacs.rl;
+package recovida.idas.rl;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.cidacs.rl.config.ColumnConfigModel;
+import recovida.idas.rl.config.ColumnConfigModel;
 
 public class Cleaning {
 

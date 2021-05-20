@@ -1,4 +1,4 @@
-package com.cidacs.rl.config;
+package recovida.idas.rl.config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.cidacs.rl.util.StatusReporter;
+import recovida.idas.rl.util.StatusReporter;
 
 public class ConfigReader {
 

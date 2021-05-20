@@ -1,4 +1,4 @@
-package com.cidacs.rl.config;
+package recovida.idas.rl.config;
 
 import java.io.Serializable;
 

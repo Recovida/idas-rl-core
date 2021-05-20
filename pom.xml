@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>groupId</groupId>
-    <artifactId>c-rl-sim</artifactId>
+    <groupId>recovida</groupId>
+    <artifactId>idas-rl</artifactId>
     <version>1.0.3</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,7 +26,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
                 <configuration>
-                    <mainClass>com.cidacs.rl.Main</mainClass>
+                    <mainClass>recovida.idas.rl.Main</mainClass>
                     <!-- 
                     # for cases where arguments are needed 
                     <arguments>argument1</arguments> 

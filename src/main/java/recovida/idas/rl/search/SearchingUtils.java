@@ -1,8 +1,8 @@
-package com.cidacs.rl.search;
+package recovida.idas.rl.search;
 
 import java.util.ArrayList;
 
-import com.cidacs.rl.record.ColumnRecordModel;
+import recovida.idas.rl.record.ColumnRecordModel;
 
 public class SearchingUtils {
 

@@ -1,11 +1,11 @@
-package com.cidacs.rl.linkage;
+package recovida.idas.rl.linkage;
 
 import java.util.Locale;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.record.ColumnRecordModel;
-import com.cidacs.rl.record.RecordPairModel;
+import recovida.idas.rl.config.ColumnConfigModel;
+import recovida.idas.rl.config.ConfigModel;
+import recovida.idas.rl.record.ColumnRecordModel;
+import recovida.idas.rl.record.RecordPairModel;
 
 public class LinkageUtils {
     public String fromRecordPairToCsv(RecordPairModel recordPair) {

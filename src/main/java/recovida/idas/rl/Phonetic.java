@@ -1,4 +1,4 @@
-package com.cidacs.rl;
+package recovida.idas.rl;
 
 import java.util.LinkedList;
 import java.util.List;

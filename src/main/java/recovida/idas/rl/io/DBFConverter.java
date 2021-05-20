@@ -1,4 +1,4 @@
-package com.cidacs.rl.io;
+package recovida.idas.rl.io;
 
 import java.io.BufferedWriter;
 import java.io.File;

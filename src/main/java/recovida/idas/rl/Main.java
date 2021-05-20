@@ -1,4 +1,4 @@
-package com.cidacs.rl;
+package recovida.idas.rl;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,19 +27,18 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.config.ConfigReader;
-import com.cidacs.rl.io.CsvHandler;
-import com.cidacs.rl.io.DBFConverter;
-import com.cidacs.rl.io.DatasetRecord;
-import com.cidacs.rl.linkage.Linkage;
-import com.cidacs.rl.linkage.LinkageUtils;
-import com.cidacs.rl.record.ColumnRecordModel;
-import com.cidacs.rl.record.RecordModel;
-import com.cidacs.rl.search.Indexing;
-import com.cidacs.rl.util.StatusReporter;
-
+import recovida.idas.rl.config.ColumnConfigModel;
+import recovida.idas.rl.config.ConfigModel;
+import recovida.idas.rl.config.ConfigReader;
+import recovida.idas.rl.io.CsvHandler;
+import recovida.idas.rl.io.DBFConverter;
+import recovida.idas.rl.io.DatasetRecord;
+import recovida.idas.rl.linkage.Linkage;
+import recovida.idas.rl.linkage.LinkageUtils;
+import recovida.idas.rl.record.ColumnRecordModel;
+import recovida.idas.rl.record.RecordModel;
+import recovida.idas.rl.search.Indexing;
+import recovida.idas.rl.util.StatusReporter;
 import scala.Tuple2;
 import sun.misc.Unsafe;
 

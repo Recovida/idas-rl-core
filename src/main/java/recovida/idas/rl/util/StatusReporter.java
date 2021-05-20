@@ -1,9 +1,9 @@
-package com.cidacs.rl.util;
+package recovida.idas.rl.util;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.cidacs.rl.Main;
+import recovida.idas.rl.Main;
 
 public class StatusReporter {
 

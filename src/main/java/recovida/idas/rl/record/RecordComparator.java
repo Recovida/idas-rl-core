@@ -1,13 +1,13 @@
-package com.cidacs.rl.record;
+package recovida.idas.rl.record;
 
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.spell.JaroWinklerDistance;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.util.StatusReporter;
+import recovida.idas.rl.config.ColumnConfigModel;
+import recovida.idas.rl.config.ConfigModel;
+import recovida.idas.rl.util.StatusReporter;
 
 public  class RecordComparator {
     private ConfigModel config;

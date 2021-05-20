@@ -1,14 +1,14 @@
-package com.cidacs.rl.linkage;
+package recovida.idas.rl.linkage;
 
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.record.RecordModel;
-import com.cidacs.rl.record.RecordPairModel;
-import com.cidacs.rl.search.Searching;
-import com.cidacs.rl.util.StatusReporter;
+import recovida.idas.rl.config.ConfigModel;
+import recovida.idas.rl.record.RecordModel;
+import recovida.idas.rl.record.RecordPairModel;
+import recovida.idas.rl.search.Searching;
+import recovida.idas.rl.util.StatusReporter;
 
 public class Linkage implements Serializable {
     private static final long serialVersionUID = 1L;

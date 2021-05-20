@@ -1,4 +1,4 @@
-package com.cidacs.rl.search;
+package recovida.idas.rl.search;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -17,13 +17,13 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-import com.cidacs.rl.config.ColumnConfigModel;
-import com.cidacs.rl.config.ConfigModel;
-import com.cidacs.rl.record.ColumnRecordModel;
-import com.cidacs.rl.record.RecordComparator;
-import com.cidacs.rl.record.RecordModel;
-import com.cidacs.rl.record.RecordPairModel;
-import com.cidacs.rl.util.Permutation;
+import recovida.idas.rl.config.ColumnConfigModel;
+import recovida.idas.rl.config.ConfigModel;
+import recovida.idas.rl.record.ColumnRecordModel;
+import recovida.idas.rl.record.RecordComparator;
+import recovida.idas.rl.record.RecordModel;
+import recovida.idas.rl.record.RecordPairModel;
+import recovida.idas.rl.util.Permutation;
 
 
 public class Searching {

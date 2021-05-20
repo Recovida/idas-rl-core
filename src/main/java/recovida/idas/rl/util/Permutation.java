@@ -1,8 +1,8 @@
-package com.cidacs.rl.util;
-
-import com.cidacs.rl.record.ColumnRecordModel;
+package recovida.idas.rl.util;
 
 import java.util.ArrayList;
+
+import recovida.idas.rl.record.ColumnRecordModel;
 
 public class Permutation {
     public ArrayList<ArrayList<Integer>> combine(int n, int k) {

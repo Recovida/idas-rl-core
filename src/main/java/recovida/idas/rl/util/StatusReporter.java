@@ -1,16 +1,52 @@
 package recovida.idas.rl.util;
 
+import java.io.PrintStream;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import recovida.idas.rl.Main;
 import recovida.idas.rl.lang.MessageProvider;
 
 public class StatusReporter {
 
-    public final static Logger LOGGER = LogManager.getLogger(Main.class);
+    public static class ConsoleLogger {
+
+        public static void warn(String message) {
+            log(System.err, "WARN", message);
+        }
+
+        public static void info(String message) {
+            log(System.out, "INFO", message);
+        }
+
+        public static void infoWithoutLineBreak(String message) {
+            log(System.out, "INFO", message, false);
+        }
+
+        public static void error(String message) {
+            log(System.err, "ERROR", message);
+        }
+
+        public static void debug(String message) {
+            log(System.err, "DEBUG", message);
+        }
+
+        public static void log(PrintStream stream, String type,
+                String message) {
+            log(stream, type, message, true);
+        }
+
+        public static void log(PrintStream stream, String type,
+                String message, boolean lineBreak) {
+            stream.format("[%8s] %5s: %s" + (lineBreak ? "%n" : ""),
+                    LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(
+                            DateTimeFormatter.ISO_LOCAL_TIME),
+                    type, message);
+        }
+
+
+    }
 
     protected static StatusReporter instance = null;
 
@@ -20,108 +56,138 @@ public class StatusReporter {
         return instance;
     }
 
-    public static void set(StatusReporter instance) { // can be used by subclasses
+    public static void set(StatusReporter instance) { // can be used by
+        // subclasses
         if (instance != null)
             StatusReporter.instance = instance;
     }
 
     public void warnIgnoringColumn(int number) {
-        LOGGER.warn(MessageFormat.format(
-                MessageProvider.getMessage("config.ignoringnum"),
-                number));
+        ConsoleLogger.warn(MessageFormat.format(
+                MessageProvider.getMessage("config.ignoringnum"), number));
     }
 
     public void errorConfigFileDoesNotExist(String configFileName) {
-        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("config.doesnotexist"),
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("config.doesnotexist"),
                 configFileName));
     }
 
     public void infoUsingConfigFile(String configFileName) {
-        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("config.using"),
-                configFileName));
+        ConsoleLogger.info(MessageFormat.format(
+                MessageProvider.getMessage("config.using"), configFileName));
     }
 
     public void infoReadingA(String fileName) {
-        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.a.reading"),
-                fileName));
+        ConsoleLogger.info(MessageFormat.format(
+                MessageProvider.getMessage("dataset.a.reading"), fileName));
     }
 
     public void infoReadingAndIndexingB(String fileName) {
-        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.b.reading"),
-                fileName));
+        ConsoleLogger.info(MessageFormat.format(
+                MessageProvider.getMessage("dataset.b.reading"), fileName));
+    }
+
+    public void errorMissingColumnInDatasetA(String column) {
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.a.missingcolumn"), column));
+    }
+
+    public void errorMissingColumnInDatasetB(String column) {
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.b.missingcolumn"), column));
+    }
+
+    public void infoAvailableColumnsInDatasetA(String column) {
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.a.columnlist"), column));
+    }
+
+    public void infoAvailableColumnsInDatasetB(String column) {
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.b.columnlist"), column));
     }
 
     public void infoFinishedIndexingB(long n) {
-        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.b.finishedreading"),
-                n));
+        ConsoleLogger.info(MessageFormat.format(
+                MessageProvider.getMessage("dataset.b.finishedreading"), n));
     }
 
     public void infoReusingIndex() {
-        LOGGER.info(MessageProvider.getMessage("dataset.b.reusingindex"));
+        ConsoleLogger
+        .info(MessageProvider.getMessage("dataset.b.reusingindex"));
     }
 
     public void infoOldIndexLacksColumns() {
-        LOGGER.info(MessageProvider.getMessage("dataset.b.incompleteindex"));
+        ConsoleLogger
+        .info(MessageProvider.getMessage("dataset.b.incompleteindex"));
     }
 
     public void infoOldIndexIsCorrupt() {
-        LOGGER.info(MessageProvider.getMessage("dataset.b.corruptindex"));
+        ConsoleLogger
+        .info(MessageProvider.getMessage("dataset.b.corruptindex"));
     }
 
     public void infoFinishedReadingA(long n) {
-        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("dataset.a.finishedreading"),
-                n));
+        ConsoleLogger.info(MessageFormat.format(
+                MessageProvider.getMessage("dataset.a.finishedreading"), n));
     }
 
     public void infoMaxRowsA(long n) {
-        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("linkage.maxrows"),
-                n));
+        ConsoleLogger.info(MessageFormat
+                .format(MessageProvider.getMessage("linkage.maxrows"), n));
     }
 
-    public void infoPerformingLinkage() {
-        LOGGER.info(MessageProvider.getMessage("linkage.linking"));
+    public void infoPerformingLinkage(int nThreads) {
+        ConsoleLogger.info(MessageFormat
+                .format(MessageProvider.getMessage("linkage.linking"), nThreads));
     }
 
     public void infoCompleted(String resultPath) {
-        LOGGER.info(MessageFormat.format(MessageProvider.getMessage("linkage.done"),
-                resultPath));
+        ConsoleLogger.info(MessageFormat.format(
+                MessageProvider.getMessage("linkage.done"), resultPath));
     }
 
     public void errorDatasetFileDoesNotExist(String fileName) {
-        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.doesnotexist"),
-                fileName));
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.doesnotexist"), fileName));
     }
 
     public void errorDatasetFileFormatIsUnsupported(String fileName) {
-        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.unsupportedformat"),
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.unsupportedformat"),
                 fileName));
     }
 
     public void errorDatasetFileCannotBeRead(String fileName, String encoding) {
-        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.couldnotread"),
-                fileName, encoding));
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.couldnotread"), fileName,
+                encoding));
     }
 
     public void errorOldIndexCannotBeDeleted(String dir) {
-        LOGGER.error(MessageFormat.format(MessageProvider.getMessage("dataset.b.cannotdeleteoldindex"),
+        ConsoleLogger.error(MessageFormat.format(
+                MessageProvider.getMessage("dataset.b.cannotdeleteoldindex"),
                 dir));
     }
 
     public void warnInvalidValueForType(String value, String type) {
-        LOGGER.warn(MessageFormat.format(MessageProvider.getMessage("dataset.invalidvalue"),
-                value, type));
+        ConsoleLogger.warn(MessageFormat.format(
+                MessageProvider.getMessage("dataset.invalidvalue"), value,
+                type));
+    }
+
+    public void infoLinkageProgress(float done) {
+        ConsoleLogger.infoWithoutLineBreak(MessageFormat.format(
+                MessageProvider.getMessage("linkage.progresspercentage") + '\r', done));
     }
 
     public void warnCouldNotLinkRow() {
-        LOGGER.warn(MessageProvider.getMessage("linkage.cannotlink"));
+        ConsoleLogger.warn(MessageProvider.getMessage("linkage.cannotlink"));
     }
 
     public void errorCannotSaveResult() {
-        LOGGER.error(MessageProvider.getMessage("linkage.cannotsave"));
-    }
-
-    public void infoSavingResult() {
-        LOGGER.info(MessageProvider.getMessage("linkage.saving"));
+        ConsoleLogger.error(MessageProvider.getMessage("linkage.cannotsave"));
     }
 
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -24,6 +23,7 @@ import recovida.idas.rl.record.RecordComparator;
 import recovida.idas.rl.record.RecordModel;
 import recovida.idas.rl.record.RecordPairModel;
 import recovida.idas.rl.util.Permutation;
+import recovida.idas.rl.util.StatusReporter.ConsoleLogger;
 
 
 public class Searching {
@@ -147,7 +147,7 @@ public class Searching {
             }
 
         } catch (IOException | ParseException e){
-            Logger.getLogger(getClass()).debug("Row " + idCandidate + " could not be linked.");
+            ConsoleLogger.debug("Row " + idCandidate + " could not be linked.");
         }
 
         return recordsFound;

@@ -18,6 +18,7 @@ public class ConfigModel implements Serializable {
     private String linkageDir = ".";
     private long maxRows = Long.MAX_VALUE;
     private float minimumScore = 0;
+    private int threadCount = Math.min(8, Runtime.getRuntime().availableProcessors());
 
     private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
 
@@ -147,6 +148,15 @@ public class ConfigModel implements Serializable {
         if (enc.equals("ANSI"))
             return "Cp1252";
         return encoding;
+    }
+
+    public int getThreadCount() {
+        return threadCount;
+    }
+
+    public void setThreadCount(int threadCount) {
+        if (threadCount > 0)
+            this.threadCount = threadCount;
     }
 
 

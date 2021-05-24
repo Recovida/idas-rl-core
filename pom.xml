@@ -6,7 +6,7 @@
 
 	<groupId>recovida</groupId>
 	<artifactId>idas-rl</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -84,31 +84,25 @@
 			<version>3.6.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bitbucket.fwilhelm</groupId>
-			<artifactId>org.jenetics</artifactId>
-			<version>3.5.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20171018</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.4</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-core_2.12</artifactId>
-			<version>3.1.0</version>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.9</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_2.12</artifactId>
-			<version>3.1.0</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.github.albfernandez</groupId>
 			<artifactId>javadbf</artifactId>

@@ -30,7 +30,7 @@ public class ConfigReader {
         try {
             config.load(configFileStream);
 
-            // read dba, dbb and dbIndex
+            // read dba, dbb, dbIndex and others
             configModel.setDbA(config.getProperty("db_a"));
             configModel.setDbB(config.getProperty("db_b"));
             configModel.setSuffixA(config.getProperty("suffix_a"));
@@ -40,6 +40,9 @@ public class ConfigReader {
             if (config.containsKey("max_rows"))
                 configModel.setMaxRows(
                         Long.valueOf(config.getProperty("max_rows")));
+            if (config.containsKey("num_threads"))
+                configModel.setThreadCount(
+                        Integer.valueOf(config.getProperty("num_threads")));
             if (config.containsKey("min_score"))
                 configModel.setMinimumScore(
                         Float.valueOf(config.getProperty("min_score")) / 100);

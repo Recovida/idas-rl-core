@@ -88,7 +88,7 @@ public class Indexing {
             this.inWriter = new IndexWriter(index, config);
 
             for (DatasetRecord csvRecord : csvRecords) {
-                tmpRecordModel = this.fromCSVRecordToRecord(++n, csvRecord);
+                tmpRecordModel = this.fromDatasetRecordToRecordModel(++n, csvRecord);
                 this.addRecordToIndex(tmpRecordModel);
             }
 
@@ -117,11 +117,11 @@ public class Indexing {
         }
     }
 
-    private RecordModel fromCSVRecordToRecord(long num, DatasetRecord csvRecord){
+    private RecordModel fromDatasetRecordToRecordModel(long num, DatasetRecord datasetRecord){
         ColumnRecordModel tmpRecordColumnRecord;
         String tmpIndex;
-        String cleanedValue;
-        String tmpValue;
+        String cleanedValue = null;
+        String tmpValue = null;
         String tmpId;
         String tmpType;
         ArrayList<ColumnRecordModel> tmpRecordColumns;
@@ -132,14 +132,22 @@ public class Indexing {
                 continue;
             tmpIndex = column.getIndexB();
             String originalValue;
-            if (column.getType().equals("copy")) {
-                originalValue = tmpIndex.equals("") ? "" : csvRecord.get(tmpIndex);
-                cleanedValue = originalValue;
-                tmpValue = originalValue;
-            } else {
-                originalValue = tmpIndex.equals(config.getRowNumColNameB()) ? String.valueOf(num) : csvRecord.get(tmpIndex);
-                cleanedValue = Cleaning.clean(column, originalValue);
-                tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
+            try {
+                if (column.getType().equals("copy")) {
+                    originalValue = tmpIndex.equals("") ? "" : datasetRecord.get(tmpIndex);
+                    cleanedValue = originalValue;
+                    tmpValue = originalValue;
+                } else {
+                    originalValue = tmpIndex.equals(config.getRowNumColNameB()) ? String.valueOf(num) : datasetRecord.get(tmpIndex);
+                    cleanedValue = Cleaning.clean(column, originalValue);
+                    tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "").replaceAll("\\s+", " ").trim();
+                }
+            } catch (IllegalArgumentException e) {
+                StatusReporter.get()
+                .errorMissingColumnInDatasetB(tmpIndex);
+                StatusReporter.get().infoAvailableColumnsInDatasetB(
+                        '"' + String.join("\", \"", datasetRecord.getKeySet()) + '"');
+                System.exit(1);
             }
             tmpId = column.getId();
             tmpType = column.getType();

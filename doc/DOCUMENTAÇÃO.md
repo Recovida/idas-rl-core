@@ -28,7 +28,7 @@ comentários do arquivo.
 
 Exemplo do formato:
 
-```
+```ini
 db_a = assets/aaaaaa.dbf
 db_b = assets/bbbbbb.csv
 

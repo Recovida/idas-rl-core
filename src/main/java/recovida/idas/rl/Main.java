@@ -156,7 +156,7 @@ public class Main {
 
         Linkage linkage = new Linkage(config);
 
-        final int BUFFER_SIZE = 10;
+        final int BUFFER_SIZE = 1000;
 
         ExecutorService pool = Executors.newFixedThreadPool(maxThreads);
         BlockingQueue<Future<String>> q = new ArrayBlockingQueue<>(BUFFER_SIZE);

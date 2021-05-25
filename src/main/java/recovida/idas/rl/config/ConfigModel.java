@@ -10,8 +10,8 @@ public class ConfigModel implements Serializable {
     private String dbB;
     private String encodingA = "UTF-8";
     private String encodingB = "UTF-8";
-    private String suffixA = "_dsa";
-    private String suffixB = "_dsb";
+    private String suffixA;
+    private String suffixB;
     private String rowNumColNameA = "#A";
     private String rowNumColNameB = "#B";
     private String dbIndex;

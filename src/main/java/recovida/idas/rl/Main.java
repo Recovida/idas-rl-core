@@ -3,8 +3,6 @@ package recovida.idas.rl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -53,6 +51,10 @@ public class Main {
         StatusReporter.get().infoUsingConfigFile(configFileName);
         ConfigModel config = confReader.readConfig(configFileName);
 
+        if (config == null) {
+            System.exit(1);
+        }
+
         String fileName_a = config.getDbA();
         String fileName_b = config.getDbB();
 
@@ -72,7 +74,7 @@ public class Main {
         StatusReporter.get().infoReadingA(fileName_a);
         DatasetReader readerA = null;
         if (fileName_a.toLowerCase().endsWith(".csv")) {
-            char delimiter_a = guessCsvDelimiter(fileName_a,
+            char delimiter_a = CSVDatasetReader.guessCsvDelimiter(fileName_a,
                     config.getEncodingA());
             readerA = new CSVDatasetReader(fileName_a, delimiter_a,
                     config.getEncodingA());
@@ -116,7 +118,7 @@ public class Main {
         Iterable<DatasetRecord> dbBRecords = null;
         DatasetReader readerB = null;
         if (fileName_b.toLowerCase().endsWith(".csv")) {
-            char delimiter_b = guessCsvDelimiter(fileName_b,
+            char delimiter_b = CSVDatasetReader.guessCsvDelimiter(fileName_b,
                     config.getEncodingB());
             readerB = new CSVDatasetReader(fileName_b, delimiter_b,
                     config.getEncodingB());
@@ -242,31 +244,6 @@ public class Main {
         writer.close();
         pool.shutdown();
         StatusReporter.get().infoCompleted(resultPath);
-    }
-
-    private static char guessCsvDelimiter(String fileName, String encoding)
-            throws IOException {
-        String firstLine = null;
-        try {
-            firstLine = Files
-                    .lines(Paths.get(fileName), Charset.forName(encoding))
-                    .findFirst().get();
-        } catch (UncheckedIOException e) {
-            StatusReporter.get().errorDatasetFileCannotBeRead(fileName,
-                    encoding);
-            System.exit(1);
-        }
-        char[] delimiters = { ',', ';', '|', '\t' };
-        char delimiter = '\0';
-        long occurrences = -1;
-        for (char sep : delimiters) {
-            long n = firstLine.chars().filter(ch -> ch == sep).count();
-            if (n > occurrences) {
-                delimiter = sep;
-                occurrences = n;
-            }
-        }
-        return delimiter;
     }
 
     private static String getHash(String fileName) {

@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import recovida.idas.rl.util.StatusReporter;
 
@@ -30,13 +33,20 @@ public class ConfigReader {
         try {
             config.load(configFileStream);
 
-            // read dba, dbb, dbIndex and others
+            String[] mandatoryFields = {"db_a", "db_b", "db_index", "linkage_folder"};
+            List<String> missing = Arrays.stream(mandatoryFields).filter(f -> !config.containsKey(f)).collect(Collectors.toList());
+            if (!missing.isEmpty() ) {
+                missing.stream().forEach(f -> StatusReporter.get().errorMissingFieldInConfigFile(f));
+                return null;
+            }
+
             configModel.setDbA(config.getProperty("db_a"));
             configModel.setDbB(config.getProperty("db_b"));
-            configModel.setSuffixA(config.getProperty("suffix_a"));
-            configModel.setSuffixB(config.getProperty("suffix_b"));
             configModel.setDbIndex(config.getProperty("db_index"));
             configModel.setLinkageDir(config.getProperty("linkage_folder"));
+
+            configModel.setSuffixA(config.getProperty("suffix_a", "_dsa"));
+            configModel.setSuffixB(config.getProperty("suffix_b", "_dsb"));
             if (config.containsKey("max_rows"))
                 configModel.setMaxRows(
                         Long.valueOf(config.getProperty("max_rows")));

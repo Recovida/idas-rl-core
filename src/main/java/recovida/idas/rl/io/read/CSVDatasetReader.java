@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -14,6 +17,7 @@ import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 
 import recovida.idas.rl.io.DatasetRecord;
+import recovida.idas.rl.util.StatusReporter;
 
 public class CSVDatasetReader implements DatasetReader {
 
@@ -49,6 +53,31 @@ public class CSVDatasetReader implements DatasetReader {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static char guessCsvDelimiter(String fileName, String encoding)
+            throws IOException {
+        String firstLine = null;
+        try {
+            firstLine = Files
+                    .lines(Paths.get(fileName), Charset.forName(encoding))
+                    .findFirst().get();
+        } catch (UncheckedIOException e) {
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileName,
+                    encoding);
+            System.exit(1);
+        }
+        char[] delimiters = { ',', ';', '|', '\t' };
+        char delimiter = '\0';
+        long occurrences = -1;
+        for (char sep : delimiters) {
+            long n = firstLine.chars().filter(ch -> ch == sep).count();
+            if (n > occurrences) {
+                delimiter = sep;
+                occurrences = n;
+            }
+        }
+        return delimiter;
     }
 
 }

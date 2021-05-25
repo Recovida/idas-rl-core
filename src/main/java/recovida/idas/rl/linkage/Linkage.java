@@ -6,8 +6,6 @@ import recovida.idas.rl.config.ConfigModel;
 import recovida.idas.rl.record.RecordModel;
 import recovida.idas.rl.record.RecordPairModel;
 import recovida.idas.rl.search.Searching;
-import recovida.idas.rl.util.StatusReporter;
-import recovida.idas.rl.util.StatusReporter.ConsoleLogger;
 
 public class Linkage implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -27,8 +25,6 @@ public class Linkage implements Serializable {
             else
                 return "";
         } else {
-            StatusReporter.get().warnCouldNotLinkRow();
-            ConsoleLogger.debug("This is the row that could not be linked: " + record.getColumnRecordModels());
             return "";
         }
     }

@@ -23,7 +23,6 @@ import recovida.idas.rl.record.RecordComparator;
 import recovida.idas.rl.record.RecordModel;
 import recovida.idas.rl.record.RecordPairModel;
 import recovida.idas.rl.util.Permutation;
-import recovida.idas.rl.util.StatusReporter.ConsoleLogger;
 
 
 public class Searching {
@@ -147,7 +146,6 @@ public class Searching {
             }
 
         } catch (IOException | ParseException e){
-            ConsoleLogger.debug("Row " + idCandidate + " could not be linked.");
         }
 
         return recordsFound;

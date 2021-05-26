@@ -1,7 +1,6 @@
 package recovida.idas.rl.io.read;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,7 +16,6 @@ import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 
 import recovida.idas.rl.io.DatasetRecord;
-import recovida.idas.rl.util.StatusReporter;
 
 public class CSVDatasetReader implements DatasetReader {
 
@@ -45,14 +43,10 @@ public class CSVDatasetReader implements DatasetReader {
                     ByteOrderMark.UTF_32BE);
             in = new InputStreamReader(isWithoutBOM, Charset.forName(encoding));
             Iterable<CSVRecord> records = format.parse(in);
-
             return DatasetRecord.fromCSVRecordIterable(records);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public static char guessCsvDelimiter(String fileName, String encoding)
@@ -63,9 +57,7 @@ public class CSVDatasetReader implements DatasetReader {
                     .lines(Paths.get(fileName), Charset.forName(encoding))
                     .findFirst().get();
         } catch (UncheckedIOException e) {
-            StatusReporter.get().errorDatasetFileCannotBeRead(fileName,
-                    encoding);
-            System.exit(1);
+            return '\0';
         }
         char[] delimiters = { ',', ';', '|', '\t' };
         char delimiter = '\0';

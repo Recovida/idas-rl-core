@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import recovida.idas.rl.util.StatusReporter;
-
 public class CSVDatasetWriter implements DatasetWriter {
 
     protected String fileName;
@@ -17,23 +15,18 @@ public class CSVDatasetWriter implements DatasetWriter {
         this.fileName = fileName;
         this.delimiter = delimiter;
         new File(fileName).getParentFile().mkdirs();
-        try {
-            bw = new BufferedWriter(new FileWriter(fileName));
-        } catch (IOException e) {
-            StatusReporter.get().errorCannotSaveResult();
-            e.printStackTrace();
-            System.exit(1);
-        }
     }
 
     @Override
-    public void writeRow(String row) {
+    public boolean writeRow(String row) {
         try {
+            if (bw == null) {
+                bw = new BufferedWriter(new FileWriter(fileName));
+            }
             bw.write(row + "\n");
+            return true;
         } catch (IOException e) {
-            StatusReporter.get().errorCannotSaveResult();
-            e.printStackTrace();
-            System.exit(1);
+            return false;
         }
     }
 

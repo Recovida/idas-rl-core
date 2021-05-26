@@ -1,4 +1,4 @@
-package recovida.idas.rl;
+package recovida.idas.rl.util;
 
 import java.util.LinkedList;
 import java.util.List;

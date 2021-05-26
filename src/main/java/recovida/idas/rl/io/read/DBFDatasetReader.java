@@ -19,20 +19,22 @@ public class DBFDatasetReader implements DatasetReader {
     protected String fileName;
     protected String encoding;
 
-
     public DBFDatasetReader(String fileName, String encoding) {
         this.fileName = fileName;
         this.encoding = encoding;
     }
 
-
     @Override
-    public  Iterable<DatasetRecord> getDatasetRecordIterable() {
+    public Iterable<DatasetRecord> getDatasetRecordIterable() {
         try {
             return new Iterable<DatasetRecord>() {
 
-                DBFReader dbf = new DBFReader(new FileInputStream(fileName), Charset.forName(encoding));
-                Map<String, Integer> keyToIndex = IntStream.range(0, dbf.getFieldCount()).boxed().collect(Collectors.toMap(i -> dbf.getField(i).getName(), Function.identity()));
+                DBFReader dbf = new DBFReader(new FileInputStream(fileName),
+                        Charset.forName(encoding));
+                Map<String, Integer> keyToIndex = IntStream
+                        .range(0, dbf.getFieldCount()).boxed().collect(
+                                Collectors.toMap(i -> dbf.getField(i).getName(),
+                                        Function.identity()));
 
                 @Override
                 public Iterator<DatasetRecord> iterator() {
@@ -51,17 +53,16 @@ public class DBFDatasetReader implements DatasetReader {
                         public DatasetRecord next() {
                             Object[] r = nextItem;
                             nextItem = dbf.nextRecord();
-                            return DatasetRecord.fromKeyToIndexAndArray(n++, keyToIndex, r);
+                            return DatasetRecord.fromKeyToIndexAndArray(n++,
+                                    keyToIndex, r);
                         }
                     };
 
                 }
             };
         } catch (IOException | DBFException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
-
 
 }

@@ -127,14 +127,14 @@ public class StatusReporter {
 
     public void infoAvailableColumnsInDatasetA(String column) {
         if (currentLevel.logs(LoggingLevel.INFO))
-            ConsoleLogger.error(MessageFormat.format(
+            ConsoleLogger.info(MessageFormat.format(
                     MessageProvider.getMessage("dataset.a.columnlist"),
                     column));
     }
 
     public void infoAvailableColumnsInDatasetB(String column) {
         if (currentLevel.logs(LoggingLevel.INFO))
-            ConsoleLogger.error(MessageFormat.format(
+            ConsoleLogger.info(MessageFormat.format(
                     MessageProvider.getMessage("dataset.b.columnlist"),
                     column));
     }
@@ -146,10 +146,10 @@ public class StatusReporter {
                     n));
     }
 
-    public void infoReusingIndex() {
+    public void infoReusingIndex(long n) {
         if (currentLevel.logs(LoggingLevel.INFO))
-            ConsoleLogger
-            .info(MessageProvider.getMessage("dataset.b.reusingindex"));
+            ConsoleLogger.info(MessageFormat.format(
+                    MessageProvider.getMessage("dataset.b.reusingindex"), n));
     }
 
     public void infoOldIndexLacksColumns() {
@@ -234,8 +234,8 @@ public class StatusReporter {
 
     public void warnCouldNotLinkRow() {
         if (currentLevel.logs(LoggingLevel.WARN))
-            ConsoleLogger.warn(
-                    MessageProvider.getMessage("linkage.cannotlink"));
+            ConsoleLogger
+            .warn(MessageProvider.getMessage("linkage.cannotlink"));
     }
 
     public void errorCannotSaveResult() {
@@ -248,6 +248,12 @@ public class StatusReporter {
         if (currentLevel.logs(LoggingLevel.ERROR))
             ConsoleLogger.error(MessageFormat.format(
                     MessageProvider.getMessage("config.missingfield"), field));
+    }
+
+    public void errorCannotIndex(String dir) {
+        if (currentLevel.logs(LoggingLevel.ERROR))
+            ConsoleLogger.error(MessageFormat.format(
+                    MessageProvider.getMessage("dataset.b.cannotindex"), dir));
     }
 
 }

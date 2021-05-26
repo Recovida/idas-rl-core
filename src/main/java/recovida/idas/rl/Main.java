@@ -33,42 +33,40 @@ import recovida.idas.rl.linkage.LinkageUtils;
 import recovida.idas.rl.record.ColumnRecordModel;
 import recovida.idas.rl.record.RecordModel;
 import recovida.idas.rl.search.Indexing;
+import recovida.idas.rl.search.Indexing.IndexingStatus;
+import recovida.idas.rl.util.Cleaning;
+import recovida.idas.rl.util.Phonetic;
 import recovida.idas.rl.util.StatusReporter;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static boolean execute(String configFileName) throws IOException {
 
         // read configuration file
         ConfigReader confReader = new ConfigReader();
-        String configFileName = new File(
-                args.length < 1 ? "assets/config.properties" : args[0])
-                .getPath();
+
         if (!new File(configFileName).isFile()) {
             StatusReporter.get().errorConfigFileDoesNotExist(configFileName);
-            System.exit(1);
+            return false;
         }
         StatusReporter.get().infoUsingConfigFile(configFileName);
         ConfigModel config = confReader.readConfig(configFileName);
 
-        if (config == null) {
-            System.exit(1);
-        }
+        if (config == null)
+            return false;
 
         String fileName_a = config.getDbA();
         String fileName_b = config.getDbB();
 
         if (!new File(fileName_a).isFile()) {
             StatusReporter.get().errorDatasetFileDoesNotExist(fileName_a);
-            System.exit(1);
+            return false;
         }
 
         if (!new File(fileName_b).isFile()) {
             StatusReporter.get().errorDatasetFileDoesNotExist(fileName_b);
-            System.exit(1);
+            return false;
         }
-
-        Indexing indexing = new Indexing(config);
 
         // read dataset A (just to check for errors and get the number of rows)
         StatusReporter.get().infoReadingA(fileName_a);
@@ -76,6 +74,11 @@ public class Main {
         if (fileName_a.toLowerCase().endsWith(".csv")) {
             char delimiter_a = CSVDatasetReader.guessCsvDelimiter(fileName_a,
                     config.getEncodingA());
+            if (delimiter_a == '\0') {
+                StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
+                        config.getEncodingA());
+                return false;
+            }
             readerA = new CSVDatasetReader(fileName_a, delimiter_a,
                     config.getEncodingA());
         } else if (fileName_a.toLowerCase().endsWith(".dbf")) {
@@ -83,9 +86,14 @@ public class Main {
         } else {
             StatusReporter.get()
             .errorDatasetFileFormatIsUnsupported(fileName_a);
-            System.exit(1);
+            return false;
         }
         Iterable<DatasetRecord> dbARecords = readerA.getDatasetRecordIterable();
+        if (dbARecords == null) {
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
+                    config.getEncodingA());
+            return false;
+        }
         long n = 0;
         Iterator<DatasetRecord> it = dbARecords.iterator();
         if (it.hasNext()) {
@@ -99,11 +107,11 @@ public class Main {
                     .map(m -> m.getIndexA()).filter(c -> !keySet.contains(c))
                     .collect(Collectors.toSet());
             if (!missing.isEmpty()) {
-                missing.stream().forEach(col -> StatusReporter.get()
-                        .errorMissingColumnInDatasetA(col));
                 StatusReporter.get().infoAvailableColumnsInDatasetA(
                         '"' + String.join("\", \"", keySet) + '"');
-                System.exit(1);
+                missing.stream().forEach(col -> StatusReporter.get()
+                        .errorMissingColumnInDatasetA(col));
+                return false;
             }
         }
         while (it.hasNext()) {
@@ -120,6 +128,11 @@ public class Main {
         if (fileName_b.toLowerCase().endsWith(".csv")) {
             char delimiter_b = CSVDatasetReader.guessCsvDelimiter(fileName_b,
                     config.getEncodingB());
+            if (delimiter_b == '\0') {
+                StatusReporter.get().errorDatasetFileCannotBeRead(fileName_b,
+                        config.getEncodingB());
+                return false;
+            }
             readerB = new CSVDatasetReader(fileName_b, delimiter_b,
                     config.getEncodingB());
         } else if (fileName_b.toLowerCase().endsWith(".dbf")) {
@@ -127,20 +140,69 @@ public class Main {
         } else {
             StatusReporter.get()
             .errorDatasetFileFormatIsUnsupported(fileName_b);
-            System.exit(1);
+            return false;
         }
         dbBRecords = readerB.getDatasetRecordIterable();
+        if (dbBRecords == null) {
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_b,
+                    config.getEncodingB());
+            return false;
+        }
 
         // prepare indexing
         config.setDbIndex(
                 config.getDbIndex() + File.separator + getHash(fileName_b));
-
-        long count_b = indexing.index(dbBRecords);
-        if (count_b > 0)
-            StatusReporter.get().infoFinishedIndexingB(count_b);
+        Indexing indexing = new Indexing(config);
+        IndexingStatus indexingStatus = indexing.getIndexingStatus();
+        switch (indexingStatus) {
+        case COMPLETE:
+            StatusReporter.get().infoReusingIndex(indexing.numIndexedEntries());
+            break;
+        case CORRUPT:
+            StatusReporter.get().infoOldIndexIsCorrupt();
+            break;
+        case INCOMPLETE:
+            StatusReporter.get().infoOldIndexLacksColumns();
+            break;
+        case NONE:
+            break;
+        }
+        if (indexingStatus == IndexingStatus.CORRUPT
+                || indexingStatus == IndexingStatus.INCOMPLETE) {
+            if (!indexing.deleteOldIndex()) {
+                StatusReporter.get().errorOldIndexCannotBeDeleted(
+                        config.getDbIndex().toString());
+                return false;
+            }
+        }
+        if (indexingStatus != IndexingStatus.COMPLETE) {
+            if (!indexing.index(dbBRecords)) {
+                Collection<String> missing = indexing
+                        .getMissingColumnsInDataset();
+                if (!missing.isEmpty()) {
+                    StatusReporter.get()
+                    .infoAvailableColumnsInDatasetB('"'
+                            + String.join("\", \"",
+                                    indexing.getColumnsInDataset())
+                            + '"');
+                    missing.stream().forEach(col -> StatusReporter.get()
+                            .errorMissingColumnInDatasetB(col));
+                } else // generic error
+                    StatusReporter.get().errorCannotIndex(Paths
+                            .get(config.getDbIndex()).getParent().toString());
+                return false;
+            }
+            StatusReporter.get()
+            .infoFinishedIndexingB(indexing.numIndexedEntries());
+        }
 
         // prepare to read dataset A again
         Iterable<DatasetRecord> records = readerA.getDatasetRecordIterable();
+        if (records == null) {
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
+                    config.getEncodingA());
+            return false;
+        }
 
         String resultPath = new File(config.getLinkageDir() + File.separator
                 + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
@@ -229,21 +291,41 @@ public class Main {
         DatasetWriter writer = new CSVDatasetWriter(
                 resultPath + File.separator + "result.csv", ';');
         String header = LinkageUtils.getCsvHeaderFromConfig(config);
-        writer.writeRow(header);
+        if (!writer.writeRow(header)) {
+            StatusReporter.get().errorCannotSaveResult();
+            return false;
+        }
         long reportEvery = Math.max(n / 100, 1);
         for (int i = 1; i <= n; i++) {
             try {
                 Future<String> f = q.take();
-                writer.writeRow(f.get());
+                if (!writer.writeRow(f.get())) {
+                    StatusReporter.get().errorCannotSaveResult();
+                    return false;
+                }
                 if (i == 1 || i == n || i % reportEvery == 0)
                     StatusReporter.get().infoLinkageProgress((float) i / n);
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                writer.close();
+                pool.shutdown();
+                return false;
             }
         }
         writer.close();
         pool.shutdown();
         StatusReporter.get().infoCompleted(resultPath);
+        return true;
+    }
+
+    public static void main(String[] args) throws IOException {
+        String configFileName = new File(
+                args.length < 1 ? "assets/config.properties" : args[0])
+                .getPath();
+        if (!execute(configFileName))
+            System.exit(1);
     }
 
     private static String getHash(String fileName) {

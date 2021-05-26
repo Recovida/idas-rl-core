@@ -1,7 +1,7 @@
 /**
  *
  */
-package recovida.idas.rl;
+package recovida.idas.rl.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

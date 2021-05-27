@@ -8,7 +8,7 @@ no formato do Cidacs-RL.
 Em um arquivo de configurações, linhas que começam com uma cerquilha ("#")
 são consideradas comentários e são ignoradas. Note que a edição de um
 arquivo de configurações por meio do
-[editor gráfico](https://gitlab.com/recovida/idas-rl-config-editor)
+[editor gráfico](https://gitlab.com/recovida/idas-rl-gui)
 **remove** todos os
 comentários do arquivo.
 

@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -40,10 +42,12 @@ public class ConfigReader {
                 return null;
             }
 
-            configModel.setDbA(config.getProperty("db_a"));
-            configModel.setDbB(config.getProperty("db_b"));
-            configModel.setDbIndex(config.getProperty("db_index"));
-            configModel.setLinkageDir(config.getProperty("linkage_folder"));
+            Path p = Paths.get(propFileName).getParent();
+
+            configModel.setDbA(p.resolve(config.getProperty("db_a")).toString());
+            configModel.setDbB(p.resolve(config.getProperty("db_b")).toString());
+            configModel.setDbIndex(p.resolve(config.getProperty("db_index")).toString());
+            configModel.setLinkageDir(p.resolve(config.getProperty("linkage_folder")).toString());
 
             configModel.setSuffixA(config.getProperty("suffix_a", "_dsa"));
             configModel.setSuffixB(config.getProperty("suffix_b", "_dsb"));

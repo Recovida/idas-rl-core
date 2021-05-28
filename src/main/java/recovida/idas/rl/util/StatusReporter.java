@@ -86,6 +86,9 @@ public class StatusReporter {
 
     protected static StatusReporter instance = null;
 
+    private StatusReporter() {
+    }
+
     public static StatusReporter get() {
         if (instance == null)
             instance = new StatusReporter();

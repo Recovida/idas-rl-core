@@ -23,7 +23,7 @@ public class MessageProvider {
     }
 
     protected static ResourceBundle createBundle(Locale locale) {
-        return ResourceBundle.getBundle("lang.messages", locale);
+        return ResourceBundle.getBundle("lang.core_messages", locale);
     }
 
     public static String getMessage(String key) {

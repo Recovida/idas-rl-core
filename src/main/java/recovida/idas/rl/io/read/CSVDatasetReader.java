@@ -50,13 +50,13 @@ public class CSVDatasetReader implements DatasetReader {
     }
 
     public static char guessCsvDelimiter(String fileName, String encoding)
-            throws IOException {
+    {
         String firstLine = null;
         try {
             firstLine = Files
                     .lines(Paths.get(fileName), Charset.forName(encoding))
                     .findFirst().get();
-        } catch (UncheckedIOException e) {
+        } catch (UncheckedIOException | IOException e) {
             return '\0';
         }
         char[] delimiters = { ',', ';', '|', '\t' };

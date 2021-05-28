@@ -40,7 +40,7 @@ import recovida.idas.rl.util.StatusReporter;
 
 public class Main {
 
-    public static boolean execute(String configFileName) throws IOException {
+    public static boolean execute(String configFileName, int progressReportIntervals) {
 
         // read configuration file
         ConfigReader confReader = new ConfigReader();
@@ -295,7 +295,7 @@ public class Main {
             StatusReporter.get().errorCannotSaveResult();
             return false;
         }
-        long reportEvery = Math.max(n / 100, 1);
+        long reportEvery = Math.max(n / progressReportIntervals, 1);
         for (int i = 1; i <= n; i++) {
             try {
                 Future<String> f = q.take();
@@ -320,11 +320,11 @@ public class Main {
         return true;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         String configFileName = new File(
                 args.length < 1 ? "assets/config.properties" : args[0])
                 .getPath();
-        if (!execute(configFileName))
+        if (!execute(configFileName, 100))
             System.exit(1);
     }
 

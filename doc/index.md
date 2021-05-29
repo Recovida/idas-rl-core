@@ -16,6 +16,9 @@ comentários do arquivo.
 
 - `db_a` e `db_b`: indicam os nomes dos arquivos que contêm os datasets A e B,
   respectivamente, no formato CSV ou DBF. Ambos são obrigatórios.
+  É possível utilizar caminhos completos ou relativos **ao arquivo de
+  configurações** (ou seja, se o dataset estiver na mesma pasta do arquivo de
+  configurações, não é preciso especificar o caminho).
 - `encoding_a` e `encoding_b`: indicam a codificação dos arquivos dos datasets
   A e B, respectivamente. Podem ser omitidos se a codificação for *UTF-8*.
 - `suffix_a` e `suffix_b`: determinam os sufixos a serem adicionados aos nomes
@@ -29,8 +32,8 @@ comentários do arquivo.
 Exemplo do formato:
 
 ```ini
-db_a = assets/aaaaaa.dbf
-db_b = assets/bbbbbb.csv
+db_a = aaaaaa.dbf
+db_b = bbbbbb.csv
 
 encoding_a = ANSI
 encoding_b = UTF-8

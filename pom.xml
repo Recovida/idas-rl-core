@@ -5,7 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>recovida</groupId>
-	<artifactId>idas-rl</artifactId>
+	<artifactId>idas-rl-core</artifactId>
+	<name>IDaS-RL Core</name>
 	<version>1.0.4</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,7 +27,7 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.2.1</version>
 				<configuration>
-					<mainClass>recovida.idas.rl.Main</mainClass>
+					<mainClass>recovida.idas.rl.core.Main</mainClass>
 				</configuration>
 			</plugin>
 			<plugin>

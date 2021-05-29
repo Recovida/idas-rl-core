@@ -288,33 +288,32 @@ public class Main {
             }
         }).start();
 
-        DatasetWriter writer = new CSVDatasetWriter(
-                resultPath + File.separator + "result.csv", ';');
-        String header = LinkageUtils.getCsvHeaderFromConfig(config);
-        if (!writer.writeRow(header)) {
-            StatusReporter.get().errorCannotSaveResult();
-            return false;
-        }
-        long reportEvery = Math.max(n / progressReportIntervals, 1);
-        for (int i = 1; i <= n; i++) {
-            try {
-                Future<String> f = q.take();
-                if (!writer.writeRow(f.get())) {
-                    StatusReporter.get().errorCannotSaveResult();
-                    return false;
-                }
-                if (i == 1 || i == n || i % reportEvery == 0)
-                    StatusReporter.get().infoLinkageProgress((float) i / n);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                writer.close();
-                pool.shutdown();
+        try (DatasetWriter writer = new CSVDatasetWriter(
+                resultPath + File.separator + "result.csv", ';')){
+            String header = LinkageUtils.getCsvHeaderFromConfig(config);
+            if (!writer.writeRow(header)) {
+                StatusReporter.get().errorCannotSaveResult();
                 return false;
             }
-        }
-        writer.close();
+            long reportEvery = Math.max(n / progressReportIntervals, 1);
+            for (int i = 1; i <= n; i++) {
+                try {
+                    Future<String> f = q.take();
+                    if (!writer.writeRow(f.get())) {
+                        StatusReporter.get().errorCannotSaveResult();
+                        return false;
+                    }
+                    if (i == 1 || i == n || i % reportEvery == 0)
+                        StatusReporter.get().infoLinkageProgress((float) i / n);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                    writer.close();
+                    pool.shutdown();
+                    return false;
+                }
+            }}
         pool.shutdown();
         StatusReporter.get().infoCompleted(resultPath);
         return true;

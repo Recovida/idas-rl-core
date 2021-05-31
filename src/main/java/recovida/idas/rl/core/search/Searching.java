@@ -36,17 +36,13 @@ public class Searching {
     private SearchingUtils seachingUtils;
     private Permutation permutation;
 
-    public Searching(ConfigModel config) {
+    public Searching(ConfigModel config) throws IOException {
         this.config = config;
         seachingUtils = new SearchingUtils();
         permutation = new Permutation();
 
-        try {
-            this.index = FSDirectory.open(Paths.get(config.getDbIndex()));
-            this.reader = DirectoryReader.open(this.index);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.index = FSDirectory.open(Paths.get(config.getDbIndex()));
+        this.reader = DirectoryReader.open(this.index);
     }
 
     public RecordPairModel getCandidatePairFromRecord(RecordModel record){

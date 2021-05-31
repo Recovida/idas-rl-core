@@ -28,8 +28,7 @@ public class ConfigReader {
         try {
             configFileStream = new FileInputStream(new File(propFileName));
         } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-            return configModel;
+            return null;
         }
 
         try {
@@ -124,7 +123,7 @@ public class ConfigReader {
                 configFileStream.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
         return configModel;
     }

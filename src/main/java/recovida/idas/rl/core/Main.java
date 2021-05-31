@@ -11,13 +11,16 @@ import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import recovida.idas.rl.core.config.ColumnConfigModel;
 import recovida.idas.rl.core.config.ConfigModel;
@@ -37,10 +40,28 @@ import recovida.idas.rl.core.search.Indexing.IndexingStatus;
 import recovida.idas.rl.core.util.Cleaning;
 import recovida.idas.rl.core.util.Phonetic;
 import recovida.idas.rl.core.util.StatusReporter;
+import recovida.idas.rl.core.util.StatusReporter.LoggingLevel;
 
 public class Main {
 
-    public static boolean execute(String configFileName, int progressReportIntervals) {
+    String configFileName;
+    int progressReportIntervals;
+
+    ExecutorService pool;
+    BlockingQueue<Future<String>> q;
+    Thread executingThread;
+    Thread readerThread;
+    Future<String> f;
+
+    public Main(String configFileName, int progressReportIntervals) {
+        this.configFileName = configFileName;
+        this.progressReportIntervals = progressReportIntervals;
+    }
+
+    public synchronized boolean execute() {
+
+        StatusReporter.currentLevel = LoggingLevel.INFO;
+        executingThread = Thread.currentThread();
 
         // read configuration file
         ConfigReader confReader = new ConfigReader();
@@ -115,6 +136,8 @@ public class Main {
             }
         }
         while (it.hasNext()) {
+            if (Thread.currentThread().isInterrupted())
+                return false;
             it.next();
             n++;
         }
@@ -150,8 +173,10 @@ public class Main {
         }
 
         // prepare indexing
-        config.setDbIndex(
-                config.getDbIndex() + File.separator + getHash(fileName_b));
+        String hash = getHash(fileName_b);
+        if (hash == null)
+            return false; // probably it was interrupted
+        config.setDbIndex(config.getDbIndex() + File.separator + hash);
         Indexing indexing = new Indexing(config);
         IndexingStatus indexingStatus = indexing.getIndexingStatus();
         switch (indexingStatus) {
@@ -222,12 +247,14 @@ public class Main {
 
         final int BUFFER_SIZE = 1000;
 
-        ExecutorService pool = Executors.newFixedThreadPool(maxThreads);
-        BlockingQueue<Future<String>> q = new ArrayBlockingQueue<>(BUFFER_SIZE);
+        pool = Executors.newFixedThreadPool(maxThreads);
+        q = new ArrayBlockingQueue<>(BUFFER_SIZE);
 
-        new Thread(() -> {
+        readerThread = new Thread(() -> {
             long readRows = 0;
             for (DatasetRecord row : records) {
+                if (Thread.currentThread().isInterrupted())
+                    return;
                 Callable<String> fn = () -> {
                     if (row.getNumber() > config.getMaxRows())
                         return "...";
@@ -237,6 +264,10 @@ public class Main {
 
                     // convert row to RecordModel
                     for (ColumnConfigModel column : config.getColumns()) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            return "";
+                        }
+
                         if (column.isGenerated()
                                 || (column.getType().equals("copy")
                                         && column.getIndexA().equals("")))
@@ -281,15 +312,17 @@ public class Main {
                 };
                 try {
                     q.put(pool.submit(fn));
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | RejectedExecutionException e) {
+                    return;
                 }
                 if (++readRows == config.getMaxRows())
                     break;
             }
-        }).start();
+        });
+        readerThread.start();
 
         try (DatasetWriter writer = new CSVDatasetWriter(
-                resultPath + File.separator + "result.csv", ';')){
+                resultPath + File.separator + "result.csv", ';')) {
             String header = LinkageUtils.getCsvHeaderFromConfig(config);
             if (!writer.writeRow(header)) {
                 StatusReporter.get().errorCannotSaveResult();
@@ -298,42 +331,79 @@ public class Main {
             long reportEvery = Math.max(n / progressReportIntervals, 1);
             for (int i = 1; i <= n; i++) {
                 try {
-                    Future<String> f = q.take();
-                    if (!writer.writeRow(f.get())) {
+                    if (Thread.currentThread().isInterrupted())
+                        return false;
+                    f = q.take();
+                    String output;
+                    try {
+                        output = f.get();
+                    } catch (CancellationException e) {
+                        return false;
+                    }
+                    if (!writer.writeRow(output)) {
                         StatusReporter.get().errorCannotSaveResult();
                         return false;
                     }
                     if (i == 1 || i == n || i % reportEvery == 0)
                         StatusReporter.get().infoLinkageProgress((float) i / n);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    return false;
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
-                    writer.close();
-                    pool.shutdown();
+                    Throwable cause = e.getCause();
+                    StatusReporter.get().errorUnexpectedError(ExceptionUtils
+                            .getStackTrace(cause == null ? e : cause));
+                    try {
+                        writer.close();
+                        pool.shutdown();
+                    } catch (Exception ee) {
+                    }
                     return false;
                 }
-            }}
+            }
+        }
         pool.shutdown();
         StatusReporter.get().infoCompleted(resultPath);
         return true;
+    }
+
+    public void interrupt() {
+        interrupt(null);
+    }
+
+    public void interrupt(Thread t) {
+        StatusReporter.get().warnInterrupted();
+        if (t == null)
+            t = executingThread;
+        StatusReporter.currentLevel = LoggingLevel.NONE;
+        try {
+            t.interrupt();
+            if (readerThread != null)
+                readerThread.interrupt();
+            if (f != null)
+                f.cancel(true);
+            if (pool != null) {
+                pool.shutdownNow();
+            }
+        } catch (Exception e) {
+        }
     }
 
     public static void main(String[] args) {
         String configFileName = new File(
                 args.length < 1 ? "assets/config.properties" : args[0])
                 .getPath();
-        if (!execute(configFileName, 100))
+        Main main = new Main(configFileName, 100);
+        if (!main.execute()) {
             System.exit(1);
+        }
     }
 
     private static String getHash(String fileName) {
         try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
             return DigestUtils.md5Hex(is);
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
 }

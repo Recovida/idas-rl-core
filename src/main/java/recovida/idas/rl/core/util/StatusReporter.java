@@ -262,6 +262,12 @@ public class StatusReporter {
             logger.error(() -> MessageProvider.getMessage("linkage.cannotsave"));
     }
 
+    public void errorUnexpectedError(String message) {
+        if (currentLevel.logs(LoggingLevel.ERROR))
+            logger.error(() -> MessageFormat.format(
+                    MessageProvider.getMessage("linkage.unexpectederror"), message));
+    }
+
     public void errorMissingFieldInConfigFile(String field) {
         if (currentLevel.logs(LoggingLevel.ERROR))
             logger.error(() -> MessageFormat.format(
@@ -272,6 +278,11 @@ public class StatusReporter {
         if (currentLevel.logs(LoggingLevel.ERROR))
             logger.error(() -> MessageFormat.format(
                     MessageProvider.getMessage("dataset.b.cannotindex"), dir));
+    }
+
+    public void warnInterrupted() {
+        if (currentLevel.logs(LoggingLevel.WARN))
+            logger.warn(() -> MessageProvider.getMessage("interrupted"));
     }
 
     public  StatusLogger getLogger() {

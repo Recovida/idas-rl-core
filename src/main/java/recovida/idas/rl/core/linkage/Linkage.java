@@ -1,5 +1,6 @@
 package recovida.idas.rl.core.linkage;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import recovida.idas.rl.core.config.ConfigModel;
@@ -16,7 +17,12 @@ public class Linkage implements Serializable {
     }
 
     public String linkSpark(RecordModel record) {
-        Searching searching = new Searching(this.config);
+        Searching searching;
+        try {
+            searching = new Searching(this.config);
+        } catch (IOException e) {
+            return "";
+        }
         LinkageUtils linkageUtils = new LinkageUtils();
         RecordPairModel candidatePair = searching.getCandidatePairFromRecord(record);
         if (candidatePair != null) {

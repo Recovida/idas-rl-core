@@ -131,6 +131,8 @@ public class Indexing {
             this.inWriter = new IndexWriter(index, idxConfig);
 
             for (DatasetRecord record : records) {
+                if (Thread.currentThread().isInterrupted())
+                    return false;
                 if (columnsInDataset.isEmpty()) // first time - save column list
                     columnsInDataset = record.getKeySet();
                 RecordModel tmpRecordModel = fromDatasetRecordToRecordModel(

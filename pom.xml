@@ -43,7 +43,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										recovida.idas.rl.Main
+										recovida.idas.rl.core.Main
 									</mainClass>
 								</manifest>
 								<manifestEntries>

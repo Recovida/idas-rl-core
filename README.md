@@ -61,8 +61,8 @@ usuário, acrescente ao arquivo
 uma nova linha com a
 [*language tag*](https://docs.oracle.com/javase/tutorial/i18n/locale/matching.html)
 correspondente ao idioma, e crie um arquivo com extensão `.properties` no
-diretório `src/main/resources/lang/` com as mensagens traduzidas. Utilize
-um dos idiomas existentes como base e mantenha o
+diretório [`lang`](src/main/resources/lang/) com as mensagens traduzidas.
+Utilize um dos idiomas existentes como base e mantenha o
 [formato](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)
 das mensagens com argumentos. Recomenda-se utilizar uma ferramenta como o
 [ResourceBundle Editor](https://marketplace.eclipse.org/content/resourcebundle-editor)

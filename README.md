@@ -4,8 +4,7 @@ Esta é uma ferramenta de record linkage desenvolvida por uma equipe do projeto
 Recovida a partir do código
 do [Cidacs-RL](https://github.com/gcgbarbosa/cidacs-rl-v1).
 
-Uma interface gráfica está disponível no
-[repositório IDaS-RL GUI](https://gitlab.com/recovida/idas-rl-gui).
+Uma interface gráfica está disponível no repositório recovida/idas-rl-gui>.
 
 
 ## Execução

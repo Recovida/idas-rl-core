@@ -349,7 +349,7 @@ public class Main {
                     } catch (CancellationException e) {
                         return false;
                     }
-                    if (!writer.writeRow(output)) {
+                    if (output != null && !output.isEmpty() && !writer.writeRow(output)) {
                         StatusReporter.get().errorCannotSaveResult();
                         return false;
                     }

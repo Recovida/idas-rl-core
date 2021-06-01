@@ -10,7 +10,7 @@ import recovida.idas.rl.core.search.Searching;
 
 public class Linkage implements Serializable {
     private static final long serialVersionUID = 1L;
-    private ConfigModel config;
+    private final ConfigModel config;
 
     public Linkage(ConfigModel config) {
         this.config = config;
@@ -19,20 +19,19 @@ public class Linkage implements Serializable {
     public String linkSpark(RecordModel record) {
         Searching searching;
         try {
-            searching = new Searching(this.config);
+            searching = new Searching(config);
         } catch (IOException e) {
             return "";
         }
         LinkageUtils linkageUtils = new LinkageUtils();
-        RecordPairModel candidatePair = searching.getCandidatePairFromRecord(record);
-        if (candidatePair != null) {
-            if (candidatePair.getScore() >= config.getMinimumScore())
-                return linkageUtils.fromRecordPairToCsv(candidatePair);
-            else
-                return "";
-        } else {
+        RecordPairModel candidatePair = searching
+                .getCandidatePairFromRecord(record);
+        if (candidatePair == null) {
             return "";
         }
+        if (candidatePair.getScore() >= config.getMinimumScore())
+            return linkageUtils.fromRecordPairToCsv(candidatePair);
+        return "";
     }
 
 }

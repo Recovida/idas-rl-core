@@ -109,7 +109,7 @@ public class Main {
             readerA = new DBFDatasetReader(fileName_a, config.getEncodingA());
         } else {
             StatusReporter.get()
-            .errorDatasetFileFormatIsUnsupported(fileName_a);
+                    .errorDatasetFileFormatIsUnsupported(fileName_a);
             return false;
         }
         Iterable<DatasetRecord> dbARecords = readerA.getDatasetRecordIterable();
@@ -127,8 +127,9 @@ public class Main {
             Collection<String> missing = config.getColumns().stream()
                     .filter(m -> !m.isGenerated() && !m.getIndexA().isEmpty()
                             && !m.getIndexA()
-                            .equals(config.getRowNumColNameA()))
-                    .map(m -> m.getIndexA()).filter(c -> !keySet.contains(c))
+                                    .equals(config.getRowNumColNameA()))
+                    .map(ColumnConfigModel::getIndexA)
+                    .filter(c -> !keySet.contains(c))
                     .collect(Collectors.toSet());
             if (!missing.isEmpty()) {
                 StatusReporter.get().infoAvailableColumnsInDatasetA(
@@ -149,7 +150,7 @@ public class Main {
         // read dataset B
         StatusReporter.get().infoReadingAndIndexingB(config.getDbB());
 
-        Iterable<DatasetRecord> dbBRecords = null;
+        Iterable<DatasetRecord> dbBRecords;
         DatasetReader readerB = null;
         if (fileName_b.toLowerCase().endsWith(".csv")) {
             char delimiter_b = CSVDatasetReader.guessCsvDelimiter(fileName_b,
@@ -165,7 +166,7 @@ public class Main {
             readerB = new DBFDatasetReader(fileName_b, config.getEncodingB());
         } else {
             StatusReporter.get()
-            .errorDatasetFileFormatIsUnsupported(fileName_b);
+                    .errorDatasetFileFormatIsUnsupported(fileName_b);
             return false;
         }
         dbBRecords = readerB.getDatasetRecordIterable();
@@ -215,10 +216,10 @@ public class Main {
                         .getMissingColumnsInDataset();
                 if (!missing.isEmpty()) {
                     StatusReporter.get()
-                    .infoAvailableColumnsInDatasetB('"'
-                            + String.join("\", \"",
-                                    indexing.getColumnsInDataset())
-                            + '"');
+                            .infoAvailableColumnsInDatasetB('"'
+                                    + String.join("\", \"",
+                                            indexing.getColumnsInDataset())
+                                    + '"');
                     missing.stream().forEach(col -> StatusReporter.get()
                             .errorMissingColumnInDatasetB(col));
                 } else // generic error
@@ -227,7 +228,7 @@ public class Main {
                 return false;
             }
             StatusReporter.get()
-            .infoFinishedIndexingB(indexing.numIndexedEntries());
+                    .infoFinishedIndexingB(indexing.numIndexedEntries());
         }
 
         // prepare to read dataset A again
@@ -240,8 +241,8 @@ public class Main {
 
         String resultPath = new File(config.getLinkageDir() + File.separator
                 + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
-                .format(java.util.Calendar.getInstance().getTime()))
-                .getPath();
+                        .format(java.util.Calendar.getInstance().getTime()))
+                                .getPath();
 
         if (config.getMaxRows() < Long.MAX_VALUE) {
             StatusReporter.get().infoMaxRowsA(config.getMaxRows());
@@ -291,7 +292,7 @@ public class Main {
                         } else {
                             originalValue = column.getIndexA()
                                     .equals(config.getRowNumColNameA())
-                                    ? String.valueOf(row.getNumber())
+                                            ? String.valueOf(row.getNumber())
                                             : row.get(column.getIndexA());
                             cleanedValue = cleaner.clean(column, originalValue);
                             // Remove anything that is not an upper-case letter,
@@ -399,7 +400,7 @@ public class Main {
     public static void main(String[] args) {
         String configFileName = new File(
                 args.length < 1 ? "assets/config.properties" : args[0])
-                .getPath();
+                        .getPath();
         Main main = new Main(configFileName, 100);
         if (!main.execute()) {
             System.exit(1);

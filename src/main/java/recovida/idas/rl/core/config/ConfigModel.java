@@ -21,7 +21,8 @@ public class ConfigModel implements Serializable {
     private String linkageDir = ".";
     private long maxRows = Long.MAX_VALUE;
     private float minimumScore = 0;
-    private int threadCount = Math.min(8, Runtime.getRuntime().availableProcessors());
+    private int threadCount = Math.min(8,
+            Runtime.getRuntime().availableProcessors());
 
     private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
 
@@ -29,13 +30,14 @@ public class ConfigModel implements Serializable {
 
     }
 
-    public ConfigModel(String dbA, String dbB, String dbIndex, ArrayList<ColumnConfigModel> columns) {
-        this.setDbA(dbA);
-        this.setDbB(dbB);
-        this.setDbIndex(dbIndex);
+    public ConfigModel(String dbA, String dbB, String dbIndex,
+            ArrayList<ColumnConfigModel> columns) {
+        setDbA(dbA);
+        setDbB(dbB);
+        setDbIndex(dbIndex);
         this.columns = columns;
-        this.maxRows = Long.MAX_VALUE;
-        this.minimumScore = 0;
+        maxRows = Long.MAX_VALUE;
+        minimumScore = 0;
     }
 
     public String getDbA() {
@@ -83,7 +85,7 @@ public class ConfigModel implements Serializable {
     }
 
     public void addColumn(ColumnConfigModel column) {
-        this.columns.add(column);
+        columns.add(column);
     }
 
     public void setColumns(ArrayList<ColumnConfigModel> columns) {
@@ -176,6 +178,5 @@ public class ConfigModel implements Serializable {
             cleaningRegex = "";
         }
     }
-
 
 }

@@ -9,45 +9,47 @@ import recovida.idas.rl.core.record.RecordPairModel;
 
 public class LinkageUtils {
     public String fromRecordPairToCsv(RecordPairModel recordPair) {
-        String csvResult = "";
+        StringBuilder csvResult = new StringBuilder();
         for (ColumnRecordModel column : recordPair.getRecordA()
                 .getColumnRecordModels()) {
             if (column.isGenerated())
                 continue;
-            csvResult = csvResult + quote(column.getValue()) + ";";
+            csvResult.append(quote(column.getValue())).append(";");
         }
         for (ColumnRecordModel column : recordPair.getRecordB()
                 .getColumnRecordModels()) {
             if (column.isGenerated())
                 continue;
-            csvResult = csvResult + quote(column.getValue()) + ";";
+            csvResult.append(quote(column.getValue())).append(";");
         }
-        csvResult = csvResult + String.format(Locale.ENGLISH, "%.2f",
-                100 * recordPair.getScore());
-        return csvResult;
+        csvResult.append(String.format(Locale.ENGLISH, "%.2f",
+                100 * recordPair.getScore()));
+        return csvResult.toString();
     }
 
     public static String getCsvHeaderFromConfig(ConfigModel config) {
-        String headerResult = "";
+        StringBuilder headerResult = new StringBuilder();
         // for each column a add to result
         for (ColumnConfigModel col : config.getColumns()) {
-            if (col.isGenerated() || (col.getType().equals("copy") && col.getIndexA().equals("")))
+            if (col.isGenerated() || (col.getType().equals("copy")
+                    && col.getIndexA().equals("")))
                 continue;
-            headerResult = headerResult + quote(col.getRenameA()) + ";";
+            headerResult.append(quote(col.getRenameA())).append(";");
         }
         // for each column b add to result
         for (ColumnConfigModel col : config.getColumns()) {
-            if (col.isGenerated() || (col.getType().equals("copy") && col.getIndexB().equals("")))
+            if (col.isGenerated() || (col.getType().equals("copy")
+                    && col.getIndexB().equals("")))
                 continue;
-            headerResult = headerResult + quote(col.getRenameB()) + ";";
+            headerResult.append(quote(col.getRenameB())).append(";");
         }
-        headerResult = headerResult + quote("score");
-        return headerResult;
+        headerResult.append(quote("score"));
+        return headerResult.toString();
     }
 
     protected static String quote(String s) {
         if (s == null)
             return ""; // empty value does not need quotes
-        return '"' + s.replaceAll("\"", "\"\"") + '"';
+        return '"' + s.replace("\"", "\"\"") + '"';
     }
 }

@@ -5,7 +5,8 @@ public class RecordPairModel {
     private RecordModel recordB;
     private double score;
 
-    public RecordPairModel(RecordModel recordA, RecordModel recordB, double score) {
+    public RecordPairModel(RecordModel recordA, RecordModel recordB,
+            double score) {
         this.recordA = recordA;
         this.recordB = recordB;
         this.score = score;

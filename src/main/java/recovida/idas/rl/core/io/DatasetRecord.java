@@ -16,7 +16,8 @@ public abstract class DatasetRecord {
 
     public abstract Collection<String> getKeySet();
 
-    public static DatasetRecord fromKeyToIndexAndArray(long number, Map<String, Integer> map, Object[] arr) {
+    public static DatasetRecord fromKeyToIndexAndArray(long number,
+            Map<String, Integer> map, Object[] arr) {
         return new DatasetRecord() {
 
             @Override
@@ -39,7 +40,8 @@ public abstract class DatasetRecord {
         };
     }
 
-    public static DatasetRecord fromCSVRecord(long number, CSVRecord csvRecord) {
+    public static DatasetRecord fromCSVRecord(long number,
+            CSVRecord csvRecord) {
         return new DatasetRecord() {
 
             @Override
@@ -59,30 +61,25 @@ public abstract class DatasetRecord {
         };
     }
 
-    public static Iterable<DatasetRecord> fromCSVRecordIterable(Iterable<CSVRecord> csvIterable) {
-        return new Iterable<DatasetRecord>() {
+    public static Iterable<DatasetRecord> fromCSVRecordIterable(
+            Iterable<CSVRecord> csvIterable) {
+        return () -> {
+            Iterator<CSVRecord> oldIt = csvIterable.iterator();
+            return new Iterator<DatasetRecord>() {
 
-            @Override
-            public Iterator<DatasetRecord> iterator() {
-                Iterator<CSVRecord> oldIt = csvIterable.iterator();
-                return new Iterator<DatasetRecord>() {
+                long n = 1;
 
-                    long n = 1;
+                @Override
+                public boolean hasNext() {
+                    return oldIt.hasNext();
+                }
 
-                    @Override
-                    public boolean hasNext() {
-                        return oldIt.hasNext();
-                    }
-
-                    @Override
-                    public DatasetRecord next() {
-                        return DatasetRecord.fromCSVRecord(n++, oldIt.next());
-                    }
-                };
-            }
+                @Override
+                public DatasetRecord next() {
+                    return DatasetRecord.fromCSVRecord(n++, oldIt.next());
+                }
+            };
         };
     }
-
-
 
 }

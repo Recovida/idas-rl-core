@@ -34,19 +34,27 @@ public class ConfigReader {
         try {
             config.load(configFileStream);
 
-            String[] mandatoryFields = {"db_a", "db_b", "db_index", "linkage_folder"};
-            List<String> missing = Arrays.stream(mandatoryFields).filter(f -> !config.containsKey(f)).collect(Collectors.toList());
-            if (!missing.isEmpty() ) {
-                missing.stream().forEach(f -> StatusReporter.get().errorMissingFieldInConfigFile(f));
+            String[] mandatoryFields = { "db_a", "db_b", "db_index",
+                    "linkage_folder" };
+            List<String> missing = Arrays.stream(mandatoryFields)
+                    .filter(f -> !config.containsKey(f))
+                    .collect(Collectors.toList());
+            if (!missing.isEmpty()) {
+                missing.stream().forEach(f -> StatusReporter.get()
+                        .errorMissingFieldInConfigFile(f));
                 return null;
             }
 
             Path p = Paths.get(propFileName).getParent();
 
-            configModel.setDbA(p.resolve(config.getProperty("db_a")).toString());
-            configModel.setDbB(p.resolve(config.getProperty("db_b")).toString());
-            configModel.setDbIndex(p.resolve(config.getProperty("db_index")).toString());
-            configModel.setLinkageDir(p.resolve(config.getProperty("linkage_folder")).toString());
+            configModel
+                    .setDbA(p.resolve(config.getProperty("db_a")).toString());
+            configModel
+                    .setDbB(p.resolve(config.getProperty("db_b")).toString());
+            configModel.setDbIndex(
+                    p.resolve(config.getProperty("db_index")).toString());
+            configModel.setLinkageDir(
+                    p.resolve(config.getProperty("linkage_folder")).toString());
 
             configModel.setSuffixA(config.getProperty("suffix_a", "_dsa"));
             configModel.setSuffixB(config.getProperty("suffix_b", "_dsb"));
@@ -60,14 +68,14 @@ public class ConfigReader {
                 configModel.setMinimumScore(
                         Float.valueOf(config.getProperty("min_score")) / 100);
             if (config.containsKey("cleaning_regex"))
-                configModel.setCleaningRegex(
-                        config.getProperty("cleaning_regex"));
+                configModel
+                        .setCleaningRegex(config.getProperty("cleaning_regex"));
             if (config.containsKey("row_num_col_a"))
                 configModel
-                .setRowNumColNameA(config.getProperty("row_num_col_a"));
+                        .setRowNumColNameA(config.getProperty("row_num_col_a"));
             if (config.containsKey("row_num_col_b"))
                 configModel
-                .setRowNumColNameB(config.getProperty("row_num_col_b"));
+                        .setRowNumColNameB(config.getProperty("row_num_col_b"));
             if (config.containsKey("encoding_a"))
                 configModel.setEncodingA(config.getProperty("encoding_a"));
             if (config.containsKey("encoding_b"))
@@ -100,7 +108,8 @@ public class ConfigReader {
                 String renameB = config.getProperty(i + "_rename_b",
                         indexB + "_" + configModel.getSuffixB());
 
-                // if any of the fields is missing, the column pair is thrown away
+                // if any of the fields is missing, the column pair is thrown
+                // away
                 if (type == null || indexA == null || indexB == null
                         || config.getProperty(i + "_weight") == null) {
                     if (type != null || indexA != null || indexB != null)

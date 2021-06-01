@@ -31,14 +31,15 @@ public class Cleaner {
         case "numerical_id":
             return data.replaceAll("[^0-9]", "");
         case "name":
-            return nameCleaningPattern.matcher(StringUtils.stripAccents(data.toUpperCase())).replaceAll("").trim();
+            return nameCleaningPattern
+                    .matcher(StringUtils.stripAccents(data.toUpperCase()))
+                    .replaceAll("").trim();
         case "date": // convert ddmmyyyy and yyyy-mm-dd to dd/mm/yyyy
             for (Pattern p : datePatterns) {
                 Matcher m = p.matcher(data);
                 if (m.matches()) {
                     return StringUtils.leftPad(m.group("day"), 2, '0') + '/'
-                            + StringUtils.leftPad(m.group("month"), 2,
-                                    '0')
+                            + StringUtils.leftPad(m.group("month"), 2, '0')
                             + '/' + m.group("year");
                 }
             }

@@ -14,11 +14,14 @@ public class ColumnConfigModel implements Serializable {
     private double phonWeight;
     private boolean generated;
 
-    public ColumnConfigModel(String id, String type, String indexA, String indexB, String renameA, String renameB, double weight) {
+    public ColumnConfigModel(String id, String type, String indexA,
+            String indexB, String renameA, String renameB, double weight) {
         this(id, type, indexA, indexB, renameA, renameB, weight, 0.0);
     }
 
-    public ColumnConfigModel(String id, String type, String indexA, String indexB, String renameA, String renameB, double weight, double phonWeight) {
+    public ColumnConfigModel(String id, String type, String indexA,
+            String indexB, String renameA, String renameB, double weight,
+            double phonWeight) {
         this.id = id;
         this.type = type;
         this.indexA = indexA;

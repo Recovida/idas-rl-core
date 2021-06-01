@@ -23,7 +23,7 @@ public class StatusReporter {
         }
 
         public boolean logs(LoggingLevel that) {
-            return this.level >= that.level;
+            return level >= that.level;
         }
     }
 
@@ -83,7 +83,7 @@ public class StatusReporter {
     }
 
     public static LoggingLevel currentLevel = LoggingLevel.INFO;
-    protected  StatusLogger logger = new ConsoleLogger();
+    protected StatusLogger logger = new ConsoleLogger();
 
     protected static StatusReporter instance = null;
 
@@ -98,7 +98,6 @@ public class StatusReporter {
         if (instance != null)
             StatusReporter.instance = instance;
     }
-
 
     public void warnIgnoringColumn(int number) {
         if (currentLevel.logs(LoggingLevel.WARN))
@@ -175,19 +174,20 @@ public class StatusReporter {
 
     public void infoOldIndexLacksColumns() {
         if (currentLevel.logs(LoggingLevel.INFO))
-            logger.info(() ->
-            MessageProvider.getMessage("dataset.b.incompleteindex"));
+            logger.info(() -> MessageProvider
+                    .getMessage("dataset.b.incompleteindex"));
     }
 
     public void infoOldIndexHasDifferentCleaningPattern() {
         if (currentLevel.logs(LoggingLevel.INFO))
-            logger.info(() ->
-            MessageProvider.getMessage("dataset.b.differentcleaningpatternonindex"));
+            logger.info(() -> MessageProvider
+                    .getMessage("dataset.b.differentcleaningpatternonindex"));
     }
 
     public void infoOldIndexIsCorrupt() {
         if (currentLevel.logs(LoggingLevel.INFO))
-            logger.info(() -> MessageProvider.getMessage("dataset.b.corruptindex"));
+            logger.info(
+                    () -> MessageProvider.getMessage("dataset.b.corruptindex"));
     }
 
     public void infoFinishedReadingA(long n) {
@@ -251,11 +251,11 @@ public class StatusReporter {
 
     public void infoLinkageProgress(float done) {
         if (currentLevel.logs(LoggingLevel.INFO))
-            logger.infoWithoutLineBreak(() ->
-            MessageFormat.format(
-                    MessageProvider.getMessage(
-                            "linkage.progresspercentage") + '\r',
-                    done));
+            logger.infoWithoutLineBreak(
+                    () -> MessageFormat.format(
+                            MessageProvider.getMessage(
+                                    "linkage.progresspercentage") + '\r',
+                            done));
     }
 
     public void warnCouldNotLinkRow() {
@@ -265,13 +265,15 @@ public class StatusReporter {
 
     public void errorCannotSaveResult() {
         if (currentLevel.logs(LoggingLevel.ERROR))
-            logger.error(() -> MessageProvider.getMessage("linkage.cannotsave"));
+            logger.error(
+                    () -> MessageProvider.getMessage("linkage.cannotsave"));
     }
 
     public void errorUnexpectedError(String message) {
         if (currentLevel.logs(LoggingLevel.ERROR))
             logger.error(() -> MessageFormat.format(
-                    MessageProvider.getMessage("linkage.unexpectederror"), message));
+                    MessageProvider.getMessage("linkage.unexpectederror"),
+                    message));
     }
 
     public void errorMissingFieldInConfigFile(String field) {
@@ -291,7 +293,7 @@ public class StatusReporter {
             logger.warn(() -> MessageProvider.getMessage("interrupted"));
     }
 
-    public  StatusLogger getLogger() {
+    public StatusLogger getLogger() {
         return logger;
     }
 

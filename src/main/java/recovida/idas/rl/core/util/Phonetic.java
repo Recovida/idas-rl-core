@@ -21,7 +21,7 @@ public class Phonetic {
 
     public static class MultipleSubstitution {
 
-        private List<Substitution> items = new LinkedList<>();
+        private final List<Substitution> items = new LinkedList<>();
 
         public MultipleSubstitution add(String regex, String replacement) {
             items.add(new Substitution(Pattern.compile(regex), replacement));

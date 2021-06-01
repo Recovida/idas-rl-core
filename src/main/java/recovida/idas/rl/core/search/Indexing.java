@@ -59,7 +59,7 @@ public class Indexing {
 
     public Indexing(ConfigModel config) {
         this.config = config;
-        this.status = checkIndexingStatus();
+        status = checkIndexingStatus();
     }
 
     public IndexingStatus getIndexingStatus() {
@@ -81,7 +81,8 @@ public class Indexing {
                 .collect(Collectors.toList());
         if (!missingColumnsInExistingIndex.isEmpty())
             return IndexingStatus.INCOMPLETE;
-        if (!Objects.equals(config.getCleaningRegex(), getCleaningRegexOnIndex(getCleaningPatternFilePath())))
+        if (!Objects.equals(config.getCleaningRegex(),
+                getCleaningRegexOnIndex(getCleaningPatternFilePath())))
             return IndexingStatus.DIFFERENT_CLEANING_PATTERN;
         try {
             FSDirectory index = FSDirectory
@@ -98,8 +99,9 @@ public class Indexing {
 
     protected static Collection<String> getIndexedColumns(Path successPath) {
         try {
-            return new LinkedHashSet<>(Arrays.asList(
-                    new String(Files.readAllBytes(successPath), Charset.forName("UTF-8")).split("\\n")));
+            return new LinkedHashSet<>(
+                    Arrays.asList(new String(Files.readAllBytes(successPath),
+                            Charset.forName("UTF-8")).split("\\n")));
         } catch (IOException e) {
             return Collections.emptySet();
         }
@@ -107,7 +109,8 @@ public class Indexing {
 
     protected static String getCleaningRegexOnIndex(Path cleaningRegexPath) {
         try {
-            return new String(Files.readAllBytes(cleaningRegexPath), Charset.forName("UTF-8"));
+            return new String(Files.readAllBytes(cleaningRegexPath),
+                    Charset.forName("UTF-8"));
         } catch (IOException e) {
             return "";
         }
@@ -116,7 +119,7 @@ public class Indexing {
     protected Collection<String> getColumnsToIndex() {
         return config.getColumns().stream().filter(c -> !c.isGenerated()
                 && !(c.getType().equals("copy") && c.getIndexB().equals("")))
-                .map(c -> c.getIndexB()).collect(Collectors.toList());
+                .map(ColumnConfigModel::getIndexB).collect(Collectors.toList());
     }
 
     protected Path getSuccessFilePath() {
@@ -127,7 +130,8 @@ public class Indexing {
         return Paths.get(config.getDbIndex()).resolve("_CLEANING");
     }
 
-    public synchronized boolean index(Iterable<DatasetRecord> records, Cleaner cleaner) {
+    public synchronized boolean index(Iterable<DatasetRecord> records,
+            Cleaner cleaner) {
         indexedEntries = 0;
         missingColumnsInExistingIndex = Collections.emptyList();
         missingColumnsInDataset = Collections.emptyList();
@@ -143,7 +147,7 @@ public class Indexing {
         Directory index = null;
         try {
             index = FSDirectory.open(dbIndexPath);
-            this.inWriter = new IndexWriter(index, idxConfig);
+            inWriter = new IndexWriter(index, idxConfig);
 
             for (DatasetRecord record : records) {
                 if (Thread.currentThread().isInterrupted())
@@ -163,14 +167,17 @@ public class Indexing {
                     return false;
             }
 
-            this.inWriter.close();
+            inWriter.close();
 
-            try (BufferedWriter bw = Files.newBufferedWriter(successPath)) { // uses UTF-8
+            try (BufferedWriter bw = Files.newBufferedWriter(successPath)) { // uses
+                                                                             // UTF-8
                 for (String col : columnsToIndex)
                     bw.write(col + '\n');
             }
 
-            try (BufferedWriter bw = Files.newBufferedWriter(getCleaningPatternFilePath())) { // uses UTF-8
+            try (BufferedWriter bw = Files
+                    .newBufferedWriter(getCleaningPatternFilePath())) { // uses
+                                                                        // UTF-8
                 bw.write(cleaner.getNameCleaningPattern().pattern());
             }
         } catch (IOException e) {
@@ -186,7 +193,7 @@ public class Indexing {
                     Field.Store.YES));
         }
         try {
-            this.inWriter.addDocument(doc);
+            inWriter.addDocument(doc);
         } catch (IOException e) {
             return false;
         }
@@ -218,7 +225,7 @@ public class Indexing {
                 } else {
                     originalValue = tmpIndex.equals(config.getRowNumColNameB())
                             ? String.valueOf(num)
-                                    : datasetRecord.get(tmpIndex);
+                            : datasetRecord.get(tmpIndex);
                     cleanedValue = cleaner.clean(column, originalValue);
                     tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "")
                             .replaceAll("\\s+", " ").trim();

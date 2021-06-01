@@ -7,7 +7,7 @@ import recovida.idas.rl.core.record.ColumnRecordModel;
 public class SearchingUtils {
 
     public String addTildeToEachName(String name) {
-        String [] tmp;
+        String[] tmp;
         tmp = name.split(" ");
 
         String result = "";
@@ -15,70 +15,82 @@ public class SearchingUtils {
         for (String strPiece : tmp) {
             result = result + strPiece + "~ ";
         }
-        return result.substring(0, result.length()-1);
+        return result.substring(0, result.length() - 1);
     }
 
-    public String getStrQueryFuzzy(ArrayList<ColumnRecordModel> columns){
-        String query = new String();
+    public String getStrQueryFuzzy(ArrayList<ColumnRecordModel> columns) {
+        StringBuilder query = new StringBuilder(new String());
 
-        for(ColumnRecordModel column: columns){
-            if(column.getType().equals("string")){
+        for (ColumnRecordModel column : columns) {
+            if (column.getType().equals("string")) {
                 // just in case we need it
             }
-            if( column.getType().equals("name")){
-                //query = query + "+" +c.getName() + ":\"" + r[c.getColumn()] + "\" ";
-                if(column.getValue().isEmpty() == false){
-                    query = query + column.getId() + ":(" + this.addTildeToEachName(column.getValue()) + ") ";
+            if (column.getType().equals("name")) {
+                // query = query + "+" +c.getName() + ":\"" + r[c.getColumn()] +
+                // "\" ";
+                if (column.getValue().isEmpty() == false) {
+                    query.append(column.getId()).append(":(")
+                            .append(addTildeToEachName(column.getValue()))
+                            .append(") ");
                 }
             }
-            if(column.getType().equals("date")){
-                if(column.getValue().isEmpty() == false){
-                    query = query +column.getId() + ":" + column.getValue() + "~ ";
+            if (column.getType().equals("date")) {
+                if (column.getValue().isEmpty() == false) {
+                    query.append(column.getId()).append(":")
+                            .append(column.getValue()).append("~ ");
                 }
             }
-            if(column.getType().equals("ibge")){
-                if(column.getValue().isEmpty() == false){
-                    query = query +column.getId() + ":" + column.getValue() + "~1 ";
+            if (column.getType().equals("ibge")) {
+                if (column.getValue().isEmpty() == false) {
+                    query.append(column.getId()).append(":")
+                            .append(column.getValue()).append("~1 ");
                 }
             }
-            if(column.getType().equals("categorical")){
-                if(column.getValue().isEmpty() == false){
-                    query = query + column.getId() + ":(" + column.getValue() + "~) ";
+            if (column.getType().equals("categorical")) {
+                if (column.getValue().isEmpty() == false) {
+                    query.append(column.getId()).append(":(")
+                            .append(column.getValue()).append("~) ");
                 }
             }
         }
-        //System.out.print(query);
-        return query;
+        // System.out.print(query);
+        return query.toString();
     }
 
-    public String getStrQueryExact(ArrayList<ColumnRecordModel> columns){
-        String query = new String();
+    public String getStrQueryExact(ArrayList<ColumnRecordModel> columns) {
+        StringBuilder query = new StringBuilder(new String());
 
-        for (ColumnRecordModel column: columns) {
-            if (!column.getType().equals("copy") && !column.getValue().isEmpty()) {
+        for (ColumnRecordModel column : columns) {
+            if (!column.getType().equals("copy")
+                    && !column.getValue().isEmpty()) {
                 if (column.getType().equals("name")) {
-                    query = query + "+" + column.getId() + ":\"" + column.getValue() + "\" ";
+                    query.append("+").append(column.getId()).append(":\"")
+                            .append(column.getValue()).append("\" ");
                 }
                 if (column.getType().equals("date")) {
-                    query = query + "+" + column.getId() + ":\"" + column.getValue() + "\" ";
+                    query.append("+").append(column.getId()).append(":\"")
+                            .append(column.getValue()).append("\" ");
                 }
                 if (column.getType().equals("ibge")) {
-                    query = query + "+" + column.getId() + ":" + column.getValue() + "~1 ";
+                    query.append("+").append(column.getId()).append(":")
+                            .append(column.getValue()).append("~1 ");
                 }
                 if (column.getType().equals("categorical")) {
-                    query = query + "+" + column.getId() + ":\"" + column.getValue() + "\" ";
+                    query.append("+").append(column.getId()).append(":\"")
+                            .append(column.getValue()).append("\" ");
                 }
             }
         }
-        //System.out.println(query);
-        return query;
+        // System.out.println(query);
+        return query.toString();
     }
 
-    public ArrayList<ColumnRecordModel> filterUnusedColumns(ArrayList<ColumnRecordModel> columns){
+    public ArrayList<ColumnRecordModel> filterUnusedColumns(
+            ArrayList<ColumnRecordModel> columns) {
         ArrayList<ColumnRecordModel> tmpResult = new ArrayList<>();
 
-        for (ColumnRecordModel column : columns){
-            switch(column.getType()){
+        for (ColumnRecordModel column : columns) {
+            switch (column.getType()) {
             case "name":
                 tmpResult.add(column);
                 break;

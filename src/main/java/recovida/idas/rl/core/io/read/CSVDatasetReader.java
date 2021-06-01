@@ -22,13 +22,13 @@ public class CSVDatasetReader implements DatasetReader {
     protected String fileName;
     protected String encoding;
     protected char delimiter;
-    private CSVFormat format;
+    private final CSVFormat format;
 
     public CSVDatasetReader(String fileName, char delimiter, String encoding) {
         this.fileName = fileName;
         this.encoding = encoding;
         this.delimiter = delimiter;
-        this.format = CSVFormat.RFC4180.withFirstRecordAsHeader()
+        format = CSVFormat.RFC4180.withFirstRecordAsHeader()
                 .withDelimiter(delimiter);
     }
 
@@ -49,8 +49,7 @@ public class CSVDatasetReader implements DatasetReader {
         }
     }
 
-    public static char guessCsvDelimiter(String fileName, String encoding)
-    {
+    public static char guessCsvDelimiter(String fileName, String encoding) {
         String firstLine = null;
         try {
             firstLine = Files

@@ -62,33 +62,45 @@ public class ConfigReader {
             configModel.setSuffixB(config.getProperty("suffix_b", "_dsb"));
             if (config.containsKey("max_rows")) {
                 String value = config.getProperty("max_rows");
+                long l = -1;
                 try {
-                    configModel.setMaxRows(Long.valueOf(value));
+                    l = Long.valueOf(value);
                 } catch (NumberFormatException e) {
+                }
+                if (l < 0) {
                     StatusReporter.get().errorConfigFileHasInvalidValue(value,
                             "max_rows");
                     return null;
                 }
+                configModel.setMaxRows(l);
             }
             if (config.containsKey("num_threads")) {
                 String value = config.getProperty("num_threads");
+                int i = 0;
                 try {
-                    configModel.setThreadCount(Integer.valueOf(value));
+                    i = Integer.valueOf(value);
                 } catch (NumberFormatException e) {
+                }
+                if (i < 0) {
                     StatusReporter.get().errorConfigFileHasInvalidValue(value,
                             "num_threads");
                     return null;
                 }
+                configModel.setThreadCount(i);
             }
             if (config.containsKey("min_score")) {
                 String value = config.getProperty("min_score");
+                float f = -1;
                 try {
-                    configModel.setMinimumScore(Float.valueOf(value) / 100);
+                    f = Float.valueOf(value) / 100;
                 } catch (NumberFormatException e) {
+                }
+                if (f < 0 || f > 100) {
                     StatusReporter.get().errorConfigFileHasInvalidValue(value,
                             "min_score");
                     return null;
                 }
+                configModel.setMinimumScore(f);
             }
             if (config.containsKey("cleaning_regex")) {
                 String value = config.getProperty("cleaning_regex");
@@ -148,22 +160,30 @@ public class ConfigReader {
                     continue;
                 }
 
-                double weight, phonWeight;
+                double weight = -1, phonWeight = 0;
                 String value = config.getProperty(i + "_weight");
                 try {
                     weight = Double.valueOf(value);
                 } catch (NumberFormatException e) {
+                }
+                if (weight < 0) {
                     StatusReporter.get().errorConfigFileHasInvalidValue(value,
-                            "weight");
+                            i + "_weight");
                     return null;
                 }
-                value = config.getProperty(i + "_phon_weight", "0.0");
-                try {
-                    phonWeight = Double.valueOf(value);
-                } catch (NumberFormatException e) {
-                    StatusReporter.get().errorConfigFileHasInvalidValue(value,
-                            "phon_weight");
-                    return null;
+                if ("name".equals(type)) {
+                    value = config.getProperty(i + "_phon_weight",
+                            "0.0");
+                    try {
+                        phonWeight = Double.valueOf(value);
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                    if (phonWeight < 0) {
+                        StatusReporter.get().errorConfigFileHasInvalidValue(
+                                value, i + "_phon_weight");
+                        return null;
+                    }
                 }
 
                 ColumnConfigModel column = new ColumnConfigModel(id, type,

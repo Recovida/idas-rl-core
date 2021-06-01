@@ -112,6 +112,13 @@ public class StatusReporter {
                     configFileName));
     }
 
+    public void errorConfigFileHasInvalidValue(String value, String field) {
+        if (currentLevel.logs(LoggingLevel.ERROR))
+            logger.error(() -> MessageFormat.format(
+                    MessageProvider.getMessage("config.invalidvalue"), value,
+                    field));
+    }
+
     public void infoUsingConfigFile(String configFileName) {
         if (currentLevel.logs(LoggingLevel.INFO))
             logger.info(() -> MessageFormat.format(

@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import recovida.idas.rl.core.util.StatusReporter;
@@ -58,18 +60,47 @@ public class ConfigReader {
 
             configModel.setSuffixA(config.getProperty("suffix_a", "_dsa"));
             configModel.setSuffixB(config.getProperty("suffix_b", "_dsb"));
-            if (config.containsKey("max_rows"))
-                configModel.setMaxRows(
-                        Long.valueOf(config.getProperty("max_rows")));
-            if (config.containsKey("num_threads"))
-                configModel.setThreadCount(
-                        Integer.valueOf(config.getProperty("num_threads")));
-            if (config.containsKey("min_score"))
-                configModel.setMinimumScore(
-                        Float.valueOf(config.getProperty("min_score")) / 100);
-            if (config.containsKey("cleaning_regex"))
-                configModel
-                        .setCleaningRegex(config.getProperty("cleaning_regex"));
+            if (config.containsKey("max_rows")) {
+                String value = config.getProperty("max_rows");
+                try {
+                    configModel.setMaxRows(Long.valueOf(value));
+                } catch (NumberFormatException e) {
+                    StatusReporter.get().errorConfigFileHasInvalidValue(value,
+                            "max_rows");
+                    return null;
+                }
+            }
+            if (config.containsKey("num_threads")) {
+                String value = config.getProperty("num_threads");
+                try {
+                    configModel.setThreadCount(Integer.valueOf(value));
+                } catch (NumberFormatException e) {
+                    StatusReporter.get().errorConfigFileHasInvalidValue(value,
+                            "num_threads");
+                    return null;
+                }
+            }
+            if (config.containsKey("min_score")) {
+                String value = config.getProperty("min_score");
+                try {
+                    configModel.setMinimumScore(Float.valueOf(value) / 100);
+                } catch (NumberFormatException e) {
+                    StatusReporter.get().errorConfigFileHasInvalidValue(value,
+                            "min_score");
+                    return null;
+                }
+            }
+            if (config.containsKey("cleaning_regex")) {
+                String value = config.getProperty("cleaning_regex");
+                try {
+                    Pattern.compile(value);
+                    configModel.setCleaningRegex(value);
+                } catch (PatternSyntaxException e) {
+                    StatusReporter.get().errorConfigFileHasInvalidValue(value,
+                            "cleaning_regex");
+                    return null;
+                }
+            }
             if (config.containsKey("row_num_col_a"))
                 configModel
                         .setRowNumColNameA(config.getProperty("row_num_col_a"));
@@ -117,10 +148,23 @@ public class ConfigReader {
                     continue;
                 }
 
-                double weight = Double
-                        .valueOf(config.getProperty(i + "_weight"));
-                double phonWeight = Double
-                        .valueOf(config.getProperty(i + "_phon_weight", "0.0"));
+                double weight, phonWeight;
+                String value = config.getProperty(i + "_weight");
+                try {
+                    weight = Double.valueOf(value);
+                } catch (NumberFormatException e) {
+                    StatusReporter.get().errorConfigFileHasInvalidValue(value,
+                            "weight");
+                    return null;
+                }
+                value = config.getProperty(i + "_phon_weight", "0.0");
+                try {
+                    phonWeight = Double.valueOf(value);
+                } catch (NumberFormatException e) {
+                    StatusReporter.get().errorConfigFileHasInvalidValue(value,
+                            "phon_weight");
+                    return null;
+                }
 
                 ColumnConfigModel column = new ColumnConfigModel(id, type,
                         indexA, indexB, renameA, renameB, weight, phonWeight);

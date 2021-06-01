@@ -179,6 +179,12 @@ public class StatusReporter {
             MessageProvider.getMessage("dataset.b.incompleteindex"));
     }
 
+    public void infoOldIndexHasDifferentCleaningPattern() {
+        if (currentLevel.logs(LoggingLevel.INFO))
+            logger.info(() ->
+            MessageProvider.getMessage("dataset.b.differentcleaningpatternonindex"));
+    }
+
     public void infoOldIndexIsCorrupt() {
         if (currentLevel.logs(LoggingLevel.INFO))
             logger.info(() -> MessageProvider.getMessage("dataset.b.corruptindex"));

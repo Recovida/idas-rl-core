@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import recovida.idas.rl.core.config.ColumnConfigModel;
 
-public class Cleaning {
+public class Cleaner {
 
     private static Pattern[] datePatterns = {
             Pattern.compile(
@@ -19,9 +19,9 @@ public class Cleaning {
             Pattern.compile(
                     "(?<year>\\d{4})-(?<month>\\d{1,2})-(?<day>\\d{1,2})") };
 
-    private static Pattern nameCleaningPattern = Pattern.compile("(\\s+(LAUDO|BO|FF|NATIMORTO|DESCONHECIDO|NUA|CHAMADA)\\s*[0-9]*\\s*)+");
+    private Pattern nameCleaningPattern = Pattern.compile("");
 
-    public static String clean(ColumnConfigModel c, String data) {
+    public String clean(ColumnConfigModel c, String data) {
         if (data == null)
             return "";
         if (c.getType().equals("copy"))
@@ -30,7 +30,7 @@ public class Cleaning {
         switch (c.getType()) {
         case "numerical_id":
             return data.replaceAll("[^0-9]", "");
-        case "name": // TODO: process names
+        case "name":
             return nameCleaningPattern.matcher(StringUtils.stripAccents(data.toUpperCase())).replaceAll("").trim();
         case "date": // convert ddmmyyyy and yyyy-mm-dd to dd/mm/yyyy
             for (Pattern p : datePatterns) {
@@ -53,6 +53,18 @@ public class Cleaning {
         default:
             return data;
         }
+    }
+
+    public Pattern getNameCleaningPattern() {
+        return nameCleaningPattern;
+    }
+
+    public void setNameCleaningPattern(Pattern pattern) {
+        nameCleaningPattern = pattern == null ? Pattern.compile("") : pattern;
+    }
+
+    public void setNameCleaningPattern(String pattern) {
+        nameCleaningPattern = Pattern.compile(pattern == null ? "" : pattern);
     }
 
 }

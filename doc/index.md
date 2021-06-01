@@ -66,12 +66,19 @@ row_num_col_b = NUMCOL_B
   computador para realizar
   outras tarefas durante a execução do programa.
 - `max_rows`: Utilizado para interromper o linkage após um determinado número
-de colunas do dataset A. Deve ser utilizado apenas para fim de
-teste, visto que esse limite é a quantidade de linhas do dataset A que
-o programa vai considerar (por exemplo, se esse valor for 50, a 51ª linha
+  de colunas do dataset A. Deve ser utilizado apenas para fim de
+  teste, visto que esse limite é a quantidade de linhas do dataset A que
+  o programa vai considerar (por exemplo, se esse valor for 50, a 51ª linha
   e todas as linhas subsequentes serão ignoradas,
   independentemente do sucesso do linkage
   das primeiras 50 linhas).
+- `cleaning_regex`: Expressão regular utilizada para limpar valores do tipo
+  `name`. Convém notar que a limpeza é feita **após** a retirada de acentos
+  e a transformação para letras maiúsculas. Além disso, no arquivo de
+  configurações, é preciso fazer "escape" de caracteres como a barra
+  invertida. A expressão regular do exemplo do fim desta seção corresponde
+  a um padrão que remove certas palavras do fim do nome, seguidas ou não
+  por números, que é utilizada por membros da SMS-SP.
 
 Exemplo do formato:
 
@@ -81,6 +88,7 @@ linkage_folder = assets/linkage
 min_score = 90.0
 num_threads = 3
 max_rows = 50
+cleaning_regex = (\\s+(LAUDO|BO|FF|NATIMORTO|DESCONHECIDO|NUA|CHAMADA)\\s*[0-9]*\\s*)+$
 ```
 
 

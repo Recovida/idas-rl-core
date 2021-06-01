@@ -37,7 +37,7 @@ import recovida.idas.rl.core.record.ColumnRecordModel;
 import recovida.idas.rl.core.record.RecordModel;
 import recovida.idas.rl.core.search.Indexing;
 import recovida.idas.rl.core.search.Indexing.IndexingStatus;
-import recovida.idas.rl.core.util.Cleaning;
+import recovida.idas.rl.core.util.Cleaner;
 import recovida.idas.rl.core.util.Phonetic;
 import recovida.idas.rl.core.util.StatusReporter;
 import recovida.idas.rl.core.util.StatusReporter.LoggingLevel;
@@ -75,6 +75,9 @@ public class Main {
 
         if (config == null)
             return false;
+
+        Cleaner cleaner = new Cleaner();
+        cleaner.setNameCleaningPattern(config.getCleaningRegex());
 
         String fileName_a = config.getDbA();
         String fileName_b = config.getDbB();
@@ -189,11 +192,17 @@ public class Main {
         case INCOMPLETE:
             StatusReporter.get().infoOldIndexLacksColumns();
             break;
+        case DIFFERENT_CLEANING_PATTERN:
+            StatusReporter.get().infoOldIndexHasDifferentCleaningPattern();
+            break;
         case NONE:
+            break;
+        default:
             break;
         }
         if (indexingStatus == IndexingStatus.CORRUPT
-                || indexingStatus == IndexingStatus.INCOMPLETE) {
+                || indexingStatus == IndexingStatus.INCOMPLETE
+                || indexingStatus == IndexingStatus.DIFFERENT_CLEANING_PATTERN) {
             if (!indexing.deleteOldIndex()) {
                 StatusReporter.get().errorOldIndexCannotBeDeleted(
                         config.getDbIndex().toString());
@@ -201,7 +210,7 @@ public class Main {
             }
         }
         if (indexingStatus != IndexingStatus.COMPLETE) {
-            if (!indexing.index(dbBRecords)) {
+            if (!indexing.index(dbBRecords, cleaner)) {
                 Collection<String> missing = indexing
                         .getMissingColumnsInDataset();
                 if (!missing.isEmpty()) {
@@ -284,8 +293,7 @@ public class Main {
                                     .equals(config.getRowNumColNameA())
                                     ? String.valueOf(row.getNumber())
                                             : row.get(column.getIndexA());
-                            cleanedValue = Cleaning.clean(column,
-                                    originalValue);
+                            cleanedValue = cleaner.clean(column, originalValue);
                             // Remove anything that is not an upper-case letter,
                             // slash, space or digit
                             tmpValue = cleanedValue

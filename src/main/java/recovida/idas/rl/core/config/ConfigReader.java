@@ -59,6 +59,9 @@ public class ConfigReader {
             if (config.containsKey("min_score"))
                 configModel.setMinimumScore(
                         Float.valueOf(config.getProperty("min_score")) / 100);
+            if (config.containsKey("cleaning_regex"))
+                configModel.setCleaningRegex(
+                        config.getProperty("cleaning_regex"));
             if (config.containsKey("row_num_col_a"))
                 configModel
                 .setRowNumColNameA(config.getProperty("row_num_col_a"));
@@ -97,7 +100,7 @@ public class ConfigReader {
                 String renameB = config.getProperty(i + "_rename_b",
                         indexB + "_" + configModel.getSuffixB());
 
-                // if any of the columns is missing the columns is thrown away
+                // if any of the fields is missing, the column pair is thrown away
                 if (type == null || indexA == null || indexB == null
                         || config.getProperty(i + "_weight") == null) {
                     if (type != null || indexA != null || indexB != null)

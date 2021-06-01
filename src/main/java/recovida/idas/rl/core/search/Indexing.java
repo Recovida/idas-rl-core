@@ -2,8 +2,8 @@ package recovida.idas.rl.core.search;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -30,13 +31,13 @@ import recovida.idas.rl.core.config.ConfigModel;
 import recovida.idas.rl.core.io.DatasetRecord;
 import recovida.idas.rl.core.record.ColumnRecordModel;
 import recovida.idas.rl.core.record.RecordModel;
-import recovida.idas.rl.core.util.Cleaning;
+import recovida.idas.rl.core.util.Cleaner;
 import recovida.idas.rl.core.util.Phonetic;
 
 public class Indexing {
 
     public enum IndexingStatus {
-        NONE, CORRUPT, INCOMPLETE, COMPLETE
+        NONE, CORRUPT, INCOMPLETE, COMPLETE, DIFFERENT_CLEANING_PATTERN
     }
 
     ConfigModel config;
@@ -80,6 +81,8 @@ public class Indexing {
                 .collect(Collectors.toList());
         if (!missingColumnsInExistingIndex.isEmpty())
             return IndexingStatus.INCOMPLETE;
+        if (!Objects.equals(config.getCleaningRegex(), getCleaningRegexOnIndex(getCleaningPatternFilePath())))
+            return IndexingStatus.DIFFERENT_CLEANING_PATTERN;
         try {
             FSDirectory index = FSDirectory
                     .open(Paths.get(config.getDbIndex()));
@@ -96,9 +99,17 @@ public class Indexing {
     protected static Collection<String> getIndexedColumns(Path successPath) {
         try {
             return new LinkedHashSet<>(Arrays.asList(
-                    new String(Files.readAllBytes(successPath)).split("\\n")));
+                    new String(Files.readAllBytes(successPath), Charset.forName("UTF-8")).split("\\n")));
         } catch (IOException e) {
             return Collections.emptySet();
+        }
+    }
+
+    protected static String getCleaningRegexOnIndex(Path cleaningRegexPath) {
+        try {
+            return new String(Files.readAllBytes(cleaningRegexPath), Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            return "";
         }
     }
 
@@ -112,7 +123,11 @@ public class Indexing {
         return Paths.get(config.getDbIndex()).resolve("_COMPLETE");
     }
 
-    public synchronized boolean index(Iterable<DatasetRecord> records) {
+    protected Path getCleaningPatternFilePath() {
+        return Paths.get(config.getDbIndex()).resolve("_CLEANING");
+    }
+
+    public synchronized boolean index(Iterable<DatasetRecord> records, Cleaner cleaner) {
         indexedEntries = 0;
         missingColumnsInExistingIndex = Collections.emptyList();
         missingColumnsInDataset = Collections.emptyList();
@@ -136,7 +151,7 @@ public class Indexing {
                 if (columnsInDataset.isEmpty()) // first time - save column list
                     columnsInDataset = record.getKeySet();
                 RecordModel tmpRecordModel = fromDatasetRecordToRecordModel(
-                        ++indexedEntries, record);
+                        ++indexedEntries, record, cleaner);
                 if (tmpRecordModel == null) {
                     missingColumnsInDataset = columnsToIndex.stream()
                             .filter(c -> !c.equals(config.getRowNumColNameB())
@@ -150,10 +165,13 @@ public class Indexing {
 
             this.inWriter.close();
 
-            try (BufferedWriter bw = new BufferedWriter(
-                    new FileWriter(successPath.toFile()))) {
+            try (BufferedWriter bw = Files.newBufferedWriter(successPath)) { // uses UTF-8
                 for (String col : columnsToIndex)
                     bw.write(col + '\n');
+            }
+
+            try (BufferedWriter bw = Files.newBufferedWriter(getCleaningPatternFilePath())) { // uses UTF-8
+                bw.write(cleaner.getNameCleaningPattern().pattern());
             }
         } catch (IOException e) {
             return false;
@@ -176,7 +194,7 @@ public class Indexing {
     }
 
     private RecordModel fromDatasetRecordToRecordModel(long num,
-            DatasetRecord datasetRecord) {
+            DatasetRecord datasetRecord, Cleaner cleaner) {
         ColumnRecordModel tmpRecordColumnRecord;
         String tmpIndex;
         String cleanedValue = null;
@@ -201,7 +219,7 @@ public class Indexing {
                     originalValue = tmpIndex.equals(config.getRowNumColNameB())
                             ? String.valueOf(num)
                                     : datasetRecord.get(tmpIndex);
-                    cleanedValue = Cleaning.clean(column, originalValue);
+                    cleanedValue = cleaner.clean(column, originalValue);
                     tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "")
                             .replaceAll("\\s+", " ").trim();
                 }

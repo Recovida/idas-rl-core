@@ -3,6 +3,8 @@ package recovida.idas.rl.core.config;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class ConfigModel implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -12,6 +14,7 @@ public class ConfigModel implements Serializable {
     private String encodingB = "UTF-8";
     private String suffixA;
     private String suffixB;
+    private String cleaningRegex = "";
     private String rowNumColNameA = "#A";
     private String rowNumColNameB = "#B";
     private String dbIndex;
@@ -157,6 +160,21 @@ public class ConfigModel implements Serializable {
     public void setThreadCount(int threadCount) {
         if (threadCount > 0)
             this.threadCount = threadCount;
+    }
+
+    public String getCleaningRegex() {
+        return cleaningRegex;
+    }
+
+    public void setCleaningRegex(String regex) {
+        if (regex == null)
+            return;
+        try {
+            Pattern.compile(regex);
+            cleaningRegex = regex;
+        } catch (PatternSyntaxException e) {
+            cleaningRegex = "";
+        }
     }
 
 

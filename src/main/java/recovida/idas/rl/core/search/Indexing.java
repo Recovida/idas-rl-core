@@ -117,8 +117,8 @@ public class Indexing {
     }
 
     protected Collection<String> getColumnsToIndex() {
-        return config.getColumns().stream().filter(c -> !c.isGenerated()
-                && !(c.getType().equals("copy") && c.getIndexB().equals("")))
+        return config.getColumns().stream().filter(
+                c -> !("copy".equals(c.getType()) && "".equals(c.getIndexB())))
                 .map(ColumnConfigModel::getIndexB).collect(Collectors.toList());
     }
 

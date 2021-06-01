@@ -32,7 +32,6 @@ assets/*
 target/
 
 .classpath
-.project
 .settings/
 .vscode/
 

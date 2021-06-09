@@ -317,7 +317,7 @@ public class Main {
                     }
                     // set the column to record
                     tmpRecord.setColumnRecordModels(tmpRecordColumns);
-                    return linkage.linkSpark(tmpRecord);
+                    return linkage.link(tmpRecord);
                 };
                 try {
                     q.put(pool.submit(fn));
@@ -349,7 +349,8 @@ public class Main {
                     } catch (CancellationException e) {
                         return false;
                     }
-                    if (output != null && !output.isEmpty() && !writer.writeRow(output)) {
+                    if (output != null && !output.isEmpty()
+                            && !writer.writeRow(output)) {
                         StatusReporter.get().errorCannotSaveResult();
                         return false;
                     }

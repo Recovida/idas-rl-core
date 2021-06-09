@@ -16,7 +16,7 @@ public class Linkage implements Serializable {
         this.config = config;
     }
 
-    public String linkSpark(RecordModel record) {
+    public String link(RecordModel record) {
         Searching searching;
         try {
             searching = new Searching(config);

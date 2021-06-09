@@ -25,7 +25,7 @@ public class SearchingUtils {
             if (column.getType().equals("string")) {
                 // just in case we need it
             }
-            if (column.getType().equals("name")) {
+            if (column.getType().equals("name") || column.getType().equals("gender")) {
                 // query = query + "+" +c.getName() + ":\"" + r[c.getColumn()] +
                 // "\" ";
                 if (column.getValue().isEmpty() == false) {
@@ -40,7 +40,7 @@ public class SearchingUtils {
                             .append(column.getValue()).append("~ ");
                 }
             }
-            if (column.getType().equals("ibge")) {
+            if (column.getType().equals("ibge") || column.getType().equals("numerical_id")) {
                 if (column.getValue().isEmpty() == false) {
                     query.append(column.getId()).append(":")
                             .append(column.getValue()).append("~1 ");
@@ -63,7 +63,7 @@ public class SearchingUtils {
         for (ColumnRecordModel column : columns) {
             if (!column.getType().equals("copy")
                     && !column.getValue().isEmpty()) {
-                if (column.getType().equals("name")) {
+                if (column.getType().equals("name") || column.getType().equals("gender")) {
                     query.append("+").append(column.getId()).append(":\"")
                             .append(column.getValue()).append("\" ");
                 }
@@ -71,7 +71,7 @@ public class SearchingUtils {
                     query.append("+").append(column.getId()).append(":\"")
                             .append(column.getValue()).append("\" ");
                 }
-                if (column.getType().equals("ibge")) {
+                if (column.getType().equals("ibge") || column.getType().equals("numerical_id")) {
                     query.append("+").append(column.getId()).append(":")
                             .append(column.getValue()).append("~1 ");
                 }
@@ -101,6 +101,12 @@ public class SearchingUtils {
                 tmpResult.add(column);
                 break;
             case "categorical":
+                tmpResult.add(column);
+                break;
+            case "numerical_id":
+                tmpResult.add(column);
+                break;
+            case "gender":
                 tmpResult.add(column);
                 break;
             }

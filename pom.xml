@@ -7,7 +7,7 @@
 	<groupId>recovida</groupId>
 	<artifactId>idas-rl-core</artifactId>
 	<name>IDaS-RL Core</name>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

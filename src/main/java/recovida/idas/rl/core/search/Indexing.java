@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -74,10 +75,11 @@ public class Indexing {
         Path successPath = getSuccessFilePath();
         if (!Files.isRegularFile(successPath))
             return IndexingStatus.CORRUPT;
-        Collection<String> alreadyIndexedColumns = getIndexedColumns(
+        Map<String, String> alreadyIndexedColumns = getIndexedColumns(
                 successPath);
-        missingColumnsInExistingIndex = getColumnsToIndex().stream()
-                .filter(c -> !alreadyIndexedColumns.contains(c))
+        Map<String, String> columnsToIndex = getColumnsToIndex();
+        missingColumnsInExistingIndex = columnsToIndex.keySet().stream()
+                .filter(c -> !Objects.equals(alreadyIndexedColumns.get(c), columnsToIndex.get(c)))
                 .collect(Collectors.toList());
         if (!missingColumnsInExistingIndex.isEmpty())
             return IndexingStatus.INCOMPLETE;
@@ -97,13 +99,15 @@ public class Indexing {
         return IndexingStatus.COMPLETE;
     }
 
-    protected static Collection<String> getIndexedColumns(Path successPath) {
+    protected static Map<String, String> getIndexedColumns(Path successPath) {
         try {
-            return new LinkedHashSet<>(
-                    Arrays.asList(new String(Files.readAllBytes(successPath),
-                            Charset.forName("UTF-8")).split("\\n")));
+            return Arrays
+                    .stream(new String(Files.readAllBytes(successPath),
+                            Charset.forName("UTF-8")).split("\\n"))
+                    .filter(l -> l.indexOf(',') >= 0).map(l -> l.split(",", 2))
+                    .collect(Collectors.toMap(s -> s[0], s -> s[1]));
         } catch (IOException e) {
-            return Collections.emptySet();
+            return Collections.emptyMap();
         }
     }
 
@@ -116,10 +120,10 @@ public class Indexing {
         }
     }
 
-    protected Collection<String> getColumnsToIndex() {
+    protected Map<String, String> getColumnsToIndex() {
         return config.getColumns().stream().filter(
                 c -> !("copy".equals(c.getType()) && "".equals(c.getIndexB())))
-                .map(ColumnConfigModel::getIndexB).collect(Collectors.toList());
+                .collect(Collectors.toMap(c -> c.getId(), c -> c.getIndexB()));
     }
 
     protected Path getSuccessFilePath() {
@@ -139,7 +143,7 @@ public class Indexing {
         Path dbIndexPath = Paths.get(config.getDbIndex());
         Path successPath = getSuccessFilePath();
 
-        Collection<String> columnsToIndex = getColumnsToIndex();
+        Map<String, String> columnsToIndex = getColumnsToIndex();
 
         StandardAnalyzer analyzer = new StandardAnalyzer();
         IndexWriterConfig idxConfig = new IndexWriterConfig(analyzer);
@@ -157,7 +161,7 @@ public class Indexing {
                 RecordModel tmpRecordModel = fromDatasetRecordToRecordModel(
                         ++indexedEntries, record, cleaner);
                 if (tmpRecordModel == null) {
-                    missingColumnsInDataset = columnsToIndex.stream()
+                    missingColumnsInDataset = columnsToIndex.values().stream()
                             .filter(c -> !c.equals(config.getRowNumColNameB())
                                     && !columnsInDataset.contains(c))
                             .collect(Collectors.toList());
@@ -171,8 +175,8 @@ public class Indexing {
 
             try (BufferedWriter bw = Files.newBufferedWriter(successPath)) { // uses
                                                                              // UTF-8
-                for (String col : columnsToIndex)
-                    bw.write(col + '\n');
+                for (Entry<String, String> idAndIndexB : columnsToIndex.entrySet())
+                    bw.write(idAndIndexB.getKey() + ',' + idAndIndexB.getValue() + '\n');
             }
 
             try (BufferedWriter bw = Files

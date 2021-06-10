@@ -46,7 +46,17 @@ public abstract class DatasetRecord {
 
             @Override
             public String get(String key) {
-                return csvRecord.get(key);
+                try {
+                    return csvRecord.get(key);
+                } catch (IllegalArgumentException e) {
+                    if (!csvRecord.isConsistent()) {
+                        // Apache Commons CSV parser does not support CSV files
+                        // that end a line prematurely when the last values are
+                        // null.
+                        return "";
+                    }
+                    throw e;
+                }
             }
 
             @Override

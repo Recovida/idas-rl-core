@@ -29,7 +29,7 @@ public class CSVDatasetReader implements DatasetReader {
         this.encoding = encoding;
         this.delimiter = delimiter;
         format = CSVFormat.RFC4180.withFirstRecordAsHeader()
-                .withDelimiter(delimiter).withQuote(null);
+                .withDelimiter(delimiter);
     }
 
     @Override

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import recovida.idas.rl.core.io.Separator;
+
 public class ConfigModel implements Serializable {
     private static final long serialVersionUID = 1L;
     private String dbA;
@@ -19,6 +21,8 @@ public class ConfigModel implements Serializable {
     private String rowNumColNameB = "#B";
     private String dbIndex;
     private String linkageDir = ".";
+    private Separator decimalSeparator = Separator.DEFAULT_DEC_SEP;
+    private Separator columnSeparator = Separator.DEFAULT_COL_SEP;
     private long maxRows = Long.MAX_VALUE;
     private float minimumScore = 0;
     private int threadCount = Math.min(8,
@@ -177,6 +181,32 @@ public class ConfigModel implements Serializable {
         } catch (PatternSyntaxException e) {
             cleaningRegex = "";
         }
+    }
+
+    public Separator getDecimalSeparator() {
+        return decimalSeparator;
+    }
+
+    public void setDecimalSeparator(Separator decimalSeparator) {
+        if (decimalSeparator != null)
+            this.decimalSeparator = decimalSeparator;
+    }
+
+    public void setDecimalSeparator(String decimalSeparator) {
+        setDecimalSeparator(Separator.fromName(decimalSeparator));
+    }
+
+    public Separator getColumnSeparator() {
+        return columnSeparator;
+    }
+
+    public void setColumnSeparator(Separator columnSeparator) {
+        if (columnSeparator != null)
+            this.columnSeparator = columnSeparator;
+    }
+
+    public void setColumnSeparator(String columnSeparator) {
+        setColumnSeparator(Separator.fromName(columnSeparator));
     }
 
 }

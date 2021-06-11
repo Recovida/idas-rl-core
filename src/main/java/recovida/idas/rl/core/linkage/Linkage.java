@@ -16,22 +16,21 @@ public class Linkage implements Serializable {
         this.config = config;
     }
 
-    public String link(RecordModel record) {
+    public RecordPairModel link(RecordModel record) {
         Searching searching;
         try {
             searching = new Searching(config);
         } catch (IOException e) {
-            return "";
+            return null;
         }
-        LinkageUtils linkageUtils = new LinkageUtils();
         RecordPairModel candidatePair = searching
                 .getCandidatePairFromRecord(record);
         if (candidatePair == null) {
-            return "";
+            return null;
         }
         if (candidatePair.getScore() >= config.getMinimumScore())
-            return linkageUtils.fromRecordPairToCsv(candidatePair);
-        return "";
+            return candidatePair;
+        return null;
     }
 
 }

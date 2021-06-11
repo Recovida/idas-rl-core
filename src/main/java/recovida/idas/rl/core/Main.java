@@ -35,6 +35,7 @@ import recovida.idas.rl.core.linkage.Linkage;
 import recovida.idas.rl.core.linkage.LinkageUtils;
 import recovida.idas.rl.core.record.ColumnRecordModel;
 import recovida.idas.rl.core.record.RecordModel;
+import recovida.idas.rl.core.record.RecordPairModel;
 import recovida.idas.rl.core.search.Indexing;
 import recovida.idas.rl.core.search.Indexing.IndexingStatus;
 import recovida.idas.rl.core.util.Cleaner;
@@ -75,6 +76,11 @@ public class Main {
 
         if (config == null)
             return false;
+
+        if (config.getDecimalSeparator().getCharacter() == config.getColumnSeparator().getCharacter()) {
+            StatusReporter.get().errorSameSeparator();
+            return false;
+        }
 
         Cleaner cleaner = new Cleaner();
         cleaner.setNameCleaningPattern(config.getCleaningRegex());
@@ -317,7 +323,8 @@ public class Main {
                     }
                     // set the column to record
                     tmpRecord.setColumnRecordModels(tmpRecordColumns);
-                    return linkage.link(tmpRecord);
+                    RecordPairModel r = linkage.link(tmpRecord);
+                    return r == null ? "" : LinkageUtils.fromRecordPairToCsv(config, r);
                 };
                 try {
                     q.put(pool.submit(fn));
@@ -331,7 +338,8 @@ public class Main {
         readerThread.start();
 
         try (DatasetWriter writer = new CSVDatasetWriter(
-                resultPath + File.separator + "result.csv", ';')) {
+                resultPath + File.separator + "result.csv",
+                config.getColumnSeparator().getCharacter())) {
             String header = LinkageUtils.getCsvHeaderFromConfig(config);
             if (!writer.writeRow(header)) {
                 StatusReporter.get().errorCannotSaveResult();

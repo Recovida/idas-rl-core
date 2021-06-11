@@ -124,6 +124,11 @@ public class ConfigReader {
             if (config.containsKey("encoding_b"))
                 configModel.setEncodingB(config.getProperty("encoding_b"));
 
+            if (config.containsKey("output_dec_sep"))
+                configModel.setDecimalSeparator(config.getProperty("output_dec_sep"));
+            if (config.containsKey("output_col_sep"))
+                configModel.setColumnSeparator(config.getProperty("output_col_sep"));
+
             // row number
             configModel.addColumn(new ColumnConfigModel("_____NUM",
                     "numerical_id", configModel.getRowNumColNameA(),

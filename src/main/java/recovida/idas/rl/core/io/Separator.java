@@ -41,7 +41,9 @@ public enum Separator {
     }
 
     public char getCharacter() {
-        return character;
+        return character != null ? character
+                : lts.localeToSeparator(MessageProvider.getLocale())
+                        .getCharacter();
     }
 
     public static List<Separator> getColumnSeparators() {
@@ -50,6 +52,16 @@ public enum Separator {
 
     public static List<Separator> getDecimalSeparators() {
         return Arrays.asList(DEFAULT_DEC_SEP, DOT, COMMA);
+    }
+
+    public static Separator fromName(String name) {
+        if (name == null)
+            return null;
+        try {
+            return Separator.valueOf(name.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static Separator decimalSeparatorFromLocale(Locale l) {

@@ -112,6 +112,12 @@ public class StatusReporter {
                     configFileName));
     }
 
+    public void errorSameSeparator() {
+        if (currentLevel.logs(LoggingLevel.ERROR))
+            logger.error(() ->
+                    MessageProvider.getMessage("config.sameseparator"));
+    }
+
     public void errorConfigFileHasInvalidValue(String value, String field) {
         if (currentLevel.logs(LoggingLevel.ERROR))
             logger.error(() -> MessageFormat.format(
@@ -307,5 +313,6 @@ public class StatusReporter {
     public void setLogger(StatusLogger logger) {
         this.logger = logger;
     }
+
 
 }

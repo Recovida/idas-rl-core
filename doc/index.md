@@ -65,6 +65,19 @@ row_num_col_b = NUMCOL_B
   preciso utilizar o
   computador para realizar
   outras tarefas durante a execução do programa.
+- `output_dec_sep`: Separador decimal utilizado no arquivo de saída
+  (atualmente, apenas para a pontuação). Os valores aceitos são `comma`
+  (vírgula) e `dot` (ponto). Se omitido ou inválido, é utilizado o separador
+  padrão do idioma em que o programa está sendo executado (ponto em inglês,
+  vírgula em português e espanhol).
+- `output_col_sep`: Separador entre colunas utilizado no arquivo de saída.
+  Os valores aceitos são `comma`
+  (vírgula), `semicolon` (ponto e vírgula), `colon` (dois-pontos),
+  `tab` (tabulação) e `pipe` (barra vertical).
+  Se omitido ou inválido, é utilizada a vírgula se o idioma em que
+  o programa está sendo executado tiver o ponto como separador decimal
+  (como inglês), ou ponto e vírgula se o idioma tiver a vírgula como separador
+  decimal (como espanhol ou português).
 - `max_rows`: Utilizado para interromper o linkage após um determinado número
   de colunas do dataset A. Deve ser utilizado apenas para fim de
   teste, visto que esse limite é a quantidade de linhas do dataset A que

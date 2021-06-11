@@ -12,7 +12,7 @@ public enum Separator {
 
     DEFAULT_COL_SEP(null, Separator::columnSeparatorFromLocale),
     DEFAULT_DEC_SEP(null, Separator::decimalSeparatorFromLocale), COMMA(','),
-    COLON(':'), SEMICOLON(';'), TAB('\t'), DOT('.');
+    COLON(':'), SEMICOLON(';'), TAB('\t'), DOT('.'), PIPE('|');
 
     private Character character;
     private LocaleToSeparator lts;
@@ -47,7 +47,7 @@ public enum Separator {
     }
 
     public static List<Separator> getColumnSeparators() {
-        return Arrays.asList(DEFAULT_COL_SEP, SEMICOLON, COMMA, COLON, TAB);
+        return Arrays.asList(DEFAULT_COL_SEP, SEMICOLON, COMMA, COLON, PIPE, TAB);
     }
 
     public static List<Separator> getDecimalSeparators() {

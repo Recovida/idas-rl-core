@@ -188,7 +188,7 @@ public class ConfigModel implements Serializable {
     }
 
     public void setDecimalSeparator(Separator decimalSeparator) {
-        if (decimalSeparator != null)
+        if (decimalSeparator != null && Separator.getDecimalSeparators().contains(decimalSeparator))
             this.decimalSeparator = decimalSeparator;
     }
 

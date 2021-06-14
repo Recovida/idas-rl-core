@@ -1,12 +1,15 @@
 package recovida.idas.rl.core.io;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.csv.CSVRecord;
+import com.univocity.parsers.common.IterableResult;
+import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.record.Record;
 
 public abstract class DatasetRecord {
 
@@ -40,23 +43,12 @@ public abstract class DatasetRecord {
         };
     }
 
-    public static DatasetRecord fromCSVRecord(long number,
-            CSVRecord csvRecord) {
+    public static DatasetRecord fromCSVRecord(long number, Record csvRecord) {
         return new DatasetRecord() {
 
             @Override
             public String get(String key) {
-                try {
-                    return csvRecord.get(key);
-                } catch (IllegalArgumentException e) {
-                    if (!csvRecord.isConsistent()) {
-                        // Apache Commons CSV parser does not support CSV files
-                        // that end a line prematurely when the last values are
-                        // null.
-                        return "";
-                    }
-                    throw e;
-                }
+                return csvRecord.getString(key);
             }
 
             @Override
@@ -66,15 +58,16 @@ public abstract class DatasetRecord {
 
             @Override
             public Collection<String> getKeySet() {
-                return Collections.unmodifiableSet(csvRecord.toMap().keySet());
+                return Collections.unmodifiableList(
+                        Arrays.asList(csvRecord.getMetaData().headers()));
             }
         };
     }
 
     public static Iterable<DatasetRecord> fromCSVRecordIterable(
-            Iterable<CSVRecord> csvIterable) {
+            IterableResult<Record, ParsingContext> csvIterable) {
         return () -> {
-            Iterator<CSVRecord> oldIt = csvIterable.iterator();
+            Iterator<Record> oldIt = csvIterable.iterator();
             return new Iterator<DatasetRecord>() {
 
                 long n = 1;
@@ -86,7 +79,8 @@ public abstract class DatasetRecord {
 
                 @Override
                 public DatasetRecord next() {
-                    return DatasetRecord.fromCSVRecord(n++, oldIt.next());
+                    Record r = oldIt.next();
+                    return DatasetRecord.fromCSVRecord(n++, r);
                 }
             };
         };

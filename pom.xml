@@ -83,9 +83,9 @@
 			<version>3.6.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-csv</artifactId>
-			<version>1.4</version>
+			<groupId>com.univocity</groupId>
+			<artifactId>univocity-parsers</artifactId>
+			<version>2.9.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>

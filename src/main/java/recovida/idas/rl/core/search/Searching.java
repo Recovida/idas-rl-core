@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -23,6 +24,7 @@ import recovida.idas.rl.core.record.RecordComparator;
 import recovida.idas.rl.core.record.RecordModel;
 import recovida.idas.rl.core.record.RecordPairModel;
 import recovida.idas.rl.core.util.Permutation;
+import recovida.idas.rl.core.util.StatusReporter;
 
 public class Searching {
     private final StandardAnalyzer analyzer = new StandardAnalyzer();
@@ -138,11 +140,6 @@ public class Searching {
 
                     tmpDocument = searcher.doc(tmpDocId);
 
-                    // for debugging
-                    // tmp =
-                    // this.fromLuceneDocumentoToRecord(tmpDocument).toString();
-                    // System.out.println(tmp);
-
                     tmpRecordModel = fromLuceneDocumentToRecord(tmpDocument);
                     seachingUtils.getStrQueryFuzzy(
                             tmpRecordModel.getColumnRecordModels());
@@ -153,6 +150,9 @@ public class Searching {
                 }
             }
 
+        } catch (IllegalArgumentException e) {
+            StatusReporter.get().warnErrorQuery(busca,
+                    ExceptionUtils.getStackTrace(e));
         } catch (IOException | ParseException e) {
         }
 

@@ -53,7 +53,6 @@ public class SearchingUtils {
                 }
             }
         }
-        // System.out.print(query);
         return query.toString();
     }
 
@@ -81,7 +80,6 @@ public class SearchingUtils {
                 }
             }
         }
-        // System.out.println(query);
         return query.toString();
     }
 

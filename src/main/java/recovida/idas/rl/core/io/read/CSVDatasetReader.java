@@ -5,15 +5,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
+
+import com.univocity.parsers.common.IterableResult;
+import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.record.Record;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 import recovida.idas.rl.core.io.DatasetRecord;
 
@@ -22,19 +23,20 @@ public class CSVDatasetReader implements DatasetReader {
     protected String fileName;
     protected String encoding;
     protected char delimiter;
-    private final CSVFormat format;
 
-    public CSVDatasetReader(String fileName, char delimiter, String encoding) {
+    public CSVDatasetReader(String fileName, String encoding) {
         this.fileName = fileName;
         this.encoding = encoding;
-        this.delimiter = delimiter;
-        format = CSVFormat.RFC4180.withFirstRecordAsHeader()
-                .withDelimiter(delimiter);
     }
 
     @Override
     public Iterable<DatasetRecord> getDatasetRecordIterable() {
         Reader in = null;
+        CsvParserSettings settings = new CsvParserSettings();
+        settings.setEmptyValue("");
+        settings.setHeaderExtractionEnabled(true);
+        CsvParser parser = new CsvParser(settings);
+
         try {
             FileInputStream fis = new FileInputStream(fileName);
             InputStream isWithoutBOM = new BOMInputStream(fis,
@@ -42,33 +44,13 @@ public class CSVDatasetReader implements DatasetReader {
                     ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE,
                     ByteOrderMark.UTF_32BE);
             in = new InputStreamReader(isWithoutBOM, Charset.forName(encoding));
-            Iterable<CSVRecord> records = format.parse(in);
+            IterableResult<Record, ParsingContext> records = parser.iterateRecords(in);
+            settings.detectFormatAutomatically();
             return DatasetRecord.fromCSVRecordIterable(records);
         } catch (IOException e) {
             return null;
         }
     }
 
-    public static char guessCsvDelimiter(String fileName, String encoding) {
-        String firstLine = null;
-        try {
-            firstLine = Files
-                    .lines(Paths.get(fileName), Charset.forName(encoding))
-                    .findFirst().get();
-        } catch (UncheckedIOException | IOException e) {
-            return '\0';
-        }
-        char[] delimiters = { ',', ';', '|', '\t' };
-        char delimiter = '\0';
-        long occurrences = -1;
-        for (char sep : delimiters) {
-            long n = firstLine.chars().filter(ch -> ch == sep).count();
-            if (n > occurrences) {
-                delimiter = sep;
-                occurrences = n;
-            }
-        }
-        return delimiter;
-    }
 
 }

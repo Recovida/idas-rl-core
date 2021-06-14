@@ -105,6 +105,12 @@ public class StatusReporter {
                     MessageProvider.getMessage("config.ignoringnum"), number));
     }
 
+    public void warnErrorQuery(String query, String trace) {
+        if (currentLevel.logs(LoggingLevel.WARN))
+            logger.warn(() -> MessageFormat.format(
+                    MessageProvider.getMessage("linkage.queryerror"), query, trace));
+    }
+
     public void errorConfigFileDoesNotExist(String configFileName) {
         if (currentLevel.logs(LoggingLevel.ERROR))
             logger.error(() -> MessageFormat.format(

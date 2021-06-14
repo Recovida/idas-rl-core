@@ -77,7 +77,8 @@ public class Main {
         if (config == null)
             return false;
 
-        if (config.getDecimalSeparator().getCharacter() == config.getColumnSeparator().getCharacter()) {
+        if (config.getDecimalSeparator().getCharacter() == config
+                .getColumnSeparator().getCharacter()) {
             StatusReporter.get().errorSameSeparator();
             return false;
         }
@@ -102,15 +103,7 @@ public class Main {
         StatusReporter.get().infoReadingA(fileName_a);
         DatasetReader readerA = null;
         if (fileName_a.toLowerCase().endsWith(".csv")) {
-            char delimiter_a = CSVDatasetReader.guessCsvDelimiter(fileName_a,
-                    config.getEncodingA());
-            if (delimiter_a == '\0') {
-                StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
-                        config.getEncodingA());
-                return false;
-            }
-            readerA = new CSVDatasetReader(fileName_a, delimiter_a,
-                    config.getEncodingA());
+            readerA = new CSVDatasetReader(fileName_a, config.getEncodingA());
         } else if (fileName_a.toLowerCase().endsWith(".dbf")) {
             readerA = new DBFDatasetReader(fileName_a, config.getEncodingA());
         } else {
@@ -125,31 +118,38 @@ public class Main {
             return false;
         }
         long n = 0;
-        Iterator<DatasetRecord> it = dbARecords.iterator();
-        if (it.hasNext()) {
-            n++;
-            // make sure all columns are present
-            Collection<String> keySet = it.next().getKeySet();
-            Collection<String> missing = config.getColumns().stream()
-                    .filter(m -> !m.isGenerated() && !m.getIndexA().isEmpty()
-                            && !m.getIndexA()
-                                    .equals(config.getRowNumColNameA()))
-                    .map(ColumnConfigModel::getIndexA)
-                    .filter(c -> !keySet.contains(c))
-                    .collect(Collectors.toSet());
-            if (!missing.isEmpty()) {
-                StatusReporter.get().infoAvailableColumnsInDatasetA(
-                        '"' + String.join("\", \"", keySet) + '"');
-                missing.stream().forEach(col -> StatusReporter.get()
-                        .errorMissingColumnInDatasetA(col));
-                return false;
+        try {
+            Iterator<DatasetRecord> it = dbARecords.iterator();
+            if (it.hasNext()) {
+                n++;
+                // make sure all columns are present
+                Collection<String> keySet = it.next().getKeySet();
+                Collection<String> missing = config.getColumns().stream()
+                        .filter(m -> !m.isGenerated()
+                                && !m.getIndexA().isEmpty()
+                                && !m.getIndexA()
+                                        .equals(config.getRowNumColNameA()))
+                        .map(ColumnConfigModel::getIndexA)
+                        .filter(c -> !keySet.contains(c))
+                        .collect(Collectors.toSet());
+                if (!missing.isEmpty()) {
+                    StatusReporter.get().infoAvailableColumnsInDatasetA(
+                            '"' + String.join("\", \"", keySet) + '"');
+                    missing.stream().forEach(col -> StatusReporter.get()
+                            .errorMissingColumnInDatasetA(col));
+                    return false;
+                }
             }
-        }
-        while (it.hasNext()) {
-            if (Thread.currentThread().isInterrupted())
-                return false;
-            it.next();
-            n++;
+            while (it.hasNext()) {
+                if (Thread.currentThread().isInterrupted())
+                    return false;
+                it.next();
+                n++;
+            }
+        } catch (Exception e) {
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_b,
+                    config.getEncodingB());
+            return false;
         }
         StatusReporter.get().infoFinishedReadingA(n);
 
@@ -159,15 +159,7 @@ public class Main {
         Iterable<DatasetRecord> dbBRecords;
         DatasetReader readerB = null;
         if (fileName_b.toLowerCase().endsWith(".csv")) {
-            char delimiter_b = CSVDatasetReader.guessCsvDelimiter(fileName_b,
-                    config.getEncodingB());
-            if (delimiter_b == '\0') {
-                StatusReporter.get().errorDatasetFileCannotBeRead(fileName_b,
-                        config.getEncodingB());
-                return false;
-            }
-            readerB = new CSVDatasetReader(fileName_b, delimiter_b,
-                    config.getEncodingB());
+            readerB = new CSVDatasetReader(fileName_b, config.getEncodingB());
         } else if (fileName_b.toLowerCase().endsWith(".dbf")) {
             readerB = new DBFDatasetReader(fileName_b, config.getEncodingB());
         } else {
@@ -324,7 +316,8 @@ public class Main {
                     // set the column to record
                     tmpRecord.setColumnRecordModels(tmpRecordColumns);
                     RecordPairModel r = linkage.link(tmpRecord);
-                    return r == null ? "" : LinkageUtils.fromRecordPairToCsv(config, r);
+                    return r == null ? ""
+                            : LinkageUtils.fromRecordPairToCsv(config, r);
                 };
                 try {
                     q.put(pool.submit(fn));

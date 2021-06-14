@@ -79,7 +79,8 @@ public class Indexing {
                 successPath);
         Map<String, String> columnsToIndex = getColumnsToIndex();
         missingColumnsInExistingIndex = columnsToIndex.keySet().stream()
-                .filter(c -> !Objects.equals(alreadyIndexedColumns.get(c), columnsToIndex.get(c)))
+                .filter(c -> !Objects.equals(alreadyIndexedColumns.get(c),
+                        columnsToIndex.get(c)))
                 .collect(Collectors.toList());
         if (!missingColumnsInExistingIndex.isEmpty())
             return IndexingStatus.INCOMPLETE;
@@ -162,7 +163,8 @@ public class Indexing {
                         ++indexedEntries, record, cleaner);
                 if (tmpRecordModel == null) {
                     missingColumnsInDataset = columnsToIndex.values().stream()
-                            .filter(c -> !c.equals(config.getRowNumColNameB())
+                            .filter(c -> !c.isEmpty()
+                                    && !c.equals(config.getRowNumColNameB())
                                     && !columnsInDataset.contains(c))
                             .collect(Collectors.toList());
                     return false;
@@ -175,8 +177,10 @@ public class Indexing {
 
             try (BufferedWriter bw = Files.newBufferedWriter(successPath)) { // uses
                                                                              // UTF-8
-                for (Entry<String, String> idAndIndexB : columnsToIndex.entrySet())
-                    bw.write(idAndIndexB.getKey() + ',' + idAndIndexB.getValue() + '\n');
+                for (Entry<String, String> idAndIndexB : columnsToIndex
+                        .entrySet())
+                    bw.write(idAndIndexB.getKey() + ',' + idAndIndexB.getValue()
+                            + '\n');
             }
 
             try (BufferedWriter bw = Files
@@ -185,7 +189,14 @@ public class Indexing {
                 bw.write(cleaner.getNameCleaningPattern().pattern());
             }
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
+        } finally {
+            try {
+                if (inWriter != null)
+                    inWriter.close();
+            } catch (IOException e) {
+            }
         }
         return true;
     }
@@ -199,6 +210,7 @@ public class Indexing {
         try {
             inWriter.addDocument(doc);
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
         return true;

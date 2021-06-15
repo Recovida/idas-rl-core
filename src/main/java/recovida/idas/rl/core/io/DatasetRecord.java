@@ -48,7 +48,7 @@ public abstract class DatasetRecord {
 
             @Override
             public String get(String key) {
-                return csvRecord.getString(key);
+                return Optional.ofNullable(csvRecord.getString(key)).orElse("");
             }
 
             @Override

@@ -116,6 +116,24 @@ public class Searching {
         return null;
     }
 
+    public void close() {
+        try {
+            if (index != null)
+                index.close();
+        } catch (IOException e) {
+        }
+        try {
+            if (reader != null)
+                reader.close();
+        } catch (IOException e) {
+        }
+    }
+
+    @Override
+    public void finalize() {
+        close();
+    }
+
     public ArrayList<RecordModel> searchCandidateRecordsFromStrQuery(
             String busca, int hits, String idCandidate) {
         int tmpDocId;

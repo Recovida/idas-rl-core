@@ -87,15 +87,25 @@ public class Indexing {
         if (!Objects.equals(config.getCleaningRegex(),
                 getCleaningRegexOnIndex(getCleaningPatternFilePath())))
             return IndexingStatus.DIFFERENT_CLEANING_PATTERN;
+        FSDirectory index = null;
+        DirectoryReader reader = null;
         try {
-            FSDirectory index = FSDirectory
-                    .open(Paths.get(config.getDbIndex()));
+            index = FSDirectory.open(Paths.get(config.getDbIndex()));
             if (index == null)
                 return IndexingStatus.CORRUPT;
-            DirectoryReader reader = DirectoryReader.open(index);
+            reader = DirectoryReader.open(index);
             indexedEntries = reader.numDocs();
         } catch (IOException e) {
             return IndexingStatus.CORRUPT;
+        } finally {
+            try {
+                if (index != null)
+                    index.close();
+                if (reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return IndexingStatus.COMPLETE;
     }
@@ -197,6 +207,12 @@ public class Indexing {
                     inWriter.close();
             } catch (IOException e) {
             }
+            try {
+                if (index != null)
+                    index.close();
+                System.err.println("Fechei depois de indexar");
+            } catch (IOException e) {
+            }
         }
         return true;
     }
@@ -276,6 +292,7 @@ public class Indexing {
             FileUtils.deleteDirectory(f);
             return true;
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
     }

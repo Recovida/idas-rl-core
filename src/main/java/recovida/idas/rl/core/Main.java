@@ -265,7 +265,7 @@ public class Main {
                     return;
                 Callable<String> fn = () -> {
                     if (row.getNumber() > config.getMaxRows())
-                        return "...";
+                        return "";
                     // place holder variables to instantiate an record object
                     RecordModel tmpRecord = new RecordModel();
                     ArrayList<ColumnRecordModel> tmpRecordColumns = new ArrayList<>();

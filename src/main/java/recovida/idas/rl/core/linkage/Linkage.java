@@ -1,5 +1,6 @@
 package recovida.idas.rl.core.linkage;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -8,21 +9,24 @@ import recovida.idas.rl.core.record.RecordModel;
 import recovida.idas.rl.core.record.RecordPairModel;
 import recovida.idas.rl.core.search.Searching;
 
-public class Linkage implements Serializable {
+public class Linkage implements Serializable, Closeable {
     private static final long serialVersionUID = 1L;
     private final ConfigModel config;
+    private Searching searching;
 
     public Linkage(ConfigModel config) {
+        System.out.println("+Linkage");
         this.config = config;
-    }
-
-    public RecordPairModel link(RecordModel record) {
-        Searching searching;
         try {
             searching = new Searching(config);
         } catch (IOException e) {
-            return null;
+            searching = null;
         }
+    }
+
+    public RecordPairModel link(RecordModel record) {
+        if (searching == null || record == null)
+            return null;
         RecordPairModel candidatePair = searching
                 .getCandidatePairFromRecord(record);
         if (candidatePair == null) {
@@ -31,6 +35,19 @@ public class Linkage implements Serializable {
         if (candidatePair.getScore() >= config.getMinimumScore())
             return candidatePair;
         return null;
+    }
+
+    @Override
+    public void close() {
+        if (searching != null) {
+            searching.close();
+            System.out.println("-Linkage");
+        }
+    }
+
+    @Override
+    public void finalize() {
+        close();
     }
 
 }

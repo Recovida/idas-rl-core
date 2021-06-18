@@ -8,10 +8,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -251,7 +253,12 @@ public class Main {
         final int maxThreads = config.getThreadCount();
         StatusReporter.get().infoPerformingLinkage(maxThreads);
 
-        Linkage linkage = new Linkage(config);
+        Set<Linkage> linkageObjects = ConcurrentHashMap.newKeySet();
+        ThreadLocal<Linkage> linkagePerThread = ThreadLocal.withInitial(() -> {
+            Linkage l = new Linkage(config);
+            linkageObjects.add(l);
+            return l;
+        });
 
         final int BUFFER_SIZE = 1000;
 
@@ -315,7 +322,7 @@ public class Main {
                     }
                     // set the column to record
                     tmpRecord.setColumnRecordModels(tmpRecordColumns);
-                    RecordPairModel r = linkage.link(tmpRecord);
+                    RecordPairModel r = linkagePerThread.get().link(tmpRecord);
                     return r == null ? ""
                             : LinkageUtils.fromRecordPairToCsv(config, r);
                 };
@@ -371,8 +378,11 @@ public class Main {
                     return false;
                 }
             }
+        } finally {
+            pool.shutdown();
+            for (Linkage l : linkageObjects)
+                l.close();
         }
-        pool.shutdown();
         StatusReporter.get().infoCompleted(resultPath);
         return true;
     }

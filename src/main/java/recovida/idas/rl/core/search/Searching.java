@@ -1,5 +1,6 @@
 package recovida.idas.rl.core.search;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -26,12 +26,11 @@ import recovida.idas.rl.core.record.RecordPairModel;
 import recovida.idas.rl.core.util.Permutation;
 import recovida.idas.rl.core.util.StatusReporter;
 
-public class Searching {
+public class Searching implements Closeable {
     private final StandardAnalyzer analyzer = new StandardAnalyzer();
     private final Directory index;
     private IndexSearcher searcher;
     private QueryParser queryParser;
-    private final IndexReader reader;
     private TopScoreDocCollector collector;
     private final ConfigModel config;
     private final SearchingUtils seachingUtils;
@@ -41,9 +40,7 @@ public class Searching {
         this.config = config;
         seachingUtils = new SearchingUtils();
         permutation = new Permutation();
-
         index = FSDirectory.open(Paths.get(config.getDbIndex()));
-        reader = DirectoryReader.open(index);
     }
 
     public RecordPairModel getCandidatePairFromRecord(RecordModel record) {
@@ -116,15 +113,12 @@ public class Searching {
         return null;
     }
 
+    @Override
     public void close() {
         try {
-            if (index != null)
+            if (index != null) {
                 index.close();
-        } catch (IOException e) {
-        }
-        try {
-            if (reader != null)
-                reader.close();
+            }
         } catch (IOException e) {
         }
     }
@@ -144,6 +138,14 @@ public class Searching {
         recordsFound = new ArrayList<>();
         RecordModel tmpRecordModel;
 
+        DirectoryReader reader;
+        try {
+            reader = DirectoryReader.open(index);
+        } catch (IOException e1) {
+            StatusReporter.get()
+                    .errorUnexpectedError(ExceptionUtils.getStackTrace(e1));
+            return recordsFound;
+        }
         searcher = new IndexSearcher(reader);
         collector = TopScoreDocCollector.create(hits);
         queryParser = new QueryParser("<default field>", analyzer);
@@ -172,6 +174,14 @@ public class Searching {
             StatusReporter.get().warnErrorQuery(busca,
                     ExceptionUtils.getStackTrace(e));
         } catch (IOException | ParseException e) {
+
+        } finally {
+            try {
+                if (reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return recordsFound;

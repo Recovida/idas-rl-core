@@ -210,7 +210,6 @@ public class Indexing {
             try {
                 if (index != null)
                     index.close();
-                System.err.println("Fechei depois de indexar");
             } catch (IOException e) {
             }
         }

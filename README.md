@@ -86,7 +86,7 @@ sob responsabilidade do
 [Prof. Dr. Paulo Andrade Lotufo](https://uspdigital.usp.br/especialistas/especialistaObter?codpub=F7A214F0B89F),
 e com a atuação da [Dra. Ana Carolina de Moraes Fontes Varella](https://bv.fapesp.br/en/pesquisador/690479/ana-carolina-de-moraes-fontes-varella/) como supervisora de dados.
 
-Sob orientação de Paulo Lotufo e a supervisão de Ana Varella,
+Sob a orientação de Paulo Lotufo e a supervisão de Ana Varella,
 o desenvolvimento está sendo feito por:
 
 - Débora Lina Nascimento Ciriaco Pereira (bolsista de dez/2020 a set/2021);

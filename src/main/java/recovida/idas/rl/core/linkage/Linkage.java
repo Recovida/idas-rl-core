@@ -15,7 +15,6 @@ public class Linkage implements Serializable, Closeable {
     private Searching searching;
 
     public Linkage(ConfigModel config) {
-        System.out.println("+Linkage");
         this.config = config;
         try {
             searching = new Searching(config);
@@ -41,7 +40,6 @@ public class Linkage implements Serializable, Closeable {
     public void close() {
         if (searching != null) {
             searching.close();
-            System.out.println("-Linkage");
         }
     }
 

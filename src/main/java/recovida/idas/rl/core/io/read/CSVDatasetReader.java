@@ -43,7 +43,7 @@ public class CSVDatasetReader implements DatasetReader {
                     ByteOrderMark.UTF_8, ByteOrderMark.UTF_16LE,
                     ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE,
                     ByteOrderMark.UTF_32BE);
-            in = new InputStreamReader(isWithoutBOM, Charset.forName(encoding));
+            in = new InputStreamReader(isWithoutBOM, Charset.forName(encoding).newDecoder());
             IterableResult<Record, ParsingContext> records = parser.iterateRecords(in);
             settings.detectFormatAutomatically();
             return DatasetRecord.fromCSVRecordIterable(records);

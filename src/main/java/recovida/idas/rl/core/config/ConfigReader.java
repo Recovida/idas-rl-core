@@ -18,6 +18,8 @@ import recovida.idas.rl.core.util.StatusReporter;
 
 public class ConfigReader {
 
+    public static int MAX_NUMBER = 999;
+
     public ConfigModel readConfig(String propFileName) {
         if (propFileName == null)
             propFileName = "assets/config.properties";
@@ -137,7 +139,7 @@ public class ConfigReader {
                     configModel.getRowNumColNameB(), 0, 0));
 
             // read all columns
-            for (int i = 0; i <= 999; i++) {
+            for (int i = 0; i <= MAX_NUMBER; i++) {
                 String id = "_COL" + i;
                 String type = config.getProperty(i + "_type");
                 String indexA = config.getProperty(i + "_index_a");

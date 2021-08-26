@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import com.univocity.parsers.common.TextParsingException;
+
 import recovida.idas.rl.core.config.ColumnConfigModel;
 import recovida.idas.rl.core.config.ConfigModel;
 import recovida.idas.rl.core.config.ConfigReader;
@@ -211,7 +213,21 @@ public class Main {
             }
         }
         if (indexingStatus != IndexingStatus.COMPLETE) {
-            if (!indexing.index(dbBRecords, cleaner)) {
+            boolean indexed = false;
+            try {
+                indexed = indexing.index(dbBRecords, cleaner);
+            } catch (TextParsingException e) {
+                Throwable t = e.getCause();
+                if (t != null && t.getClass().getCanonicalName()
+                        .startsWith("java.nio.charset")) {
+                    StatusReporter.get().errorDatasetFileCannotBeRead(
+                            fileName_b, config.getEncodingB());
+                    return false;
+                }
+                StatusReporter.get().errorUnexpectedError(
+                        ExceptionUtils.getStackTrace(t != null ? t : e));
+            }
+            if (!indexed) {
                 Collection<String> missing = indexing
                         .getMissingColumnsInDataset();
                 if (!missing.isEmpty()) {

@@ -151,8 +151,8 @@ public class Main {
                 n++;
             }
         } catch (Exception e) {
-            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_b,
-                    config.getEncodingB());
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
+                    config.getEncodingA());
             return false;
         }
         StatusReporter.get().infoFinishedReadingA(n);

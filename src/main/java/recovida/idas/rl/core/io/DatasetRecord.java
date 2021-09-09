@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,11 +45,14 @@ public abstract class DatasetRecord {
     }
 
     public static DatasetRecord fromCSVRecord(long number, Record csvRecord) {
+        Map<String, String> contents = csvRecord.toFieldMap();
+        List<String> keys = Collections.unmodifiableList(
+                Arrays.asList(csvRecord.getMetaData().headers()));
         return new DatasetRecord() {
 
             @Override
             public String get(String key) {
-                return Optional.ofNullable(csvRecord.getString(key)).orElse("");
+                return Optional.ofNullable(contents.getOrDefault(key, null)).orElse("");
             }
 
             @Override
@@ -58,8 +62,7 @@ public abstract class DatasetRecord {
 
             @Override
             public Collection<String> getKeySet() {
-                return Collections.unmodifiableList(
-                        Arrays.asList(csvRecord.getMetaData().headers()));
+                return keys;
             }
         };
     }

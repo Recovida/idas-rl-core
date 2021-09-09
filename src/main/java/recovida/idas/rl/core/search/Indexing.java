@@ -260,6 +260,8 @@ public class Indexing {
                     cleanedValue = cleaner.clean(column, originalValue);
                     tmpValue = cleanedValue.replaceAll("[^A-Z0-9 /]", "")
                             .replaceAll("\\s+", " ").trim();
+                    if (!"date".equals(column.getType()))
+                        tmpValue = tmpValue.replace('/', ' ');
                 }
             } catch (IllegalArgumentException e) {
                 return null;

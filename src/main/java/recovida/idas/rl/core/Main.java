@@ -321,6 +321,9 @@ public class Main {
                             tmpValue = cleanedValue
                                     .replaceAll("[^A-Z0-9 /]", "")
                                     .replaceAll("\\s+", " ").trim();
+                            // Keep slash only if the type is date
+                            if (!"date".equals(tmpType))
+                                tmpValue = tmpValue.replace('/', ' ');
                         }
                         String tmpId = column.getId();
 

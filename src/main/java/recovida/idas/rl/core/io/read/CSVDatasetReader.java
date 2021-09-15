@@ -23,10 +23,12 @@ public class CSVDatasetReader implements DatasetReader {
     protected String fileName;
     protected String encoding;
     protected char delimiter;
+    protected boolean lenient;
 
-    public CSVDatasetReader(String fileName, String encoding) {
+    public CSVDatasetReader(String fileName, String encoding, boolean lenient) {
         this.fileName = fileName;
         this.encoding = encoding;
+        this.lenient = lenient;
     }
 
     @Override
@@ -43,14 +45,18 @@ public class CSVDatasetReader implements DatasetReader {
                     ByteOrderMark.UTF_8, ByteOrderMark.UTF_16LE,
                     ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE,
                     ByteOrderMark.UTF_32BE);
-            in = new InputStreamReader(isWithoutBOM, Charset.forName(encoding).newDecoder());
-            IterableResult<Record, ParsingContext> records = parser.iterateRecords(in);
+            in = lenient
+                    ? new InputStreamReader(isWithoutBOM,
+                            Charset.forName(encoding))
+                    : new InputStreamReader(isWithoutBOM,
+                            Charset.forName(encoding).newDecoder());
+            IterableResult<Record, ParsingContext> records = parser
+                    .iterateRecords(in);
             settings.detectFormatAutomatically();
             return DatasetRecord.fromCSVRecordIterable(records);
         } catch (IOException e) {
             return null;
         }
     }
-
 
 }

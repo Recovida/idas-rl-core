@@ -127,9 +127,24 @@ public class ConfigReader {
                 configModel.setEncodingB(config.getProperty("encoding_b"));
 
             if (config.containsKey("output_dec_sep"))
-                configModel.setDecimalSeparator(config.getProperty("output_dec_sep"));
+                configModel.setDecimalSeparator(
+                        config.getProperty("output_dec_sep"));
             if (config.containsKey("output_col_sep"))
-                configModel.setColumnSeparator(config.getProperty("output_col_sep"));
+                configModel.setColumnSeparator(
+                        config.getProperty("output_col_sep"));
+
+            Pattern truePattern = Pattern.compile("\\s*(true|yes|1)\\s*",
+                    Pattern.CASE_INSENSITIVE);
+            if (config.containsKey("lenient_a")) {
+                String s = (String) config.getProperty("lenient_a", "0");
+                configModel.setLenientA(
+                        s != null && truePattern.matcher(s).matches());
+            }
+            if (config.containsKey("lenient_b")) {
+                String s = (String) config.getProperty("lenient_b", "0");
+                configModel.setLenientB(
+                        s != null && truePattern.matcher(s).matches());
+            }
 
             // row number
             configModel.addColumn(new ColumnConfigModel("_____NUM",
@@ -179,8 +194,7 @@ public class ConfigReader {
                     return null;
                 }
                 if ("name".equals(type)) {
-                    value = config.getProperty(i + "_phon_weight",
-                            "0.0");
+                    value = config.getProperty(i + "_phon_weight", "0.0");
                     try {
                         phonWeight = Double.valueOf(value);
                     } catch (NumberFormatException e) {

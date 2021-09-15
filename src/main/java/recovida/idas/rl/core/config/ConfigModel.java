@@ -21,6 +21,8 @@ public class ConfigModel implements Serializable {
     private String rowNumColNameB = "#B";
     private String dbIndex;
     private String linkageDir = ".";
+    private boolean lenientA = false;
+    private boolean lenientB = false;
     private Separator decimalSeparator = Separator.DEFAULT_DEC_SEP;
     private Separator columnSeparator = Separator.DEFAULT_COL_SEP;
     private long maxRows = Long.MAX_VALUE;
@@ -207,6 +209,22 @@ public class ConfigModel implements Serializable {
 
     public void setColumnSeparator(String columnSeparator) {
         setColumnSeparator(Separator.fromName(columnSeparator));
+    }
+
+    public boolean isLenientA() {
+        return lenientA;
+    }
+
+    public void setLenientA(boolean lenientA) {
+        this.lenientA = lenientA;
+    }
+
+    public boolean isLenientB() {
+        return lenientB;
+    }
+
+    public void setLenientB(boolean lenientB) {
+        this.lenientB = lenientB;
     }
 
 }

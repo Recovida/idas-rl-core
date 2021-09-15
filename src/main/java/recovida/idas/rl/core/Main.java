@@ -107,7 +107,8 @@ public class Main {
         StatusReporter.get().infoReadingA(fileName_a);
         DatasetReader readerA = null;
         if (fileName_a.toLowerCase().endsWith(".csv")) {
-            readerA = new CSVDatasetReader(fileName_a, config.getEncodingA());
+            readerA = new CSVDatasetReader(fileName_a, config.getEncodingA(),
+                    config.isLenientA());
         } else if (fileName_a.toLowerCase().endsWith(".dbf")) {
             readerA = new DBFDatasetReader(fileName_a, config.getEncodingA());
         } else {
@@ -163,7 +164,8 @@ public class Main {
         Iterable<DatasetRecord> dbBRecords;
         DatasetReader readerB = null;
         if (fileName_b.toLowerCase().endsWith(".csv")) {
-            readerB = new CSVDatasetReader(fileName_b, config.getEncodingB());
+            readerB = new CSVDatasetReader(fileName_b, config.getEncodingB(),
+                    config.isLenientB());
         } else if (fileName_b.toLowerCase().endsWith(".dbf")) {
             readerB = new DBFDatasetReader(fileName_b, config.getEncodingB());
         } else {

@@ -8,6 +8,14 @@ import recovida.idas.rl.core.record.ColumnRecordModel;
 import recovida.idas.rl.core.record.RecordPairModel;
 
 public class LinkageUtils {
+
+    private static String formatNumber(double number, char decSep) {
+        String s = String.format(Locale.ENGLISH, "%.2f", number);
+        if (decSep != '.')
+            s = s.replace('.', decSep);
+        return s;
+    }
+
     public static String fromRecordPairToCsv(ConfigModel config,
             RecordPairModel recordPair) {
         StringBuilder csvResult = new StringBuilder();
@@ -24,12 +32,8 @@ public class LinkageUtils {
                 continue;
             csvResult.append(quote(column.getValue())).append(sep);
         }
-        String s = String.format(Locale.ENGLISH, "%.2f",
-                100 * recordPair.getScore());
         char decSep = config.getDecimalSeparator().getCharacter();
-        if (decSep != '.')
-            s = s.replace('.', decSep);
-        csvResult.append(s);
+        csvResult.append(formatNumber(100 * recordPair.getScore(), decSep));
         return csvResult.toString();
     }
 

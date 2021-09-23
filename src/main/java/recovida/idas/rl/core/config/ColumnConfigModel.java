@@ -13,6 +13,8 @@ public class ColumnConfigModel implements Serializable {
     private double weight;
     private double phonWeight;
     private boolean generated;
+    private String similarityCol = "";
+    private double similarityMin = 0.0;
 
     public ColumnConfigModel(String id, String type, String indexA,
             String indexB, String renameA, String renameB, double weight) {
@@ -22,6 +24,13 @@ public class ColumnConfigModel implements Serializable {
     public ColumnConfigModel(String id, String type, String indexA,
             String indexB, String renameA, String renameB, double weight,
             double phonWeight) {
+        this(id, type, indexA, indexB, renameA, renameB, weight, phonWeight,
+                null, 0.0);
+    }
+
+    public ColumnConfigModel(String id, String type, String indexA,
+            String indexB, String renameA, String renameB, double weight,
+            double phonWeight, String similarityCol, double similarityMin) {
         this.id = id;
         this.type = type;
         this.indexA = indexA;
@@ -30,6 +39,8 @@ public class ColumnConfigModel implements Serializable {
         this.renameB = renameB;
         this.weight = weight;
         this.phonWeight = phonWeight;
+        this.similarityCol = similarityCol;
+        this.similarityMin = similarityMin;
     }
 
     public String getId() {
@@ -102,6 +113,22 @@ public class ColumnConfigModel implements Serializable {
 
     public void setRenameB(String renameB) {
         this.renameB = renameB;
+    }
+
+    public String getSimilarityCol() {
+        return similarityCol;
+    }
+
+    public void setSimilarityCol(String similarityCol) {
+        this.similarityCol = similarityCol;
+    }
+
+    public double getSimilarityMin() {
+        return similarityMin;
+    }
+
+    public void setSimilarityMin(double similarityMin) {
+        this.similarityMin = similarityMin;
     }
 
 }

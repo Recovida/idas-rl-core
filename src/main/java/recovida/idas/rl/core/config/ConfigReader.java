@@ -182,7 +182,8 @@ public class ConfigReader {
                     continue;
                 }
 
-                double weight = -1, phonWeight = 0;
+                double weight = -1, phonWeight = -1, similarityMin = -1;
+                String similarityCol = null;
                 String value = config.getProperty(i + "_weight");
                 try {
                     weight = Double.valueOf(value);
@@ -198,17 +199,35 @@ public class ConfigReader {
                     try {
                         phonWeight = Double.valueOf(value);
                     } catch (NumberFormatException e) {
-                        return null;
                     }
                     if (phonWeight < 0) {
                         StatusReporter.get().errorConfigFileHasInvalidValue(
                                 value, i + "_phon_weight");
                         return null;
                     }
+
+                    // similarity
+                    value = config.getProperty(i + "_similarity_col", "");
+                    if (value != null && !value.isEmpty()) {
+                        similarityCol = value;
+                        value = config.getProperty(i + "_similarity_min",
+                                "0.0");
+                        try {
+                            similarityMin = Double.valueOf(value);
+                        } catch (NumberFormatException e) {
+                        }
+                        if (similarityMin < 0) {
+                            StatusReporter.get().errorConfigFileHasInvalidValue(
+                                    value, i + "_similarity_col");
+                            return null;
+                        }
+                    }
+
                 }
 
                 ColumnConfigModel column = new ColumnConfigModel(id, type,
-                        indexA, indexB, renameA, renameB, weight, phonWeight);
+                        indexA, indexB, renameA, renameB, weight, phonWeight,
+                        similarityCol, similarityMin);
                 configModel.addColumn(column);
 
                 if (type.equals("name") && phonWeight > 0) {

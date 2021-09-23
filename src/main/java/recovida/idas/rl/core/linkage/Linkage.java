@@ -28,9 +28,8 @@ public class Linkage implements Serializable, Closeable {
             return null;
         RecordPairModel candidatePair = searching
                 .getCandidatePairFromRecord(record);
-        if (candidatePair == null) {
+        if (candidatePair == null)
             return null;
-        }
         if (candidatePair.getScore() >= config.getMinimumScore())
             return candidatePair;
         return null;

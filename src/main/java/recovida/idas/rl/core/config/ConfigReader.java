@@ -91,7 +91,8 @@ public class ConfigReader {
                 configModel.setThreadCount(i);
             }
             if (config.containsKey("min_score")) {
-                String value = config.getProperty("min_score");
+                String value = config.getProperty("min_score", "0").replace(',',
+                        '.');
                 float f = -1;
                 try {
                     f = Float.valueOf(value) / 100;
@@ -184,7 +185,8 @@ public class ConfigReader {
 
                 double weight = -1, phonWeight = -1, similarityMin = -1;
                 String similarityCol = null;
-                String value = config.getProperty(i + "_weight");
+                String value = config.getProperty(i + "_weight").replace(',',
+                        '.');
                 try {
                     weight = Double.valueOf(value);
                 } catch (NumberFormatException e) {
@@ -195,7 +197,8 @@ public class ConfigReader {
                     return null;
                 }
                 if ("name".equals(type)) {
-                    value = config.getProperty(i + "_phon_weight", "0.0");
+                    value = config.getProperty(i + "_phon_weight", "0.0")
+                            .replace(',', '.');
                     try {
                         phonWeight = Double.valueOf(value);
                     } catch (NumberFormatException e) {
@@ -207,18 +210,18 @@ public class ConfigReader {
                     }
 
                     // similarity
-                    value = config.getProperty(i + "_similarity_col", "");
+                    value = config.getProperty(i + "_col_similarity", "");
                     if (value != null && !value.isEmpty()) {
                         similarityCol = value;
-                        value = config.getProperty(i + "_similarity_min",
-                                "0.0");
+                        value = config.getProperty(i + "_min_similarity", "0.0")
+                                .replace(',', '.');
                         try {
                             similarityMin = Double.valueOf(value) / 100;
                         } catch (NumberFormatException e) {
                         }
                         if (similarityMin < 0) {
                             StatusReporter.get().errorConfigFileHasInvalidValue(
-                                    value, i + "_similarity_col");
+                                    value, i + "_min_similarity");
                             return null;
                         }
                     }

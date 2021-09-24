@@ -7,25 +7,33 @@ no formato do Cidacs-RL.
 
 Em um arquivo de configurações, linhas que começam com uma cerquilha ("#")
 são consideradas comentários e são ignoradas. Note que a edição de um
-arquivo de configurações por meio do
-[editor gráfico](https://gitlab.com/recovida/idas-rl-gui)
+arquivo de configurações por meio da
+[interface gráfica (LinkaSUS)](https://gitlab.com/recovida/idas-rl-gui)
 **remove** todos os
-comentários do arquivo.
+comentários do arquivo, bem como todos os campos não reconhecidos.
 
 ## Campos sobre os datasets
 
-- `db_a` e `db_b`: indicam os nomes dos arquivos que contêm os datasets A e B,
+- `db_a` e `db_b`: Indicam os nomes dos arquivos que contêm os datasets A e B,
   respectivamente, no formato CSV ou DBF. Ambos são obrigatórios.
-  É possível utilizar caminhos completos ou relativos **ao arquivo de
-  configurações** (ou seja, se o dataset estiver na mesma pasta do arquivo de
+  É possível utilizar caminhos completos ou relativos
+  **ao arquivo de configurações**
+  (ou seja, se o dataset estiver na mesma pasta do arquivo de
   configurações, não é preciso especificar o caminho).
-- `encoding_a` e `encoding_b`: indicam a codificação dos arquivos dos datasets
+- `encoding_a` e `encoding_b`: Indicam a codificação dos arquivos dos datasets
   A e B, respectivamente. Podem ser omitidos se a codificação for *UTF-8*.
-- `suffix_a` e `suffix_b`: determinam os sufixos a serem adicionados aos nomes
+- `lenient_a` e `lenient_b`: Quando verdadeiros ("yes", "1" ou "true"),
+  fazem com que a
+  decodificação ocorra de forma leniente na leitura dos datasets,
+  ignorando sequências de bytes que não correspondem a caracteres na
+  codificação escolhida. Caso contrário (valores falsos ou campos omitidos),
+  a decodificação será feita no modo estrito, exibindo erro caso existam
+  bytes não decodificáveis usando a codificação especificada.
+- `suffix_a` e `suffix_b`: Determinam os sufixos a serem adicionados aos nomes
   das colunas dos datasets A e B, respectivamente. Se omitidos, os
   valores-padrão _dsa_ e _dsb_ serão utilizados. Colunas que forem renomeadas
   não ganham sufixos.
-- `row_num_col_a`e `row_num_col_a`: nomes das colunas do arquivo de saída que
+- `row_num_col_a`e `row_num_col_a`: Nomes das colunas do arquivo de saída que
   guardarão os números das linhas das tabelas originais. Se omitidos, os
   valores-padrão _#A_ e _#B_ serão utilizados.
 
@@ -54,7 +62,9 @@ row_num_col_b = NUMCOL_B
 - `min_score`: Pontuação mínima. Se definido, pares de linhas que obtiverem
   pontuação menor que o valor fixado não aparecerão no arquivo de saída,
   mesmo quando não for possível encontrar uma correspondência melhor.
-  Note que a pontuação varia de 0 a 100.
+  Note que a pontuação varia de 0 a 100. Independentemente da presença
+  deste campo, a pontuação será calculada durante o linkage com base nos
+  pesos e armazenada na coluna _score_  do arquivo de saída.
 - `num_threads`: Número de threads que serão criadas para o linkage.
   Deve ser um número inteiro positivo, normalmente não ultrapassando
   a quantidade de núcleos (cores)
@@ -66,7 +76,8 @@ row_num_col_b = NUMCOL_B
   computador para realizar
   outras tarefas durante a execução do programa.
 - `output_dec_sep`: Separador decimal utilizado no arquivo de saída
-  (atualmente, apenas para a pontuação). Os valores aceitos são `comma`
+  (atualmente, apenas para a pontuação e a similaridade).
+  Os valores aceitos são `comma`
   (vírgula) e `dot` (ponto). Se omitido ou inválido, é utilizado o separador
   padrão do idioma em que o programa está sendo executado (ponto em inglês,
   vírgula em português e espanhol).
@@ -132,6 +143,29 @@ no fim da seção. Variáveis com campos obrigatórios faltantes são ignoradas.
 - `phon_weight`: Peso das colunas geradas a partir da transformação
   fonética. É opcional, e só pode ser
   utilizado se o tipo for `name`.
+- `col_similarity`: Campo opcional, utilizado apenas em variáveis do tipo `name`,
+  que contém o nome da nova coluna em que
+  será salva a medida de similaridade entre os valores. Ao contrário da
+  pontuação (*score*), este cálculo considera **apenas** os valores desta
+  variável (presentes nas colunas indicadas por `index_a` e `index_b` nos
+  datasets A e B, respectivamente), sendo 100 quando os valores são iguais
+  e 0 quando são totalmente diferentes. Quando a variável está em branco
+  em ao menos um dos
+  datasets, a similaridade não é calculada. 
+  <br/>
+  <small>
+  A fórmula utilizada para o cálculo de similaridade é a
+  *[longest common subsequence distance](https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/similarity/LongestCommonSubsequenceDistance.html)*
+  após ser normalizada e transformada no complemento. Se `lcsd(s1, s2)` for
+  essa distância, a similaridade é definida como
+  `1 - 100 * lcsd(s1, s2) / [length(s1) + length(s2)]`.
+  </small>
+- `min_similarity`: Campo opcional, utilizado apenas quando `col_similarity` está
+  presente. Se definido, será a similaridade mínima: o programa descartará
+  pares de linhas nas quais os valores desta variável não sejam vazios e
+  possuam similaridade menor que o mínimo estabelecido,
+  mesmo quando não for possível encontrar uma correspondência melhor.
+  Note que a similaridade varia de 0 a 100.
 
 **Exemplo de par de colunas para o linkage:**
 
@@ -144,7 +178,12 @@ queremos que os nomes dessas colunas sejam `NOME_NA_TABELA_A` e
 respectivamente. A fim de lidar com erros de digitação causados por
 maneiras distintas de representar uma mesma pronúncia, queremos que
 uma transformação fonética seja utilizada, de modo que colunas adicionais
-sejam geradas internamente e utilizadas no linkage com peso `0.9`. Neste
+sejam geradas internamente e utilizadas no linkage com peso 0,9.
+Por ser uma variável importante, queremos que a similaridade
+entre os valores seja calculada e salva numa coluna nova chamada
+`SIMILARIDADE_NOME`, e que correspondências nas quais a similaridade
+seja menor que 700 sejam descartadas.
+Neste
 caso, o arquivo de configurações deverá ter as seguintes linhas (em que
 `42` é o número que associamos à variável nome):
 
@@ -156,6 +195,8 @@ caso, o arquivo de configurações deverá ter as seguintes linhas (em que
 42_phon_weight = 0.9
 42_rename_a = NOME_NA_TABELA_A
 42_rename_b = NOME_NA_TABELA_B
+42_col_similarity = SIMILARIDADE_NOME
+42_min_similarity = 700
 ```
 
 **Exemplo de coluna a ser copiada:**

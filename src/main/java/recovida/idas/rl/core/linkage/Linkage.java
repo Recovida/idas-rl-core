@@ -46,9 +46,12 @@ public class Linkage implements Serializable, Closeable {
                 if ("name".equals(c.getType())
                         && (simCol = c.getSimilarityCol()) != null
                         && !simCol.isEmpty()) {
-                    String a = candidatePair.getRecordA().getColumnRecordModel(c.getId()).getValue();
-                    String b = candidatePair.getRecordB().getColumnRecordModel(c.getId()).getValue();
-                    if (a != null && b != null && !a.isEmpty() && !b.isEmpty()) {
+                    String a = candidatePair.getRecordA()
+                            .getColumnRecordModel(c.getId()).getValue();
+                    String b = candidatePair.getRecordB()
+                            .getColumnRecordModel(c.getId()).getValue();
+                    if (a != null && b != null && !a.isEmpty()
+                            && !b.isEmpty()) {
                         double similarity = similarityCalculator.compute(a, b);
                         if (similarity < c.getSimilarityMin())
                             return null;

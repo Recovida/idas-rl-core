@@ -56,7 +56,8 @@ public class Searching implements Closeable {
         filteredColumns = seachingUtils
                 .filterUnusedColumns(record.getColumnRecordModels());
         // filter unused columns
-        String recordId = record.getColumnRecordModels().iterator().next().getValue();
+        String recordId = record.getColumnRecordModels().iterator().next()
+                .getValue();
 
         // FASE 1
         strBusca = seachingUtils.getStrQueryExact(filteredColumns);

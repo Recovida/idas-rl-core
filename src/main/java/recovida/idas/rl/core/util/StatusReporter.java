@@ -108,7 +108,8 @@ public class StatusReporter {
     public void warnErrorQuery(String query, String trace) {
         if (currentLevel.logs(LoggingLevel.WARN))
             logger.warn(() -> MessageFormat.format(
-                    MessageProvider.getMessage("linkage.queryerror"), query, trace));
+                    MessageProvider.getMessage("linkage.queryerror"), query,
+                    trace));
     }
 
     public void errorConfigFileDoesNotExist(String configFileName) {
@@ -120,8 +121,8 @@ public class StatusReporter {
 
     public void errorSameSeparator() {
         if (currentLevel.logs(LoggingLevel.ERROR))
-            logger.error(() ->
-                    MessageProvider.getMessage("config.sameseparator"));
+            logger.error(
+                    () -> MessageProvider.getMessage("config.sameseparator"));
     }
 
     public void errorConfigFileHasInvalidValue(String value, String field) {
@@ -319,6 +320,5 @@ public class StatusReporter {
     public void setLogger(StatusLogger logger) {
         this.logger = logger;
     }
-
 
 }

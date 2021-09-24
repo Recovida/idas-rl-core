@@ -52,7 +52,8 @@ public abstract class DatasetRecord {
 
             @Override
             public String get(String key) {
-                return Optional.ofNullable(contents.getOrDefault(key, null)).orElse("");
+                return Optional.ofNullable(contents.getOrDefault(key, null))
+                        .orElse("");
             }
 
             @Override

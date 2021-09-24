@@ -19,7 +19,7 @@ public class NormalisedDistance implements SimilarityScore<Double> {
         this.denominatorSupplier = denominatorSupplier;
         this.label = "Normalised" + absoluteDistance.getClass().getSimpleName();
     }
-    
+
     public NormalisedDistance(FuzzyScore fs,
             DenominatorSupplier denominatorSupplier) {
         this.absoluteDistance = new SimilarityScore<Integer>() {
@@ -38,9 +38,9 @@ public class NormalisedDistance implements SimilarityScore<Double> {
         return (double) absoluteDistance.apply(left, right)
                 / denominatorSupplier.getDenominator(left, right);
     }
-    
+
     @Override
-    public String toString() { 
+    public String toString() {
         return label;
     }
 

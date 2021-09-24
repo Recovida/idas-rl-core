@@ -47,7 +47,8 @@ public enum Separator {
     }
 
     public static List<Separator> getColumnSeparators() {
-        return Arrays.asList(DEFAULT_COL_SEP, SEMICOLON, COMMA, COLON, PIPE, TAB);
+        return Arrays.asList(DEFAULT_COL_SEP, SEMICOLON, COMMA, COLON, PIPE,
+                TAB);
     }
 
     public static List<Separator> getDecimalSeparators() {

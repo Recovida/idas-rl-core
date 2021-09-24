@@ -182,7 +182,7 @@ sejam geradas internamente e utilizadas no linkage com peso 0,9.
 Por ser uma variável importante, queremos que a similaridade
 entre os valores seja calculada e salva numa coluna nova chamada
 `SIMILARIDADE_NOME`, e que correspondências nas quais a similaridade
-seja menor que 700 sejam descartadas.
+seja menor que 70 sejam descartadas.
 Neste
 caso, o arquivo de configurações deverá ter as seguintes linhas (em que
 `42` é o número que associamos à variável nome):
@@ -196,7 +196,7 @@ caso, o arquivo de configurações deverá ter as seguintes linhas (em que
 42_rename_a = NOME_NA_TABELA_A
 42_rename_b = NOME_NA_TABELA_B
 42_col_similarity = SIMILARIDADE_NOME
-42_min_similarity = 700
+42_min_similarity = 70
 ```
 
 **Exemplo de coluna a ser copiada:**

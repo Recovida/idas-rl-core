@@ -1,6 +1,8 @@
 package recovida.idas.rl.core.search;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import recovida.idas.rl.core.record.ColumnRecordModel;
 
@@ -18,7 +20,7 @@ public class SearchingUtils {
         return result.substring(0, result.length() - 1);
     }
 
-    public String getStrQueryFuzzy(ArrayList<ColumnRecordModel> columns) {
+    public String getStrQueryFuzzy(Collection<ColumnRecordModel> columns) {
         StringBuilder query = new StringBuilder(new String());
 
         for (ColumnRecordModel column : columns) {
@@ -56,7 +58,7 @@ public class SearchingUtils {
         return query.toString();
     }
 
-    public String getStrQueryExact(ArrayList<ColumnRecordModel> columns) {
+    public String getStrQueryExact(Collection<ColumnRecordModel> columns) {
         StringBuilder query = new StringBuilder(new String());
 
         for (ColumnRecordModel column : columns) {
@@ -83,8 +85,8 @@ public class SearchingUtils {
         return query.toString();
     }
 
-    public ArrayList<ColumnRecordModel> filterUnusedColumns(
-            ArrayList<ColumnRecordModel> columns) {
+    public List<ColumnRecordModel> filterUnusedColumns(
+            Collection<ColumnRecordModel> columns) {
         ArrayList<ColumnRecordModel> tmpResult = new ArrayList<>();
 
         for (ColumnRecordModel column : columns) {

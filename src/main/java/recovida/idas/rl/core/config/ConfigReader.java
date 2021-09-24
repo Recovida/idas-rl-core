@@ -213,7 +213,7 @@ public class ConfigReader {
                         value = config.getProperty(i + "_similarity_min",
                                 "0.0");
                         try {
-                            similarityMin = Double.valueOf(value);
+                            similarityMin = Double.valueOf(value) / 100;
                         } catch (NumberFormatException e) {
                         }
                         if (similarityMin < 0) {

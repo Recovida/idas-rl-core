@@ -1,26 +1,24 @@
 package recovida.idas.rl.core.record;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class RecordModel {
 
-    private ArrayList<ColumnRecordModel> columnRecordModels;
+    private Map<String, ColumnRecordModel> crm;
 
-    public ArrayList<ColumnRecordModel> getColumnRecordModels() {
-        return columnRecordModels;
+    public Collection<ColumnRecordModel> getColumnRecordModels() {
+        return crm.values();
     }
 
-    public void setColumnRecordModels(
-            ArrayList<ColumnRecordModel> columnRecordModels) {
-        this.columnRecordModels = columnRecordModels;
+    public ColumnRecordModel getColumnRecordModel(String id) {
+        return crm.getOrDefault(id, null);
     }
 
-    public RecordModel(ArrayList<ColumnRecordModel> columnRecordModels) {
-
-        this.columnRecordModels = columnRecordModels;
-    }
-
-    public RecordModel() {
-
+    public RecordModel(Collection<ColumnRecordModel> columnRecordModels) {
+        this.crm = new LinkedHashMap<String, ColumnRecordModel>();
+        for (ColumnRecordModel m : columnRecordModels)
+            this.crm.put(m.getId(), m);
     }
 }

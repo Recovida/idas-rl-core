@@ -36,7 +36,7 @@ import recovida.idas.rl.core.io.read.DatasetReader;
 import recovida.idas.rl.core.io.write.CSVDatasetWriter;
 import recovida.idas.rl.core.io.write.DatasetWriter;
 import recovida.idas.rl.core.linkage.Linkage;
-import recovida.idas.rl.core.linkage.LinkageUtils;
+import recovida.idas.rl.core.linkage.LinkageOutput;
 import recovida.idas.rl.core.record.ColumnRecordModel;
 import recovida.idas.rl.core.record.RecordModel;
 import recovida.idas.rl.core.record.RecordPairModel;
@@ -283,6 +283,8 @@ public class Main {
         pool = Executors.newFixedThreadPool(maxThreads);
         q = new ArrayBlockingQueue<>(BUFFER_SIZE);
 
+        LinkageOutput linkageOutput = new LinkageOutput(config);
+
         readerThread = new Thread(() -> {
             long readRows = 0;
             for (DatasetRecord row : records) {
@@ -291,8 +293,7 @@ public class Main {
                 Callable<String> fn = () -> {
                     if (row.getNumber() > config.getMaxRows())
                         return "";
-                    // place holder variables to instantiate an record object
-                    RecordModel tmpRecord = new RecordModel();
+                    // place holder variables to instantiate a record object
                     ArrayList<ColumnRecordModel> tmpRecordColumns = new ArrayList<>();
 
                     // convert row to RecordModel
@@ -342,10 +343,10 @@ public class Main {
                         }
                     }
                     // set the column to record
-                    tmpRecord.setColumnRecordModels(tmpRecordColumns);
+                    RecordModel tmpRecord = new RecordModel(tmpRecordColumns);
                     RecordPairModel r = linkagePerThread.get().link(tmpRecord);
                     return r == null ? ""
-                            : LinkageUtils.fromRecordPairToCsv(config, r);
+                            : linkageOutput.fromRecordPairToCsv(r);
                 };
                 try {
                     q.put(pool.submit(fn));
@@ -361,7 +362,7 @@ public class Main {
         try (DatasetWriter writer = new CSVDatasetWriter(
                 resultPath + File.separator + "result.csv",
                 config.getColumnSeparator().getCharacter())) {
-            String header = LinkageUtils.getCsvHeaderFromConfig(config);
+            String header = linkageOutput.getCsvHeader();
             if (!writer.writeRow(header)) {
                 StatusReporter.get().errorCannotSaveResult();
                 return false;

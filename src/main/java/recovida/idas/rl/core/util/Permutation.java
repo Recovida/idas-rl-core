@@ -1,6 +1,7 @@
 package recovida.idas.rl.core.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import recovida.idas.rl.core.record.ColumnRecordModel;
 
@@ -31,8 +32,8 @@ public class Permutation {
         }
     }
 
-    public ArrayList<ColumnRecordModel> getPermutationsOfRecordColumns(
-            ArrayList<ColumnRecordModel> columns, ArrayList<Integer> indexes) {
+    public List<ColumnRecordModel> getPermutationsOfRecordColumns(
+            List<ColumnRecordModel> columns, List<Integer> indexes) {
         ArrayList<ColumnRecordModel> tmpResultColumns = new ArrayList<>();
 
         // filterOff unwanted columns

@@ -4,15 +4,15 @@ import org.apache.commons.text.similarity.SimilarityScore;
 
 public abstract class SimilarityCalculator {
 
-    public abstract float compute(String s1, String s2);
+    public abstract double compute(String s1, String s2);
 
     public static <T extends Number> SimilarityCalculator fromSimilarityScore(
             SimilarityScore<T> ss) {
         return new SimilarityCalculator() {
 
             @Override
-            public float compute(String s1, String s2) {
-                return ss.apply(s1, s2).floatValue();
+            public double compute(String s1, String s2) {
+                return ss.apply(s1, s2).doubleValue();
             }
 
             @Override
@@ -28,8 +28,8 @@ public abstract class SimilarityCalculator {
         return new SimilarityCalculator() {
 
             @Override
-            public float compute(String s1, String s2) {
-                return 1 - ss.apply(s1, s2).floatValue();
+            public double compute(String s1, String s2) {
+                return 1 - ss.apply(s1, s2).doubleValue();
             }
 
             @Override

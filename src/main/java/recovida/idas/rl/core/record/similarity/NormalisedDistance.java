@@ -9,7 +9,7 @@ public class NormalisedDistance implements SimilarityScore<Double> {
     private DenominatorSupplier denominatorSupplier;
     private String label;
 
-    interface DenominatorSupplier {
+    public interface DenominatorSupplier {
         public int getDenominator(CharSequence s1, CharSequence s2);
     }
 

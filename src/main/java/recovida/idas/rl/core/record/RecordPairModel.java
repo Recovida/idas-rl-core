@@ -1,15 +1,20 @@
 package recovida.idas.rl.core.record;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class RecordPairModel {
     private RecordModel recordA;
     private RecordModel recordB;
     private double score;
+    private Map<String, Double> similarities;
 
     public RecordPairModel(RecordModel recordA, RecordModel recordB,
             double score) {
         this.recordA = recordA;
         this.recordB = recordB;
         this.score = score;
+        this.similarities = new LinkedHashMap<>();
     }
 
     public RecordModel getRecordA() {
@@ -34,5 +39,13 @@ public class RecordPairModel {
 
     public void setScore(double score) {
         this.score = score;
+    }
+
+    public Double getSimilarity(String id) {
+        return similarities.getOrDefault(id, null);
+    }
+
+    public void setSimilarity(String similarityCol, Double value) {
+        similarities.put(similarityCol, value);
     }
 }

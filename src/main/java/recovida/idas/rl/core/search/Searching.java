@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -47,15 +48,15 @@ public class Searching implements Closeable {
         int HITS = 100;
         String strBusca;
         ArrayList<RecordModel> tmpCandidates;
-        final ArrayList<ColumnRecordModel> filteredColumns;
-        ArrayList<ColumnRecordModel> tmpColumns;
+        final List<ColumnRecordModel> filteredColumns;
+        List<ColumnRecordModel> tmpColumns;
         RecordComparator recordComparator = new RecordComparator(config);
         RecordPairModel tmpCandidate;
 
         filteredColumns = seachingUtils
                 .filterUnusedColumns(record.getColumnRecordModels());
         // filter unused columns
-        String recordId = record.getColumnRecordModels().get(0).getValue();
+        String recordId = record.getColumnRecordModels().iterator().next().getValue();
 
         // FASE 1
         strBusca = seachingUtils.getStrQueryExact(filteredColumns);

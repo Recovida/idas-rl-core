@@ -20,9 +20,15 @@ import recovida.idas.rl.core.io.DatasetRecord;
 public class DBFDatasetReader implements DatasetReader {
 
     protected String fileName;
-    
+
     protected String encoding;
 
+    /**
+     * Creates an instance.
+     * 
+     * @param fileName name of the DBF file containing the dataset
+     * @param encoding the encoding of the file (see {@link Charset})
+     */
     public DBFDatasetReader(String fileName, String encoding) {
         this.fileName = fileName;
         this.encoding = encoding;

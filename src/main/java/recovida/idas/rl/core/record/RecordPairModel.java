@@ -4,9 +4,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class RecordPairModel {
+    
     private RecordModel recordA;
+    
     private RecordModel recordB;
+    
     private double score;
+    
     private Map<String, Double> similarities;
 
     public RecordPairModel(RecordModel recordA, RecordModel recordB,

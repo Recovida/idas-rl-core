@@ -50,12 +50,17 @@ import recovida.idas.rl.core.util.StatusReporter.LoggingLevel;
 public class Main {
 
     String configFileName;
+    
     int progressReportIntervals;
 
     ExecutorService pool;
+    
     BlockingQueue<Future<String>> q;
+    
     Thread executingThread;
+    
     Thread readerThread;
+    
     Future<String> f;
 
     public Main(String configFileName, int progressReportIntervals) {

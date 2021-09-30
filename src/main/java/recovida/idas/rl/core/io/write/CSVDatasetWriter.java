@@ -8,7 +8,9 @@ import java.io.IOException;
 public class CSVDatasetWriter implements DatasetWriter {
 
     protected String fileName;
+    
     protected char delimiter;
+    
     protected BufferedWriter bw;
 
     public CSVDatasetWriter(String fileName, char delimiter) {

@@ -83,6 +83,7 @@ public class StatusReporter {
     }
 
     public static LoggingLevel currentLevel = LoggingLevel.INFO;
+    
     protected StatusLogger logger = new ConsoleLogger();
 
     protected static StatusReporter instance = null;

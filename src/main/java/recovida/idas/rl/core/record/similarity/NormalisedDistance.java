@@ -6,7 +6,9 @@ import org.apache.commons.text.similarity.SimilarityScore;
 public class NormalisedDistance implements SimilarityScore<Double> {
 
     private SimilarityScore<Integer> absoluteDistance;
+    
     private DenominatorSupplier denominatorSupplier;
+    
     private String label;
 
     public interface DenominatorSupplier {

@@ -3,17 +3,30 @@ package recovida.idas.rl.core.config;
 import java.io.Serializable;
 
 public class ColumnConfigModel implements Serializable {
+    
     private static final long serialVersionUID = 1L;
+    
     private String id;
+    
     private String type;
+    
     private String indexA;
+    
+    
     private String indexB;
+    
     private String renameA;
+    
     private String renameB;
+    
     private double weight;
+    
     private double phonWeight;
+    
     private boolean generated;
+    
     private String similarityCol = "";
+    
     private double similarityMin = 0.0;
 
     public ColumnConfigModel(String id, String type, String indexA,

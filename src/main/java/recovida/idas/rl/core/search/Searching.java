@@ -28,13 +28,21 @@ import recovida.idas.rl.core.util.Permutation;
 import recovida.idas.rl.core.util.StatusReporter;
 
 public class Searching implements Closeable {
+    
     private final StandardAnalyzer analyzer = new StandardAnalyzer();
+    
     private final Directory index;
+    
     private IndexSearcher searcher;
+    
     private QueryParser queryParser;
+    
     private TopScoreDocCollector collector;
+    
     private final ConfigModel config;
+    
     private final SearchingUtils seachingUtils;
+    
     private final Permutation permutation;
 
     public Searching(ConfigModel config) throws IOException {

@@ -42,10 +42,15 @@ public class Indexing {
     }
 
     ConfigModel config;
+    
     IndexWriter inWriter;
+    
     IndexingStatus status = IndexingStatus.NONE;
+    
     Collection<String> missingColumnsInExistingIndex = Collections.emptyList();
+    
     Collection<String> missingColumnsInDataset = Collections.emptyList();
+    
     Collection<String> columnsInDataset = Collections.emptyList();
 
     public Collection<String> getColumnsInDataset() {

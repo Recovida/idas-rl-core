@@ -11,6 +11,7 @@ public class Phonetic {
     public static class Substitution {
 
         public Pattern pattern;
+
         public String replacement;
 
         public Substitution(Pattern pattern, String replacement) {
@@ -36,9 +37,10 @@ public class Phonetic {
 
     }
 
-    final static MultipleSubstitution globalSubstitutions = new MultipleSubstitution()
+    static final MultipleSubstitution globalSubstitutions = new MultipleSubstitution()
             .add(" (D?[AEO]|D[AO]S|EM|N[OA]S?) ", " ").add("(.)(\\1)+", "$1");
-    final static MultipleSubstitution perNameSubstitutions = new MultipleSubstitution()
+    
+    static final MultipleSubstitution perNameSubstitutions = new MultipleSubstitution()
             .add("Y", "I").add("PH", "F").add("CHR", "CR").add("CHIO", "QUIO")
             .add("CÇ", "S").add("C([TS])", "$1").add("[MN]Ç", "S")
             .add("[MN]([BCDFGJKLPQRSTVWXZ])", "$1").add("SÇ", "C")

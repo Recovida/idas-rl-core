@@ -1,9 +1,13 @@
 package recovida.idas.rl.core.record;
 
 public class ColumnRecordModel {
+    
     private String id;
+    
     private String type;
+    
     private String value;
+    
     private boolean generated = false;
 
     public ColumnRecordModel(String id, String type, String value) {

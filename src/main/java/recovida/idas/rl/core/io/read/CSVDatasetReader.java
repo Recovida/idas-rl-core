@@ -21,8 +21,11 @@ import recovida.idas.rl.core.io.DatasetRecord;
 public class CSVDatasetReader implements DatasetReader {
 
     protected String fileName;
+    
     protected String encoding;
+    
     protected char delimiter;
+    
     protected boolean lenient;
 
     public CSVDatasetReader(String fileName, String encoding, boolean lenient) {

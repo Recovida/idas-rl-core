@@ -9,24 +9,43 @@ import java.util.regex.PatternSyntaxException;
 import recovida.idas.rl.core.io.Separator;
 
 public class ConfigModel implements Serializable {
+    
     private static final long serialVersionUID = 1L;
+    
     private String dbA;
+    
     private String dbB;
+    
     private String encodingA = "UTF-8";
+    
     private String encodingB = "UTF-8";
+    
     private String suffixA;
+    
     private String suffixB;
+    
     private String cleaningRegex = "";
+    
     private String rowNumColNameA = "#A";
+    
     private String rowNumColNameB = "#B";
+    
     private String dbIndex;
+    
     private String linkageDir = ".";
+    
     private boolean lenientA = false;
+    
     private boolean lenientB = false;
+    
     private Separator decimalSeparator = Separator.DEFAULT_DEC_SEP;
+    
     private Separator columnSeparator = Separator.DEFAULT_COL_SEP;
+    
     private long maxRows = Long.MAX_VALUE;
+    
     private float minimumScore = 0;
+    
     private int threadCount = Math.min(8,
             Runtime.getRuntime().availableProcessors());
 

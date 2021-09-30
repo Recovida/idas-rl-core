@@ -13,7 +13,9 @@ import recovida.idas.rl.core.record.RecordPairModel;
 public class LinkageOutput {
 
     private ConfigModel config;
+    
     private Map<String, String> simColumns; // id -> similarity column name
+    
     private char decSep;
 
     public LinkageOutput(ConfigModel config) {

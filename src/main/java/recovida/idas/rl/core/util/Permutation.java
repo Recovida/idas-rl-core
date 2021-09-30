@@ -6,6 +6,7 @@ import java.util.List;
 import recovida.idas.rl.core.record.ColumnRecordModel;
 
 public class Permutation {
+    
     public ArrayList<ArrayList<Integer>> combine(int n, int k) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
 

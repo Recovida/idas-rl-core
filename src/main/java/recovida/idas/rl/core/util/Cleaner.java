@@ -1,6 +1,3 @@
-/**
- *
- */
 package recovida.idas.rl.core.util;
 
 import java.util.regex.Matcher;

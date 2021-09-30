@@ -17,6 +17,7 @@ import recovida.idas.rl.core.io.DatasetRecord;
 public class DBFDatasetReader implements DatasetReader {
 
     protected String fileName;
+    
     protected String encoding;
 
     public DBFDatasetReader(String fileName, String encoding) {

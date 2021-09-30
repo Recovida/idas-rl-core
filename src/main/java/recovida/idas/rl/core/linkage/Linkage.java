@@ -15,10 +15,14 @@ import recovida.idas.rl.core.record.similarity.SimilarityCalculator;
 import recovida.idas.rl.core.search.Searching;
 
 public class Linkage implements Serializable, Closeable {
+
     private static final long serialVersionUID = 1L;
+
     private final ConfigModel config;
+
     private Searching searching;
-    private final static SimilarityCalculator similarityCalculator = SimilarityCalculator
+
+    private static final SimilarityCalculator similarityCalculator = SimilarityCalculator
             .fromComplementarySimilarityScore(new NormalisedDistance(
                     new LongestCommonSubsequenceDistance(),
                     (left, right) -> Math.max(left.length() + right.length(),

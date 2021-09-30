@@ -18,16 +18,27 @@ import com.univocity.parsers.csv.CsvParserSettings;
 
 import recovida.idas.rl.core.io.DatasetRecord;
 
+/**
+ * Provides a mechanism to read a dataset from a CSV file.
+ */
 public class CSVDatasetReader implements DatasetReader {
 
     protected String fileName;
-    
+
     protected String encoding;
-    
+
     protected char delimiter;
-    
+
     protected boolean lenient;
 
+    /**
+     * Creates an instance.
+     * 
+     * @param fileName name of the CSV file containing the dataset
+     * @param encoding the encoding of the file (see {@link Charset})
+     * @param lenient  whether unparsable bytes should be just ignored rather
+     *                 than resulting in an exception
+     */
     public CSVDatasetReader(String fileName, String encoding, boolean lenient) {
         this.fileName = fileName;
         this.encoding = encoding;

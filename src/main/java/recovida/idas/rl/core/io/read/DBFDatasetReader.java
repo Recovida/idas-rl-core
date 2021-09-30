@@ -14,6 +14,9 @@ import com.linuxense.javadbf.DBFReader;
 
 import recovida.idas.rl.core.io.DatasetRecord;
 
+/**
+ * Provides a mechanism to read a dataset from a DBF file.
+ */
 public class DBFDatasetReader implements DatasetReader {
 
     protected String fileName;

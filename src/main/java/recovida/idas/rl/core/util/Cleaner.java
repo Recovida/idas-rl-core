@@ -7,6 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import recovida.idas.rl.core.config.ColumnConfigModel;
 
+/**
+ * This class contains some methods that are used to clean strings before the
+ * linkage.
+ */
 public class Cleaner {
 
     private static Pattern[] datePatterns = {
@@ -18,6 +22,14 @@ public class Cleaner {
 
     private Pattern nameCleaningPattern = Pattern.compile("");
 
+    /**
+     * Cleans a string by transforming and removing characters according to the
+     * column type.
+     * 
+     * @param c    the column definition
+     * @param data the string to be cleaned
+     * @return the cleaned string
+     */
     public String clean(ColumnConfigModel c, String data) {
         if (data == null)
             return "";

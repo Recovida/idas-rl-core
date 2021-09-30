@@ -18,8 +18,18 @@ import recovida.idas.rl.core.util.StatusReporter;
 
 public class ConfigReader {
 
+    /**
+     * The maximum number of a column.
+     */
     public static int MAX_NUMBER = 999;
 
+    /**
+     * Reads a configuration from a .properties file.
+     * 
+     * @param propFileName name of the file containing the configuration
+     * @return a {@link ConfigModel} with the options read from the file, or
+     *         <code>null</code> if errors were found
+     */
     public ConfigModel readConfig(String propFileName) {
         if (propFileName == null)
             propFileName = "assets/config.properties";
@@ -31,7 +41,7 @@ public class ConfigReader {
         InputStream configFileStream;
         try {
             configFileStream = new FileInputStream(new File(propFileName));
-        } catch (FileNotFoundException e1) {
+        } catch (FileNotFoundException ex) {
             return null;
         }
 

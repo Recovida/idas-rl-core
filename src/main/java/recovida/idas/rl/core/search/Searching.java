@@ -53,7 +53,7 @@ public class Searching implements Closeable {
     }
 
     public RecordPairModel getCandidatePairFromRecord(RecordModel record) {
-        int HITS = 100;
+        int hits = 100;
         String strBusca;
         ArrayList<RecordModel> tmpCandidates;
         final List<ColumnRecordModel> filteredColumns;
@@ -70,7 +70,7 @@ public class Searching implements Closeable {
         // FASE 1
         strBusca = seachingUtils.getStrQueryExact(filteredColumns);
         // DO THE QUERY
-        tmpCandidates = searchCandidateRecordsFromStrQuery(strBusca, HITS,
+        tmpCandidates = searchCandidateRecordsFromStrQuery(strBusca, hits,
                 recordId);
         // IF ANY RESULT WAS FOUND
         if (tmpCandidates.isEmpty() == false) {
@@ -97,7 +97,7 @@ public class Searching implements Closeable {
             strBusca = seachingUtils.getStrQueryExact(tmpColumns);
             // add resultadoss
             tmpCandidates.addAll(searchCandidateRecordsFromStrQuery(strBusca,
-                    HITS, recordId));
+                    hits, recordId));
 
         }
         if (tmpCandidates.isEmpty() == false) {
@@ -112,7 +112,7 @@ public class Searching implements Closeable {
         // FASE 3
         strBusca = seachingUtils.getStrQueryFuzzy(filteredColumns);
         // DO THE QUERY
-        tmpCandidates = searchCandidateRecordsFromStrQuery(strBusca, HITS,
+        tmpCandidates = searchCandidateRecordsFromStrQuery(strBusca, hits,
                 recordId);
         // IF ANY RESULT WAS FOUND
         if (tmpCandidates.isEmpty() == false) {
@@ -151,9 +151,9 @@ public class Searching implements Closeable {
         DirectoryReader reader;
         try {
             reader = DirectoryReader.open(index);
-        } catch (IOException e1) {
+        } catch (IOException ex) {
             StatusReporter.get()
-                    .errorUnexpectedError(ExceptionUtils.getStackTrace(e1));
+                    .errorUnexpectedError(ExceptionUtils.getStackTrace(ex));
             return recordsFound;
         }
         searcher = new IndexSearcher(reader);
@@ -213,8 +213,8 @@ public class Searching implements Closeable {
             tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType,
                     tmpValue);
             tmpRecordColumnRecord.setGenerated(
-                    column.isGenerated() || (tmpType.equals("copy")
-                            && column.getIndexB().equals("")));
+                    column.isGenerated() || tmpType.equals("copy")
+                            && column.getIndexB().equals(""));
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);

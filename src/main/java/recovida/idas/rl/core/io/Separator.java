@@ -8,11 +8,51 @@ import java.util.Locale;
 
 import recovida.idas.rl.core.lang.MessageProvider;
 
+/**
+ * Represents separator characters.
+ */
 public enum Separator {
 
+    /**
+     * The default column separator in the current language.
+     */
     DEFAULT_COL_SEP(null, Separator::columnSeparatorFromLocale),
-    DEFAULT_DEC_SEP(null, Separator::decimalSeparatorFromLocale), COMMA(','),
-    COLON(':'), SEMICOLON(';'), TAB('\t'), DOT('.'), PIPE('|');
+
+    /**
+     * The default decimal separator in the current language.
+     */
+    DEFAULT_DEC_SEP(null, Separator::decimalSeparatorFromLocale),
+
+    /**
+     * A comma (",").
+     */
+    COMMA(','),
+
+    /**
+     * A colon (":").
+     */
+
+    COLON(':'),
+
+    /**
+     * A semicolon (";").
+     */
+    SEMICOLON(';'),
+
+    /**
+     * A tab character.
+     */
+    TAB('\t'),
+
+    /**
+     * A dot (".").
+     */
+    DOT('.'),
+
+    /**
+     * A vertical bar ("|").
+     */
+    PIPE('|');
 
     private Character character;
     private LocaleToSeparator lts;
@@ -21,7 +61,18 @@ public enum Separator {
         this.character = character;
     }
 
+    /**
+     * Abstraction for a function that returns a (column/decimal) separator for
+     * a given language.
+     */
     public interface LocaleToSeparator {
+
+        /**
+         * Obtains the separator that corresponds to the given locale.
+         * 
+         * @param l the locale
+         * @return the separator for {@code l}
+         */
         Separator localeToSeparator(Locale l);
     }
 
@@ -55,6 +106,13 @@ public enum Separator {
         return Arrays.asList(DEFAULT_DEC_SEP, DOT, COMMA);
     }
 
+    /**
+     * Returns a separator from its name.
+     * 
+     * @param name name of the separator
+     * @return a {@code Separator} instance correspondent to {@code name}, or
+     *         {@code null} if it does not exist
+     */
     public static Separator fromName(String name) {
         if (name == null)
             return null;

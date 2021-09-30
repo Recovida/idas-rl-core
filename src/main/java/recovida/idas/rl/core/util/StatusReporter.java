@@ -9,6 +9,16 @@ import java.util.function.Supplier;
 
 import recovida.idas.rl.core.lang.MessageProvider;
 
+// CHECKSTYLE.OFF: JavadocMethod
+// CHECKSTYLE.OFF: JavadocType
+// CHECKSTYLE.OFF: JavadocVariable
+// CHECKSTYLE.OFF: MissingJavadocMethod
+// CHECKSTYLE.OFF: SummaryJavadoc
+// CHECKSTYLE.OFF: WriteTag
+
+/**
+ * Internal logging mechanism.
+ */
 public class StatusReporter {
 
     public enum LoggingLevel {
@@ -83,7 +93,7 @@ public class StatusReporter {
     }
 
     public static LoggingLevel currentLevel = LoggingLevel.INFO;
-    
+
     protected StatusLogger logger = new ConsoleLogger();
 
     protected static StatusReporter instance = null;

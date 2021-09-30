@@ -29,28 +29,59 @@ import org.apache.lucene.store.FSDirectory;
 
 import recovida.idas.rl.core.config.ColumnConfigModel;
 import recovida.idas.rl.core.config.ConfigModel;
-import recovida.idas.rl.core.io.DatasetRecord;
+import recovida.idas.rl.core.io.AbstractDatasetRecord;
 import recovida.idas.rl.core.record.ColumnRecordModel;
 import recovida.idas.rl.core.record.RecordModel;
 import recovida.idas.rl.core.util.Cleaner;
 import recovida.idas.rl.core.util.Phonetic;
 
+/**
+ * Dataset indexing mechanism using Apache Lucene.
+ */
 public class Indexing {
 
+    /**
+     * Status of old indexing.
+     */
     public enum IndexingStatus {
-        NONE, CORRUPT, INCOMPLETE, COMPLETE, DIFFERENT_CLEANING_PATTERN
+
+        /**
+         * No previous indices were found.
+         */
+        NONE,
+
+        /**
+         * A broken index was found.
+         */
+        CORRUPT,
+
+        /**
+         * An old index was found, but it does not have some required columns.
+         */
+        INCOMPLETE,
+
+        /**
+         * An old index exists and can be reused.
+         */
+        COMPLETE,
+
+        /**
+         * An old index was found, but it cannot be reused because the cleaning
+         * pattern has been changed.
+         */
+        DIFFERENT_CLEANING_PATTERN
     }
 
     ConfigModel config;
-    
+
     IndexWriter inWriter;
-    
+
     IndexingStatus status = IndexingStatus.NONE;
-    
+
     Collection<String> missingColumnsInExistingIndex = Collections.emptyList();
-    
+
     Collection<String> missingColumnsInDataset = Collections.emptyList();
-    
+
     Collection<String> columnsInDataset = Collections.emptyList();
 
     public Collection<String> getColumnsInDataset() {
@@ -63,6 +94,11 @@ public class Indexing {
 
     protected long indexedEntries = 0;
 
+    /**
+     * Creates an instance using a specific configuration.
+     * 
+     * @param config configuration
+     */
     public Indexing(ConfigModel config) {
         this.config = config;
         status = checkIndexingStatus();
@@ -72,7 +108,7 @@ public class Indexing {
         return status;
     }
 
-    public IndexingStatus checkIndexingStatus() {
+    private IndexingStatus checkIndexingStatus() {
         indexedEntries = 0;
         Path dbIndexPath = Paths.get(config.getDbIndex());
         if (!Files.isDirectory(dbIndexPath))
@@ -150,7 +186,14 @@ public class Indexing {
         return Paths.get(config.getDbIndex()).resolve("_CLEANING");
     }
 
-    public synchronized boolean index(Iterable<DatasetRecord> records,
+    /**
+     * Indexes the records in the given sequence.
+     * 
+     * @param records sequence of records to index
+     * @param cleaner cleaner mechanism
+     * @return whether the indexing was successful
+     */
+    public synchronized boolean index(Iterable<AbstractDatasetRecord> records,
             Cleaner cleaner) {
         indexedEntries = 0;
         missingColumnsInExistingIndex = Collections.emptyList();
@@ -169,7 +212,7 @@ public class Indexing {
             index = FSDirectory.open(dbIndexPath);
             inWriter = new IndexWriter(index, idxConfig);
 
-            for (DatasetRecord record : records) {
+            for (AbstractDatasetRecord record : records) {
                 if (Thread.currentThread().isInterrupted())
                     return false;
                 if (columnsInDataset.isEmpty()) // first time - save column list
@@ -237,7 +280,7 @@ public class Indexing {
     }
 
     private RecordModel fromDatasetRecordToRecordModel(long num,
-            DatasetRecord datasetRecord, Cleaner cleaner) {
+            AbstractDatasetRecord datasetRecord, Cleaner cleaner) {
         ColumnRecordModel tmpRecordColumnRecord;
         String tmpIndex;
         String cleanedValue = null;
@@ -292,6 +335,11 @@ public class Indexing {
         return recordModel;
     }
 
+    /**
+     * Deletes an old index.
+     * 
+     * @return whether the deletion was successful
+     */
     public boolean deleteOldIndex() {
         File f = new File(config.getDbIndex());
         try {
@@ -303,6 +351,11 @@ public class Indexing {
         }
     }
 
+    /**
+     * Returns the number of indexed entries.
+     * 
+     * @return how many entries were indexed
+     */
     public long numIndexedEntries() {
         return indexedEntries;
     }

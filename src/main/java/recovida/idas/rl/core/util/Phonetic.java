@@ -6,9 +6,19 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Provides a method that converts a name into a phonetic representation in
+ * Portuguese. It is <b>not</b> a phonetic transcription and it does <b>not</b>
+ * represent the actual pronunciations. The phonetic representations of similar
+ * names (such as different spellings for the same name) should be almost
+ * identical.
+ */
 public class Phonetic {
 
-    public static class Substitution {
+    /**
+     * Represents a single substitution pattern.
+     */
+    private static class Substitution {
 
         public Pattern pattern;
 
@@ -20,7 +30,10 @@ public class Phonetic {
         }
     }
 
-    public static class MultipleSubstitution {
+    /**
+     * Represents a multiple substitution pattern.
+     */
+    private static class MultipleSubstitution {
 
         private final List<Substitution> items = new LinkedList<>();
 
@@ -37,10 +50,10 @@ public class Phonetic {
 
     }
 
-    static final MultipleSubstitution globalSubstitutions = new MultipleSubstitution()
+    private static final MultipleSubstitution GLOBAL_SUBSTITUTIONS = new MultipleSubstitution()
             .add(" (D?[AEO]|D[AO]S|EM|N[OA]S?) ", " ").add("(.)(\\1)+", "$1");
-    
-    static final MultipleSubstitution perNameSubstitutions = new MultipleSubstitution()
+
+    private static final MultipleSubstitution PER_NAME_SUBSTITUTIONS = new MultipleSubstitution()
             .add("Y", "I").add("PH", "F").add("CHR", "CR").add("CHIO", "QUIO")
             .add("CÇ", "S").add("C([TS])", "$1").add("[MN]Ç", "S")
             .add("[MN]([BCDFGJKLPQRSTVWXZ])", "$1").add("SÇ", "C")
@@ -57,15 +70,23 @@ public class Phonetic {
             .add("H", "").add("I", "E").add("([DLMNRSTUZ]|AO)$", "")
             .add("K$", "KE").add("(.)(\\1)+", "$1");
 
+    /**
+     * Converts a name into its phonetic representation in Portuguese. This is
+     * <b>not</b> a phonetic transcription and does <b>not</b> represent the
+     * actual pronunciation.
+     * 
+     * @param name the name to convert
+     * @return the phonetic representation of {@code name}
+     */
     public static String convert(String name) {
         if (name == null)
             return "";
         name = StringUtils.stripAccents(name.toUpperCase());
-        name = globalSubstitutions.apply(name);
-        List<String> cleaned_name = new LinkedList<>();
+        name = GLOBAL_SUBSTITUTIONS.apply(name);
+        List<String> cleanedName = new LinkedList<>();
         for (String word : name.split("\\s+"))
-            cleaned_name.add(perNameSubstitutions.apply(word));
-        return StringUtils.join(cleaned_name, ' ').replaceAll("\\s\\s+", " ");
+            cleanedName.add(PER_NAME_SUBSTITUTIONS.apply(word));
+        return StringUtils.join(cleanedName, ' ').replaceAll("\\s\\s+", " ");
     }
 
 }

@@ -16,12 +16,15 @@ import java.util.stream.Collectors;
 
 import recovida.idas.rl.core.util.StatusReporter;
 
+/**
+ * Configuration file reader.
+ */
 public class ConfigReader {
 
     /**
      * The maximum number of a column.
      */
-    public static int MAX_NUMBER = 999;
+    public static final int MAX_NUMBER = 999;
 
     /**
      * Reads a configuration from a .properties file.

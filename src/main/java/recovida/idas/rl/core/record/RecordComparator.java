@@ -9,15 +9,24 @@ import recovida.idas.rl.core.config.ColumnConfigModel;
 import recovida.idas.rl.core.config.ConfigModel;
 import recovida.idas.rl.core.util.StatusReporter;
 
+/**
+ * Provides an algorithm to compute the score of record pair.
+ */
 public class RecordComparator {
+
     private final ConfigModel config;
 
+    /**
+     * Creates an instance using a given configuration.
+     * 
+     * @param config the configuration
+     */
     public RecordComparator(ConfigModel config) {
         this.config = config;
     }
 
     private double compareTwoRecords(RecordModel recordA, RecordModel recordB) {
-        double tmp_total = 0.0;// 2 + (0.125 * 8) + 0.08 + 0.04 + 0.5;
+        double tmpTotal = 0.0;// 2 + (0.125 * 8) + 0.08 + 0.04 + 0.5;
         double score;
         double penalty = 0.0;
 
@@ -55,7 +64,7 @@ public class RecordComparator {
                     || columnConfig.getType().equals("string")) {
                 if (columnA.getValue().isEmpty() == false
                         && columnB.getValue().isEmpty() == false) {
-                    tmp_total = tmp_total + columnConfig.getWeight();
+                    tmpTotal = tmpTotal + columnConfig.getWeight();
                     scoreNomes = scoreNomes + getDistanceString(
                             columnA.getValue(), columnB.getValue(),
                             columnConfig.getWeight());
@@ -68,7 +77,7 @@ public class RecordComparator {
                 try {
                     if (columnA.getValue().isEmpty() == false
                             && columnB.getValue().isEmpty() == false) {
-                        tmp_total = tmp_total + columnConfig.getWeight();
+                        tmpTotal = tmpTotal + columnConfig.getWeight();
                         scoreDates = scoreDates + getDistanceDate(
                                 columnA.getValue(), columnB.getValue(),
                                 columnConfig.getWeight());
@@ -87,7 +96,7 @@ public class RecordComparator {
                             && "".equals(columnB.getValue()) == false) {
                         if (columnA.getValue().length() == 6
                                 && columnB.getValue().length() == 6) {
-                            tmp_total = tmp_total + columnConfig.getWeight();
+                            tmpTotal = tmpTotal + columnConfig.getWeight();
                             scoreIbge = scoreIbge + getDistanceIBGE(
                                     columnA.getValue(), columnB.getValue(),
                                     columnConfig.getWeight());
@@ -103,7 +112,7 @@ public class RecordComparator {
                 try {
                     if (columnA.getValue().isEmpty() == false
                             && columnB.getValue().isEmpty() == false) {
-                        tmp_total = tmp_total + columnConfig.getWeight();
+                        tmpTotal = tmpTotal + columnConfig.getWeight();
                         if (columnA.getValue()
                                 .charAt(columnA.getValue().length()
                                         - 1) == columnB.getValue().charAt(
@@ -128,7 +137,7 @@ public class RecordComparator {
                 try {
                     if (columnA.getValue().isEmpty() == false
                             && columnB.getValue().isEmpty() == false) {
-                        tmp_total = tmp_total + columnConfig.getWeight();
+                        tmpTotal = tmpTotal + columnConfig.getWeight();
                         scoreCategorical = scoreCategorical
                                 + getDistanceCategorical(columnA.getValue(),
                                         columnB.getValue(),
@@ -144,7 +153,7 @@ public class RecordComparator {
                 try {
                     if (columnA.getValue().isEmpty() == false
                             && columnB.getValue().isEmpty() == false) {
-                        tmp_total = tmp_total + columnConfig.getWeight();
+                        tmpTotal = tmpTotal + columnConfig.getWeight();
                         scoreNumericalId = scoreNumericalId
                                 + getDistanceNumericalId(columnA.getValue(),
                                         columnB.getValue(),
@@ -162,8 +171,10 @@ public class RecordComparator {
 
         score = scoreCategorical + scoreDates + scoreIbge + scoreNomes
                 + scoreGender + scoreNumericalId;
-        return (score / tmp_total) - penalty;
+        return (score / tmpTotal) - penalty;
     }
+
+    // CHECKSTYLE.OFF: JavadocMethod
 
     public RecordPairModel findBestCandidatePair(RecordModel record,
             ArrayList<RecordModel> candidates) {

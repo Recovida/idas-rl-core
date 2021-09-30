@@ -1,6 +1,6 @@
 package recovida.idas.rl.core.io.read;
 
-import recovida.idas.rl.core.io.DatasetRecord;
+import recovida.idas.rl.core.io.AbstractDatasetRecord;
 
 /**
  * Provides a mechanism to read a dataset from a file.
@@ -12,6 +12,6 @@ public interface DatasetReader {
      * 
      * @return an iterable of the records that are being read
      */
-    Iterable<DatasetRecord> getDatasetRecordIterable();
+    Iterable<AbstractDatasetRecord> getDatasetRecordIterable();
 
 }

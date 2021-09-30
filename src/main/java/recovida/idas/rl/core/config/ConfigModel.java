@@ -8,53 +8,67 @@ import java.util.regex.PatternSyntaxException;
 
 import recovida.idas.rl.core.io.Separator;
 
+/**
+ * Represents a linkage configuration.
+ */
 public class ConfigModel implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private String dbA;
-    
+
     private String dbB;
-    
+
     private String encodingA = "UTF-8";
-    
+
     private String encodingB = "UTF-8";
-    
+
     private String suffixA;
-    
+
     private String suffixB;
-    
+
     private String cleaningRegex = "";
-    
+
     private String rowNumColNameA = "#A";
-    
+
     private String rowNumColNameB = "#B";
-    
+
     private String dbIndex;
-    
+
     private String linkageDir = ".";
-    
+
     private boolean lenientA = false;
-    
+
     private boolean lenientB = false;
-    
+
     private Separator decimalSeparator = Separator.DEFAULT_DEC_SEP;
-    
+
     private Separator columnSeparator = Separator.DEFAULT_COL_SEP;
-    
+
     private long maxRows = Long.MAX_VALUE;
-    
+
     private float minimumScore = 0;
-    
+
     private int threadCount = Math.min(8,
             Runtime.getRuntime().availableProcessors());
 
     private ArrayList<ColumnConfigModel> columns = new ArrayList<>();
 
+    /**
+     * Creates an instance with the default values.
+     */
     public ConfigModel() {
 
     }
 
+    /**
+     * Creates an instance.
+     * 
+     * @param dbA     dataset A file name
+     * @param dbB     dataset B file name
+     * @param dbIndex index directory name
+     * @param columns collection of column pairs
+     */
     public ConfigModel(String dbA, String dbB, String dbIndex,
             ArrayList<ColumnConfigModel> columns) {
         setDbA(dbA);
@@ -109,6 +123,10 @@ public class ConfigModel implements Serializable {
         return columns;
     }
 
+    /**
+     * Adds a column pair.
+     * @param column column pair
+     */
     public void addColumn(ColumnConfigModel column) {
         columns.add(column);
     }

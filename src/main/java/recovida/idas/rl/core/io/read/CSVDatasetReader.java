@@ -16,7 +16,7 @@ import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
-import recovida.idas.rl.core.io.DatasetRecord;
+import recovida.idas.rl.core.io.AbstractDatasetRecord;
 
 /**
  * Provides a mechanism to read a dataset from a CSV file.
@@ -46,7 +46,7 @@ public class CSVDatasetReader implements DatasetReader {
     }
 
     @Override
-    public Iterable<DatasetRecord> getDatasetRecordIterable() {
+    public Iterable<AbstractDatasetRecord> getDatasetRecordIterable() {
         Reader in = null;
         CsvParserSettings settings = new CsvParserSettings();
         settings.setEmptyValue("");
@@ -67,7 +67,7 @@ public class CSVDatasetReader implements DatasetReader {
             IterableResult<Record, ParsingContext> records = parser
                     .iterateRecords(in);
             settings.detectFormatAutomatically();
-            return DatasetRecord.fromCSVRecordIterable(records);
+            return AbstractDatasetRecord.fromCSVRecordIterable(records);
         } catch (IOException e) {
             return null;
         }

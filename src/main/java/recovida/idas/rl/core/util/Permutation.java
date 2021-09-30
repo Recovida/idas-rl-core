@@ -1,6 +1,15 @@
 package recovida.idas.rl.core.util;
 
 import java.util.ArrayList;
+
+//CHECKSTYLE.OFF: JavadocMethod
+//CHECKSTYLE.OFF: JavadocType
+//CHECKSTYLE.OFF: JavadocVariable
+//CHECKSTYLE.OFF: MissingJavadocMethod
+//CHECKSTYLE.OFF: SummaryJavadoc
+//CHECKSTYLE.OFF: WriteTag
+
+
 import java.util.List;
 
 import recovida.idas.rl.core.record.ColumnRecordModel;

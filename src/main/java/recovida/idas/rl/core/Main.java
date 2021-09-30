@@ -29,7 +29,7 @@ import com.univocity.parsers.common.TextParsingException;
 import recovida.idas.rl.core.config.ColumnConfigModel;
 import recovida.idas.rl.core.config.ConfigModel;
 import recovida.idas.rl.core.config.ConfigReader;
-import recovida.idas.rl.core.io.DatasetRecord;
+import recovida.idas.rl.core.io.AbstractDatasetRecord;
 import recovida.idas.rl.core.io.read.CSVDatasetReader;
 import recovida.idas.rl.core.io.read.DBFDatasetReader;
 import recovida.idas.rl.core.io.read.DatasetReader;
@@ -47,27 +47,41 @@ import recovida.idas.rl.core.util.Phonetic;
 import recovida.idas.rl.core.util.StatusReporter;
 import recovida.idas.rl.core.util.StatusReporter.LoggingLevel;
 
+/**
+ * IDaS-RL entry point.
+ */
 public class Main {
 
     String configFileName;
-    
+
     int progressReportIntervals;
 
     ExecutorService pool;
-    
+
     BlockingQueue<Future<String>> q;
-    
+
     Thread executingThread;
-    
+
     Thread readerThread;
-    
+
     Future<String> f;
 
+    /**
+     * Creates an instance.
+     * 
+     * @param configFileName          name of the configuration file
+     * @param progressReportIntervals number of progress reports
+     */
     public Main(String configFileName, int progressReportIntervals) {
         this.configFileName = configFileName;
         this.progressReportIntervals = progressReportIntervals;
     }
 
+    /**
+     * Starts an execution.
+     * 
+     * @return whether the operation succeeded
+     */
     public synchronized boolean execute() {
 
         StatusReporter.currentLevel = LoggingLevel.INFO;
@@ -95,41 +109,41 @@ public class Main {
         Cleaner cleaner = new Cleaner();
         cleaner.setNameCleaningPattern(config.getCleaningRegex());
 
-        String fileName_a = config.getDbA();
-        String fileName_b = config.getDbB();
+        String fileNameA = config.getDbA();
+        String fileNameB = config.getDbB();
 
-        if (!new File(fileName_a).isFile()) {
-            StatusReporter.get().errorDatasetFileDoesNotExist(fileName_a);
+        if (!new File(fileNameA).isFile()) {
+            StatusReporter.get().errorDatasetFileDoesNotExist(fileNameA);
             return false;
         }
 
-        if (!new File(fileName_b).isFile()) {
-            StatusReporter.get().errorDatasetFileDoesNotExist(fileName_b);
+        if (!new File(fileNameB).isFile()) {
+            StatusReporter.get().errorDatasetFileDoesNotExist(fileNameB);
             return false;
         }
 
         // read dataset A (just to check for errors and get the number of rows)
-        StatusReporter.get().infoReadingA(fileName_a);
+        StatusReporter.get().infoReadingA(fileNameA);
         DatasetReader readerA = null;
-        if (fileName_a.toLowerCase().endsWith(".csv")) {
-            readerA = new CSVDatasetReader(fileName_a, config.getEncodingA(),
+        if (fileNameA.toLowerCase().endsWith(".csv")) {
+            readerA = new CSVDatasetReader(fileNameA, config.getEncodingA(),
                     config.isLenientA());
-        } else if (fileName_a.toLowerCase().endsWith(".dbf")) {
-            readerA = new DBFDatasetReader(fileName_a, config.getEncodingA());
+        } else if (fileNameA.toLowerCase().endsWith(".dbf")) {
+            readerA = new DBFDatasetReader(fileNameA, config.getEncodingA());
         } else {
-            StatusReporter.get()
-                    .errorDatasetFileFormatIsUnsupported(fileName_a);
+            StatusReporter.get().errorDatasetFileFormatIsUnsupported(fileNameA);
             return false;
         }
-        Iterable<DatasetRecord> dbARecords = readerA.getDatasetRecordIterable();
+        Iterable<AbstractDatasetRecord> dbARecords = readerA
+                .getDatasetRecordIterable();
         if (dbARecords == null) {
-            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileNameA,
                     config.getEncodingA());
             return false;
         }
         long n = 0;
         try {
-            Iterator<DatasetRecord> it = dbARecords.iterator();
+            Iterator<AbstractDatasetRecord> it = dbARecords.iterator();
             if (it.hasNext()) {
                 n++;
                 // make sure all columns are present
@@ -157,7 +171,7 @@ public class Main {
                 n++;
             }
         } catch (Exception e) {
-            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileNameA,
                     config.getEncodingA());
             return false;
         }
@@ -166,27 +180,26 @@ public class Main {
         // read dataset B
         StatusReporter.get().infoReadingAndIndexingB(config.getDbB());
 
-        Iterable<DatasetRecord> dbBRecords;
+        Iterable<AbstractDatasetRecord> dbBRecords;
         DatasetReader readerB = null;
-        if (fileName_b.toLowerCase().endsWith(".csv")) {
-            readerB = new CSVDatasetReader(fileName_b, config.getEncodingB(),
+        if (fileNameB.toLowerCase().endsWith(".csv")) {
+            readerB = new CSVDatasetReader(fileNameB, config.getEncodingB(),
                     config.isLenientB());
-        } else if (fileName_b.toLowerCase().endsWith(".dbf")) {
-            readerB = new DBFDatasetReader(fileName_b, config.getEncodingB());
+        } else if (fileNameB.toLowerCase().endsWith(".dbf")) {
+            readerB = new DBFDatasetReader(fileNameB, config.getEncodingB());
         } else {
-            StatusReporter.get()
-                    .errorDatasetFileFormatIsUnsupported(fileName_b);
+            StatusReporter.get().errorDatasetFileFormatIsUnsupported(fileNameB);
             return false;
         }
         dbBRecords = readerB.getDatasetRecordIterable();
         if (dbBRecords == null) {
-            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_b,
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileNameB,
                     config.getEncodingB());
             return false;
         }
 
         // prepare indexing
-        String hash = getHash(fileName_b);
+        String hash = getHash(fileNameB);
         if (hash == null)
             return false; // probably it was interrupted
         config.setDbIndex(config.getDbIndex() + File.separator + hash);
@@ -227,8 +240,8 @@ public class Main {
                 Throwable t = e.getCause();
                 if (t != null && t.getClass().getCanonicalName()
                         .startsWith("java.nio.charset")) {
-                    StatusReporter.get().errorDatasetFileCannotBeRead(
-                            fileName_b, config.getEncodingB());
+                    StatusReporter.get().errorDatasetFileCannotBeRead(fileNameB,
+                            config.getEncodingB());
                     return false;
                 }
                 StatusReporter.get().errorUnexpectedError(
@@ -255,9 +268,10 @@ public class Main {
         }
 
         // prepare to read dataset A again
-        Iterable<DatasetRecord> records = readerA.getDatasetRecordIterable();
+        Iterable<AbstractDatasetRecord> records = readerA
+                .getDatasetRecordIterable();
         if (records == null) {
-            StatusReporter.get().errorDatasetFileCannotBeRead(fileName_a,
+            StatusReporter.get().errorDatasetFileCannotBeRead(fileNameA,
                     config.getEncodingA());
             return false;
         }
@@ -283,16 +297,16 @@ public class Main {
             return l;
         });
 
-        final int BUFFER_SIZE = 1000;
+        final int bufferSize = 1000;
 
         pool = Executors.newFixedThreadPool(maxThreads);
-        q = new ArrayBlockingQueue<>(BUFFER_SIZE);
+        q = new ArrayBlockingQueue<>(bufferSize);
 
         LinkageOutput linkageOutput = new LinkageOutput(config);
 
         readerThread = new Thread(() -> {
             long readRows = 0;
-            for (DatasetRecord row : records) {
+            for (AbstractDatasetRecord row : records) {
                 if (Thread.currentThread().isInterrupted())
                     return;
                 Callable<String> fn = () -> {
@@ -308,8 +322,8 @@ public class Main {
                         }
 
                         if (column.isGenerated()
-                                || (column.getType().equals("copy")
-                                        && column.getIndexA().equals("")))
+                                || column.getType().equals("copy")
+                                        && column.getIndexA().equals(""))
                             continue;
                         String tmpType = column.getType();
                         String originalValue, cleanedValue, tmpValue;
@@ -400,7 +414,7 @@ public class Main {
                     try {
                         writer.close();
                         pool.shutdown();
-                    } catch (Exception ee) {
+                    } catch (Exception exc) {
                     }
                     return false;
                 }
@@ -414,11 +428,19 @@ public class Main {
         return true;
     }
 
+    /**
+     * Interrupts the execution thread and cancels the operation.
+     */
     public void interrupt() {
         interrupt(null);
     }
 
-    public void interrupt(Thread t) {
+    /**
+     * Interrupts a thread and cancels the operation.
+     * 
+     * @param t the thread to be interrupted
+     */
+    private void interrupt(Thread t) {
         StatusReporter.get().warnInterrupted();
         if (t == null)
             t = executingThread;
@@ -436,6 +458,12 @@ public class Main {
         }
     }
 
+    /**
+     * Entry point.
+     * 
+     * @param args array containing the configuration file name in its first
+     *             position
+     */
     public static void main(String[] args) {
         String configFileName = new File(
                 args.length < 1 ? "assets/config.properties" : args[0])

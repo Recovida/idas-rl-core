@@ -69,15 +69,15 @@ public class LinkageOutput {
         // for each column a add to result
         char sep = config.getColumnSeparator().getCharacter();
         for (ColumnConfigModel col : config.getColumns()) {
-            if (col.isGenerated() || (col.getType().equals("copy")
-                    && col.getIndexA().equals("")))
+            if (col.isGenerated() || col.getType().equals("copy")
+                    && col.getIndexA().equals(""))
                 continue;
             headerResult.append(quote(col.getRenameA())).append(sep);
         }
         // for each column b add to result
         for (ColumnConfigModel col : config.getColumns()) {
-            if (col.isGenerated() || (col.getType().equals("copy")
-                    && col.getIndexB().equals("")))
+            if (col.isGenerated() || col.getType().equals("copy")
+                    && col.getIndexB().equals(""))
                 continue;
             headerResult.append(quote(col.getRenameB())).append(sep);
         }

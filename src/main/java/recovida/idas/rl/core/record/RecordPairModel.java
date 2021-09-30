@@ -3,16 +3,26 @@ package recovida.idas.rl.core.record;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Represents a pair of records and its score.
+ */
 public class RecordPairModel {
-    
+
     private RecordModel recordA;
-    
+
     private RecordModel recordB;
-    
+
     private double score;
-    
+
     private Map<String, Double> similarities;
 
+    /**
+     * Creates an instance from a pair of records and its score.
+     * 
+     * @param recordA the first record
+     * @param recordB the second record
+     * @param score   the score between {@code recordA} e {@code recordB}
+     */
     public RecordPairModel(RecordModel recordA, RecordModel recordB,
             double score) {
         this.recordA = recordA;

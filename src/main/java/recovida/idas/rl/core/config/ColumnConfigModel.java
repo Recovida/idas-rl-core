@@ -2,38 +2,64 @@ package recovida.idas.rl.core.config;
 
 import java.io.Serializable;
 
+/**
+ * Represents a pair of columns (one from each dataset).
+ */
 public class ColumnConfigModel implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private String id;
-    
+
     private String type;
-    
+
     private String indexA;
-    
-    
+
     private String indexB;
-    
+
     private String renameA;
-    
+
     private String renameB;
-    
+
     private double weight;
-    
+
     private double phonWeight;
-    
+
     private boolean generated;
-    
+
     private String similarityCol = "";
-    
+
     private double similarityMin = 0.0;
 
+    /**
+     * Creates an instance.
+     * 
+     * @param id      id of the column pair
+     * @param type    type of the data
+     * @param indexA  column name in dataset A
+     * @param indexB  column name in dataset B
+     * @param renameA dataset A column name in output
+     * @param renameB dataset B column name in output
+     * @param weight  weight of this column pair
+     */
     public ColumnConfigModel(String id, String type, String indexA,
             String indexB, String renameA, String renameB, double weight) {
         this(id, type, indexA, indexB, renameA, renameB, weight, 0.0);
     }
 
+    /**
+     * Creates an instance.
+     * 
+     * @param id         id of the column pair
+     * @param type       type of the data
+     * @param indexA     column name in dataset A
+     * @param indexB     column name in dataset B
+     * @param renameA    dataset A column name in output
+     * @param renameB    dataset B column name in output
+     * @param weight     weight of this column pair
+     * @param phonWeight weight of the phonetic representation of this column
+     *                   pair
+     */
     public ColumnConfigModel(String id, String type, String indexA,
             String indexB, String renameA, String renameB, double weight,
             double phonWeight) {
@@ -41,6 +67,23 @@ public class ColumnConfigModel implements Serializable {
                 null, 0.0);
     }
 
+    /**
+     * Creates an instance.
+     * 
+     * @param id            id of the column pair
+     * @param type          type of the data
+     * @param indexA        column name in dataset A
+     * @param indexB        column name in dataset B
+     * @param renameA       dataset A column name in output
+     * @param renameB       dataset B column name in output
+     * @param weight        weight of this column pair
+     * @param phonWeight    weight of the phonetic representation of this column
+     *                      pair
+     * @param similarityCol name of the column which will contain the similarity
+     *                      between the values (or {@code null} to prevent the
+     *                      creation of such column)
+     * @param similarityMin minimum similarity
+     */
     public ColumnConfigModel(String id, String type, String indexA,
             String indexB, String renameA, String renameB, double weight,
             double phonWeight, String similarityCol, double similarityMin) {

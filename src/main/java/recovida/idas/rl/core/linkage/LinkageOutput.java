@@ -10,14 +10,22 @@ import recovida.idas.rl.core.config.ConfigModel;
 import recovida.idas.rl.core.record.ColumnRecordModel;
 import recovida.idas.rl.core.record.RecordPairModel;
 
+/**
+ * Generates CSV lines (header and rows) with the linkage result.
+ */
 public class LinkageOutput {
 
     private ConfigModel config;
-    
+
     private Map<String, String> simColumns; // id -> similarity column name
-    
+
     private char decSep;
 
+    /**
+     * Creates an instance with a given configuration.
+     * 
+     * @param config the linkage configuration
+     */
     public LinkageOutput(ConfigModel config) {
         this.config = config;
         this.simColumns = new LinkedHashMap<>();
@@ -39,6 +47,12 @@ public class LinkageOutput {
         return s;
     }
 
+    /**
+     * Converts a record pair into a CSV line.
+     * 
+     * @param recordPair the record pair to be converted
+     * @return a CSV line with the contents of the record pair
+     */
     public String fromRecordPairToCsv(RecordPairModel recordPair) {
         StringBuilder csvResult = new StringBuilder();
         char sep = config.getColumnSeparator().getCharacter();
@@ -64,6 +78,11 @@ public class LinkageOutput {
         return csvResult.toString();
     }
 
+    /**
+     * Generates the CSV header.
+     * 
+     * @return the CSV header
+     */
     public String getCsvHeader() {
         StringBuilder headerResult = new StringBuilder();
         // for each column a add to result

@@ -27,22 +27,25 @@ import recovida.idas.rl.core.record.RecordPairModel;
 import recovida.idas.rl.core.util.Permutation;
 import recovida.idas.rl.core.util.StatusReporter;
 
+// CHECKSTYLE.OFF: Javadoc*
+// CHECKSTYLE.OFF: WriteTag
+
 public class Searching implements Closeable {
-    
+
     private final StandardAnalyzer analyzer = new StandardAnalyzer();
-    
+
     private final Directory index;
-    
+
     private IndexSearcher searcher;
-    
+
     private QueryParser queryParser;
-    
+
     private TopScoreDocCollector collector;
-    
+
     private final ConfigModel config;
-    
+
     private final SearchingUtils seachingUtils;
-    
+
     private final Permutation permutation;
 
     public Searching(ConfigModel config) throws IOException {
@@ -212,9 +215,8 @@ public class Searching implements Closeable {
             tmpType = column.getType();
             tmpRecordColumnRecord = new ColumnRecordModel(tmpId, tmpType,
                     tmpValue);
-            tmpRecordColumnRecord.setGenerated(
-                    column.isGenerated() || tmpType.equals("copy")
-                            && column.getIndexB().equals(""));
+            tmpRecordColumnRecord.setGenerated(column.isGenerated()
+                    || tmpType.equals("copy") && column.getIndexB().equals(""));
             tmpRecordColumns.add(tmpRecordColumnRecord);
         }
         RecordModel recordModel = new RecordModel(tmpRecordColumns);

@@ -6,6 +6,10 @@ import java.util.List;
 
 import recovida.idas.rl.core.record.ColumnRecordModel;
 
+
+// CHECKSTYLE.OFF: Javadoc*
+// CHECKSTYLE.OFF: WriteTag
+
 public class SearchingUtils {
 
     public String addTildeToEachName(String name) {

@@ -13,8 +13,7 @@ Inicialmente, [instale o Java](https://www.java.com/pt-BR/download/manual.jsp)
 na versão 8 ou qualquer versão mais recente.
 
 Faça o download da última versão do IDaS-RL (Core) na página
-[Releases](https://gitlab.com/recovida/idas-rl-gui/-/releases) deste
-repositório.
+[Releases](https://github.com/Recovida/idas-rl-core/releases).
 
 Dentro do diretório (pasta) em que o arquivo `.jar` estiver salvo, crie
 um subdiretório chamado `assets` contendo um arquivo de configurações chamado
